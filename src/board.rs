@@ -1,33 +1,79 @@
 use std::collections::HashMap;
+use std::fmt;
+
+use crate::base_converter;
 
 #[derive(Debug)]
 pub struct Board {
-    spaces: HashMap<String, String>,
+    spaces: HashMap<String, Option<String>>,
+    height: u8,
+    width: u8,
 }
 
 impl Board {
-    pub fn new(height: usize, width: usize) -> Board {
+    pub fn new(height: u8, width: u8) -> Board {
 
         let mut spaces = HashMap::new();
 
-        for h in 0..height {
-            for w in 0..width {
-                let column_name = get_colum_name(w);
-                let id = format!("{}{}", column_name, h+1);
-                spaces.insert(id, String::from(""));
+        for h in 1..(height + 1) {
+            for w in 1..(width + 1) {
+                let column_name = base_converter::get_column_name_from_index(w);
+                let id = format!("{}{}", column_name, h + 1);
+                spaces.insert(id, None);
             }
         }
 
         Board {
-            spaces
+            spaces,
+            height,
+            width,
         }
+    }
+
+    fn print_row(&self, row_num: u8) -> String {
+        let divider = "|";
+
+        let mut r = String::new();
+        r.push_str(divider);
+
+        for col in 1..(self.width + 1) {
+            let key = format!("{}{}", base_converter::get_column_name_from_index(col), row_num);
+
+            let s = self
+                .spaces
+                .get(&key)
+                .unwrap_or(&None)
+                .clone()
+                .unwrap_or(String::from(" "));
+
+            r.push_str(&s);
+            r.push_str(divider);
+        }
+
+        r.to_string()
     }
 }
 
-fn get_colum_name(col_number: usize) -> char {
-    let chars: Vec<char> = "abcdefghijklmnopqrstuvwxyz".chars().collect();
-    let index = col_number % chars.len();
-    chars[index]
+impl fmt::Display for Board {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let pattern = "+-";
+        let mut r = pattern.repeat((self.width + 1) as usize);
+        r.pop();
+
+        let mut response = String::new();
+        response.push_str(&r);
+        response.push_str("\n");
+
+        for h in (1..(self.height+1)).rev() {
+            let row = Board::print_row(&self, h);
+            response.push_str(&row);
+            response.push_str("\n");
+            response.push_str(&r);
+            response.push_str("\n");
+        }
+
+        write!(f, "{}", response)
+    }
 }
 
 #[cfg(test)]
