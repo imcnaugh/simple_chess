@@ -14,8 +14,8 @@ impl Board {
     pub fn new(height: u8, width: u8) -> Board {
         let mut spaces = HashMap::new();
 
-        for h in 1..(height + 1) {
-            for w in 1..(width + 1) {
+        for h in 1..=height {
+            for w in 1..=width {
                 let column_name = base_converter::get_column_name_from_index(w);
                 let id = format!("{}{}", column_name, h);
                 spaces.insert(id.clone(), None);
@@ -35,7 +35,7 @@ impl Board {
         let mut r = String::new();
         r.push_str(divider);
 
-        for col in 1..(self.width + 1) {
+        for col in 1..=self.width {
             let key = format!(
                 "{}{}",
                 base_converter::get_column_name_from_index(col),
@@ -67,7 +67,7 @@ impl fmt::Display for Board {
         response.push_str(&r);
         response.push('\n');
 
-        for h in (1..(self.height + 1)).rev() {
+        for h in (1..=self.height).rev() {
             let row = Board::print_row(self, h);
             response.push_str(&row);
             response.push('\n');
@@ -87,6 +87,14 @@ mod tests {
     fn new_board() {
         let new_board = Board::new(8, 8);
 
-        println!("{:?}", new_board);
+        for col in 'a'..='h' {
+            for row in '1'..='8' {
+                let key = format!("{}{}", col, row);
+                assert!(new_board.spaces.contains_key(&key))
+            }
+        }
+
+        assert!(!new_board.spaces.contains_key("i1"));
+        assert!(!new_board.spaces.contains_key("a9"));
     }
 }
