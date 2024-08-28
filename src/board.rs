@@ -17,8 +17,8 @@ impl Board {
         for h in 1..(height + 1) {
             for w in 1..(width + 1) {
                 let column_name = base_converter::get_column_name_from_index(w);
-                let id = format!("{}{}", column_name, h + 1);
-                spaces.insert(id, None);
+                let id = format!("{}{}", column_name, h);
+                spaces.insert(id.clone(), None);
             }
         }
 
