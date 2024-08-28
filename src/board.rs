@@ -1,11 +1,12 @@
 use std::collections::HashMap;
 use std::fmt;
 
+use crate::{BoardSquare, SquareColor};
+
 use crate::base_converter;
 
-#[derive(Debug)]
 pub struct Board {
-    spaces: HashMap<String, Option<String>>,
+    spaces: HashMap<String, BoardSquare>,
     height: u8,
     width: u8,
 }
@@ -18,7 +19,15 @@ impl Board {
             for w in 1..=width {
                 let column_name = base_converter::get_column_name_from_index(w);
                 let id = format!("{}{}", column_name, h);
-                spaces.insert(id.clone(), None);
+
+                let square_color = if w % 2 == (if h % 2 == 0 {1} else {0}) {
+                    SquareColor::White
+                } else {
+                    SquareColor::Black
+                };
+
+                let square = BoardSquare::new(id.clone(), square_color);
+                spaces.insert(id.clone(), square);
             }
         }
 
@@ -32,19 +41,10 @@ impl Board {
 
 impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let pattern = "+-";
-        let mut r = pattern.repeat((self.width + 1) as usize);
-        r.pop();
-
         let mut response = String::new();
-        response.push_str(&r);
-        response.push('\n');
 
         let print_row = |row_num| -> String {
-            let divider = "|";
-
             let mut r = String::new();
-            r.push_str(divider);
 
             for col in 1..=self.width {
                 let key = format!(
@@ -56,12 +56,10 @@ impl fmt::Display for Board {
                 let s = &self
                     .spaces
                     .get(&key)
-                    .unwrap_or(&None)
-                    .clone()
-                    .unwrap_or(String::from(" "));
+                    .unwrap()
+                    .to_string();
 
                 r.push_str(&s);
-                r.push_str(divider);
             }
 
             r.to_string()
@@ -70,8 +68,6 @@ impl fmt::Display for Board {
         for h in (1..=self.height).rev() {
             let row = print_row(h);
             response.push_str(&row);
-            response.push('\n');
-            response.push_str(&r);
             response.push('\n');
         }
 
