@@ -28,33 +28,6 @@ impl Board {
             width,
         }
     }
-
-    fn print_row(&self, row_num: u8) -> String {
-        let divider = "|";
-
-        let mut r = String::new();
-        r.push_str(divider);
-
-        for col in 1..=self.width {
-            let key = format!(
-                "{}{}",
-                base_converter::get_column_name_from_index(col),
-                row_num
-            );
-
-            let s = self
-                .spaces
-                .get(&key)
-                .unwrap_or(&None)
-                .clone()
-                .unwrap_or(String::from(" "));
-
-            r.push_str(&s);
-            r.push_str(divider);
-        }
-
-        r.to_string()
-    }
 }
 
 impl fmt::Display for Board {
@@ -67,8 +40,35 @@ impl fmt::Display for Board {
         response.push_str(&r);
         response.push('\n');
 
+        let print_row = |row_num| -> String {
+            let divider = "|";
+
+            let mut r = String::new();
+            r.push_str(divider);
+
+            for col in 1..=self.width {
+                let key = format!(
+                    "{}{}",
+                    base_converter::get_column_name_from_index(col),
+                    row_num
+                );
+
+                let s = &self
+                    .spaces
+                    .get(&key)
+                    .unwrap_or(&None)
+                    .clone()
+                    .unwrap_or(String::from(" "));
+
+                r.push_str(&s);
+                r.push_str(divider);
+            }
+
+            r.to_string()
+        };
+
         for h in (1..=self.height).rev() {
-            let row = Board::print_row(self, h);
+            let row = print_row(h);
             response.push_str(&row);
             response.push('\n');
             response.push_str(&r);
