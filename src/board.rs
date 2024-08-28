@@ -12,7 +12,6 @@ pub struct Board {
 
 impl Board {
     pub fn new(height: u8, width: u8) -> Board {
-
         let mut spaces = HashMap::new();
 
         for h in 1..(height + 1) {
@@ -37,7 +36,11 @@ impl Board {
         r.push_str(divider);
 
         for col in 1..(self.width + 1) {
-            let key = format!("{}{}", base_converter::get_column_name_from_index(col), row_num);
+            let key = format!(
+                "{}{}",
+                base_converter::get_column_name_from_index(col),
+                row_num
+            );
 
             let s = self
                 .spaces
@@ -64,7 +67,7 @@ impl fmt::Display for Board {
         response.push_str(&r);
         response.push_str("\n");
 
-        for h in (1..(self.height+1)).rev() {
+        for h in (1..(self.height + 1)).rev() {
             let row = Board::print_row(&self, h);
             response.push_str(&row);
             response.push_str("\n");
@@ -82,7 +85,7 @@ mod tests {
 
     #[test]
     fn new_board() {
-        let new_board = Board::new(8,8);
+        let new_board = Board::new(8, 8);
 
         println!("{:?}", new_board);
     }

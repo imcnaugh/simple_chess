@@ -13,43 +13,43 @@ const NEW_BASE: u8 = 26;
 /// assert_eq!("a", col_name);
 /// ```
 pub fn get_column_name_from_index(mut num: u8) -> String {
-	let mut result = String::new();
+    let mut result = String::new();
 
-	if num == 0 {
-		return String::new();
-	}
+    if num == 0 {
+        return String::new();
+    }
 
-	loop {
-		let remainder = (num - 1) % NEW_BASE;
-		let devisor = (num - 1) / NEW_BASE;
+    loop {
+        let remainder = (num - 1) % NEW_BASE;
+        let devisor = (num - 1) / NEW_BASE;
 
-		result.push((b'a' + remainder) as char);
+        result.push((b'a' + remainder) as char);
 
-		if devisor == 0 {
-			break;
-		}
+        if devisor == 0 {
+            break;
+        }
 
-		num = devisor;
-	}
+        num = devisor;
+    }
 
-	result.chars().rev().collect()
+    result.chars().rev().collect()
 }
 
 #[cfg(test)]
 mod tests {
-	use super::*;
+    use super::*;
 
-	#[test]
-	fn single_char_response() {
-		assert_eq!("a", get_column_name_from_index(1));
-		assert_eq!("b", get_column_name_from_index(2));
-		assert_eq!("z", get_column_name_from_index(26));
-	}
+    #[test]
+    fn single_char_response() {
+        assert_eq!("a", get_column_name_from_index(1));
+        assert_eq!("b", get_column_name_from_index(2));
+        assert_eq!("z", get_column_name_from_index(26));
+    }
 
-	#[test]
-	fn double_char_response() {
-		assert_eq!("aa", get_column_name_from_index(27));
-		assert_eq!("ab", get_column_name_from_index(28));
-		assert_eq!("hq", get_column_name_from_index(225));
-	}
+    #[test]
+    fn double_char_response() {
+        assert_eq!("aa", get_column_name_from_index(27));
+        assert_eq!("ab", get_column_name_from_index(28));
+        assert_eq!("hq", get_column_name_from_index(225));
+    }
 }
