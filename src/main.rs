@@ -1,4 +1,3 @@
-use chess::base_converter;
 use chess::Board;
 
 fn main() {

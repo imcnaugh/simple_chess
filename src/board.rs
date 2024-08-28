@@ -65,14 +65,14 @@ impl fmt::Display for Board {
 
         let mut response = String::new();
         response.push_str(&r);
-        response.push_str("\n");
+        response.push('\n');
 
         for h in (1..(self.height + 1)).rev() {
-            let row = Board::print_row(&self, h);
+            let row = Board::print_row(self, h);
             response.push_str(&row);
-            response.push_str("\n");
+            response.push('\n');
             response.push_str(&r);
-            response.push_str("\n");
+            response.push('\n');
         }
 
         write!(f, "{}", response)
