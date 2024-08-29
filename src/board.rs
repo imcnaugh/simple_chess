@@ -34,47 +34,27 @@ impl Board {
         }
 
         for (id, space) in &spaces {
-            let (col, row) = Self::split_id_to_row_col(&id);
+            let (col, row) = Self::split_id_to_row_col(id);
             let curent_col = base_converter::get_column_name_from_index(col);
             let left_col = base_converter::get_column_name_from_index(col - 1);
             let right_col = base_converter::get_column_name_from_index(col + 1);
             let top_row = row + 1;
             let bottom_row = row - 1;
 
+            let set_space = |id: &str, direction: Direction| {
+                if let Some(neighbor) = spaces.get(id) {
+                    space.borrow_mut().add_neighbor(direction, neighbor);
+                }
+            };
 
-            let north_id = format!("{curent_col}{top_row}");
-            let north_east_id = format!("{right_col}{top_row}");
-            let east_id = format!("{right_col}{row}");
-            let south_east_id = format!("{right_col}{bottom_row}");
-            let south_id = format!("{curent_col}{bottom_row}");
-            let south_west_id = format!("{left_col}{bottom_row}");
-            let west_id = format!("{left_col}{row}");
-            let north_west_id = format!("{left_col}{top_row}");
-
-            if let Some(neighbor) = spaces.get(&north_id) {
-                space.borrow_mut().add_neighbor(Direction::North, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&north_east_id) {
-                space.borrow_mut().add_neighbor(Direction::NorthEast, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&east_id) {
-                space.borrow_mut().add_neighbor(Direction::East, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&south_east_id) {
-                space.borrow_mut().add_neighbor(Direction::SouthEast, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&south_id) {
-                space.borrow_mut().add_neighbor(Direction::South, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&south_west_id) {
-                space.borrow_mut().add_neighbor(Direction::SouthWest, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&west_id) {
-                space.borrow_mut().add_neighbor(Direction::West, neighbor);
-            }
-            if let Some(neighbor) = spaces.get(&north_west_id) {
-                space.borrow_mut().add_neighbor(Direction::NorthWest, neighbor);
-            }
+            set_space(&format!("{curent_col}{top_row}"), Direction::North);
+            set_space(&format!("{right_col}{top_row}"), Direction::NorthEast);
+            set_space(&format!("{right_col}{row}"), Direction::East);
+            set_space(&format!("{right_col}{bottom_row}"), Direction::SouthEast);
+            set_space(&format!("{curent_col}{bottom_row}"), Direction::South);
+            set_space(&format!("{left_col}{bottom_row}"), Direction::SouthWest);
+            set_space(&format!("{left_col}{row}"), Direction::West);
+            set_space(&format!("{left_col}{top_row}"), Direction::NorthWest);
         }
 
         Board {
@@ -91,7 +71,7 @@ impl Board {
         let mut found_digit = false;
 
         for c in s.chars() {
-            if !found_digit && c.is_digit(10) {
+            if !found_digit && c.is_ascii_digit() {
                 found_digit = true;
             }
 
@@ -130,7 +110,7 @@ impl fmt::Display for Board {
                     .borrow()
                     .to_string();
 
-                r.push_str(&s);
+                r.push_str(s);
             }
 
             r.to_string()
