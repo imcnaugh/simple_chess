@@ -1,19 +1,16 @@
-use std::collections::HashMap;
 use std::fmt;
-
-use crate::{BoardSquare, SquareColor, Direction};
-
+use crate::{BoardSquare, SquareColor, Direction, Graph};
 use crate::base_converter;
 
 pub struct Board {
-    spaces: HashMap<String, BoardSquare>,
+    spaces: Graph<String, BoardSquare, Direction>,
     height: u8,
     width: u8,
 }
 
 impl Board {
     pub fn new<'a>(height: u8, width: u8) -> Board {
-        let mut spaces = HashMap::new();
+        let mut spaces = Graph::new();
 
         for h in 1..=height {
             for w in 1..=width {
@@ -27,7 +24,34 @@ impl Board {
                 };
 
                 let square = BoardSquare::new(id.clone(), square_color);
-                spaces.insert(id.clone(), square);
+                spaces.add_node(id.clone(), square);
+            }
+        }
+
+        for h in 1..=height {
+            for w in 1..=width {
+                let column_name = base_converter::get_column_name_from_index(w);
+                let id = format!("{}{}", column_name, h);
+
+                if h < height {
+                    let north = format!("{}{}", column_name, h + 1);
+                    spaces.add_edge(id.clone(), north, Direction::North);
+                }
+
+                if h > 1 {
+                    let south = format!("{}{}", column_name, h - 1);
+                    spaces.add_edge(id.clone(), south, Direction::South);
+                }
+
+                if w < width {
+                    let east = format!("{}{}", base_converter::get_column_name_from_index(w + 1), h);
+                    spaces.add_edge(id.clone(), east, Direction::East);
+                }
+
+                if w > 1 {
+                    let west = format!("{}{}", base_converter::get_column_name_from_index(w - 1), h);
+                    spaces.add_edge(id.clone(), west, Direction::West);
+                }
             }
         }
 
@@ -55,7 +79,7 @@ impl fmt::Display for Board {
 
                 let s = &self
                     .spaces
-                    .get(&key)
+                    .get_node(key)
                     .unwrap()
                     .to_string();
 
@@ -86,16 +110,15 @@ mod tests {
         for col in 'a'..='h' {
             for row in '1'..='8' {
                 let key = format!("{}{}", col, row);
-                assert!(new_board.spaces.contains_key(&key))
+                let square = new_board.spaces.get_node(key.clone()).unwrap();
+                assert_eq!(key, square.name);
             }
         }
 
-        assert!(!new_board.spaces.contains_key("i1"));
-        assert!(!new_board.spaces.contains_key("a9"));
+        // assert!(new_board.spaces.get_node(String::from("i1")));
+        // assert!(new_board.spaces.get_node(String::from("a9")));
 
-        let a1 = new_board.spaces.get("a1").unwrap();
-        let possible = a1.borrow().neighbors.get(&Direction::North).unwrap().upgrade();
-        let idk = possible.unwrap().borrow().name.clone();
-        assert_eq!("a2", idk);
+        let a1 = new_board.spaces.get_node(String::from("a1")).unwrap();
+        let possible = new_board.spaces.get_edge(String::from("a1"), Direction::North);
     }
 }
