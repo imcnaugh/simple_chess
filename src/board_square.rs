@@ -1,13 +1,9 @@
-use std::collections::HashMap;
 use std::fmt;
-use std::rc::{Weak, Rc};
-use std::cell::RefCell;
 
 pub struct BoardSquare {
 	pub name: String,
-	piece: Option<String>,
+	_piece: Option<String>,
 	color: SquareColor,
-	pub neighbors: HashMap<Direction, Weak<RefCell<BoardSquare>>>,
 }
 
 pub enum SquareColor {
@@ -32,14 +28,9 @@ impl BoardSquare {
 	pub fn new(name: String, color: SquareColor) -> BoardSquare {
 		BoardSquare {
 			name,
-			piece: None,
+			_piece: None,
 			color,
-			neighbors: HashMap::new(),
 		}
-	}
-
-	pub fn add_neighbor(&mut self, direction: Direction, square: &Rc<RefCell<BoardSquare>>){
-		self.neighbors.insert(direction, Rc::downgrade(square));
 	}
 }
 
