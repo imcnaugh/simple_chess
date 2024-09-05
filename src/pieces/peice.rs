@@ -4,7 +4,7 @@ pub trait Piece: fmt::Display {
     fn color(&self) -> &PieceColor;
 }
 
-struct Pawn {
+pub(crate) struct Pawn {
     color: PieceColor,
 }
 impl Pawn {
@@ -44,7 +44,7 @@ impl fmt::Display for Rook {
     }
 }
 
-struct Knight {
+pub(crate) struct Knight {
     color: PieceColor,
 }
 impl Knight {
@@ -64,7 +64,7 @@ impl fmt::Display for Knight {
     }
 }
 
-struct Bishop {
+pub(crate) struct Bishop {
     color: PieceColor,
 }
 impl Bishop {
@@ -84,7 +84,7 @@ impl fmt::Display for Bishop {
     }
 }
 
-struct Queen {
+pub(crate) struct Queen {
     color: PieceColor,
 }
 impl Queen {
@@ -104,7 +104,7 @@ impl fmt::Display for Queen {
     }
 }
 
-struct King {
+pub(crate) struct King {
     color: PieceColor,
 }
 impl King {
