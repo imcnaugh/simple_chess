@@ -33,25 +33,21 @@ impl Board {
                 let column_name = base_converter::get_column_name_from_index(w);
                 let id = format!("{}{}", column_name, h);
 
-                if h < height {
-                    let north = format!("{}{}", column_name, h + 1);
-                    spaces.add_edge(id.clone(), north, Direction::North);
-                }
+                let mut add_edge = |from: String, to: String, direction: Direction| {
+                    match spaces.get_node(to.clone()) {
+                        Some(_) => spaces.add_edge(from, to, direction),
+                        None => return,
+                    }
+                };
 
-                if h > 1 {
-                    let south = format!("{}{}", column_name, h - 1);
-                    spaces.add_edge(id.clone(), south, Direction::South);
-                }
-
-                if w < width {
-                    let east = format!("{}{}", base_converter::get_column_name_from_index(w + 1), h);
-                    spaces.add_edge(id.clone(), east, Direction::East);
-                }
-
-                if w > 1 {
-                    let west = format!("{}{}", base_converter::get_column_name_from_index(w - 1), h);
-                    spaces.add_edge(id.clone(), west, Direction::West);
-                }
+                add_edge(id.clone(), format!("{}{}", column_name, h + 1), Direction::North);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w + 1), h + 1), Direction::NorthEast);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w + 1), h), Direction::East);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w + 1), h - 1), Direction::SouthEast);
+                add_edge(id.clone(), format!("{}{}", column_name, h - 1), Direction::South);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w - 1), h - 1), Direction::SouthWest);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w - 1), h), Direction::West);
+                add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w - 1), h + 1), Direction::NorthWest);
             }
         }
 
@@ -115,10 +111,11 @@ mod tests {
             }
         }
 
-        // assert!(new_board.spaces.get_node(String::from("i1")));
-        // assert!(new_board.spaces.get_node(String::from("a9")));
+        assert!(new_board.spaces.get_node(String::from("i1")).is_none());
+        assert!(new_board.spaces.get_node(String::from("a9")).is_none());
 
         let a1 = new_board.spaces.get_node(String::from("a1")).unwrap();
         let possible = new_board.spaces.get_edge(String::from("a1"), Direction::North);
+        assert_eq!(possible, Some(&String::from("a2")));
     }
 }
