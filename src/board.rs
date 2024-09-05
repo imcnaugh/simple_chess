@@ -1,6 +1,7 @@
 use std::fmt;
 use crate::{BoardSquare, SquareColor, Direction, Graph};
 use crate::base_converter;
+use crate::pieces::peice::{Piece, PieceColor, Rook};
 
 pub struct Board {
     spaces: Graph<String, BoardSquare, Direction>,
@@ -50,6 +51,15 @@ impl Board {
                 add_edge(id.clone(), format!("{}{}", base_converter::get_column_name_from_index(w - 1), h + 1), Direction::NorthWest);
             }
         }
+
+        spaces.get_node_mut(String::from("a1"))
+            .unwrap()
+            .set_piece(Box::new(Rook::new(PieceColor::White)));
+
+        spaces.get_node_mut(String::from("h8"))
+            .unwrap()
+            .set_piece(Box::new(Rook::new(PieceColor::Black)));
+        
 
         Board {
             spaces,

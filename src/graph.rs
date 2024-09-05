@@ -25,6 +25,10 @@ impl<K: Clone + Eq + Hash, N, E: Eq + Hash> Graph<K, N, E> {
         self.nodes.get(&key)
     }
 
+    pub fn get_node_mut(&mut self, key: K) -> Option<&mut N> {
+        self.nodes.get_mut(&key)
+    }
+
     pub fn add_edge(&mut self, from: K, to: K, edge: E) {
         self.edges.get_mut(&from).unwrap().insert(edge, to);
     }

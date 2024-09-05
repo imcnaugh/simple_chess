@@ -1,8 +1,9 @@
 use std::fmt;
+use crate::pieces::peice::Piece;
 
 pub struct BoardSquare {
 	pub name: String,
-	_piece: Option<String>,
+	piece: Option<Box<dyn Piece>>,
 	color: SquareColor,
 }
 
@@ -28,16 +29,23 @@ impl BoardSquare {
 	pub fn new(name: String, color: SquareColor) -> BoardSquare {
 		BoardSquare {
 			name,
-			_piece: None,
+			piece: None,
 			color,
 		}
+	}
+
+	pub fn set_piece(&mut self, piece: Box<dyn Piece>) {
+		self.piece = Some(piece);
 	}
 }
 
 impl fmt::Display for BoardSquare {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		let bg_color = self.color.get_bg_color();
-        write!(f, "{}{}{}", bg_color, "   ", "\x1b[0m")
+		match &self.piece {
+			Some(piece) => write!(f, "{}{}{}", bg_color, piece, "\x1b[0m"),
+			None => write!(f, "{}{}{}", bg_color, " ", "\x1b[0m"),
+		}
 	}
 }
 
