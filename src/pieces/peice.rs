@@ -124,7 +124,7 @@ impl fmt::Display for King {
     }
 }
 
-pub(crate) enum PieceColor {
+pub enum PieceColor {
     White,
     Black,
 }
