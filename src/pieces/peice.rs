@@ -2,7 +2,7 @@ use std::fmt;
 
 pub trait Piece: fmt::Display {}
 
-pub(crate) struct Pawn {
+pub struct Pawn {
     color: PieceColor,
 }
 impl Piece for Pawn {}
@@ -18,7 +18,7 @@ impl fmt::Display for Pawn {
     }
 }
 
-pub(crate) struct Rook {
+pub struct Rook {
     color: PieceColor,
 }
 impl Piece for Rook {}
@@ -34,7 +34,7 @@ impl fmt::Display for Rook {
     }
 }
 
-pub(crate) struct Knight {
+pub struct Knight {
     color: PieceColor,
 }
 impl Piece for Knight {}
@@ -50,7 +50,7 @@ impl fmt::Display for Knight {
     }
 }
 
-pub(crate) struct Bishop {
+pub struct Bishop {
     color: PieceColor,
 }
 impl Piece for Bishop {}
@@ -66,7 +66,7 @@ impl fmt::Display for Bishop {
     }
 }
 
-pub(crate) struct Queen {
+pub struct Queen {
     color: PieceColor,
 }
 impl Piece for Queen {}
@@ -82,7 +82,7 @@ impl fmt::Display for Queen {
     }
 }
 
-pub(crate) struct King {
+pub struct King {
     color: PieceColor,
 }
 impl Piece for King {}
