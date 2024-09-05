@@ -60,6 +60,7 @@ impl Board {
             }
         }
 
+        // TODO move this outside of the Board struct
         spaces.get_node_mut(String::from("a1"))
             .unwrap()
             .set_piece(Box::new(Rook::new(PieceColor::White)));

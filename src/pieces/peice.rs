@@ -1,20 +1,14 @@
 use std::fmt;
 
-pub trait Piece: fmt::Display {
-    fn color(&self) -> &PieceColor;
-}
+pub trait Piece: fmt::Display {}
 
 pub(crate) struct Pawn {
     color: PieceColor,
 }
+impl Piece for Pawn {}
 impl Pawn {
     pub fn new(color: PieceColor) -> Pawn {
         Pawn { color }
-    }
-}
-impl Piece for Pawn {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for Pawn {
@@ -27,14 +21,10 @@ impl fmt::Display for Pawn {
 pub(crate) struct Rook {
     color: PieceColor,
 }
+impl Piece for Rook {}
 impl Rook {
     pub fn new(color: PieceColor) -> Rook {
         Rook { color }
-    }
-}
-impl Piece for Rook {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for Rook {
@@ -47,14 +37,10 @@ impl fmt::Display for Rook {
 pub(crate) struct Knight {
     color: PieceColor,
 }
+impl Piece for Knight {}
 impl Knight {
     pub fn new(color: PieceColor) -> Knight {
         Knight { color }
-    }
-}
-impl Piece for Knight {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for Knight {
@@ -67,14 +53,10 @@ impl fmt::Display for Knight {
 pub(crate) struct Bishop {
     color: PieceColor,
 }
+impl Piece for Bishop {}
 impl Bishop {
     pub fn new(color: PieceColor) -> Bishop {
         Bishop { color }
-    }
-}
-impl Piece for Bishop {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for Bishop {
@@ -87,14 +69,10 @@ impl fmt::Display for Bishop {
 pub(crate) struct Queen {
     color: PieceColor,
 }
+impl Piece for Queen {}
 impl Queen {
     pub fn new(color: PieceColor) -> Queen {
         Queen { color }
-    }
-}
-impl Piece for Queen {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for Queen {
@@ -107,14 +85,10 @@ impl fmt::Display for Queen {
 pub(crate) struct King {
     color: PieceColor,
 }
+impl Piece for King {}
 impl King {
     pub fn new(color: PieceColor) -> King {
         King { color }
-    }
-}
-impl Piece for King {
-    fn color(&self) -> &PieceColor {
-        &self.color
     }
 }
 impl fmt::Display for King {

@@ -5,5 +5,5 @@ mod graph;
 mod pieces;
 
 pub use board::Board;
-pub use board_square::{BoardSquare, SquareColor, Direction};
+use board_square::{BoardSquare, SquareColor, Direction};
 pub use graph::Graph;

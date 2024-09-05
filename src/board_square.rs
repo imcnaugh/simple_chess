@@ -2,7 +2,7 @@ use std::fmt;
 use crate::pieces::peice::Piece;
 
 pub struct BoardSquare {
-	pub name: String,
+	_name: String,
 	piece: Option<Box<dyn Piece>>,
 	color: SquareColor,
 }
@@ -28,7 +28,7 @@ pub enum Direction {
 impl BoardSquare {
 	pub fn new(name: String, color: SquareColor) -> BoardSquare {
 		BoardSquare {
-			name,
+			_name: name,
 			piece: None,
 			color,
 		}
