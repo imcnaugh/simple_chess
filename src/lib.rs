@@ -1,9 +1,10 @@
-pub mod base_converter;
+mod base_converter;
 mod board;
 mod board_square;
 mod graph;
-pub mod pieces;
+mod pieces;
+pub mod chess_game;
 
-pub use board::Board;
+use board::Board;
 use board_square::{BoardSquare, SquareColor, Direction};
-pub use graph::Graph;
+use graph::Graph;
