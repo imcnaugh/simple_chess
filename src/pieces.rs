@@ -1,3 +1,2 @@
-pub mod peice;
+pub mod better_piece;
 
-pub use peice::{Bishop, King, Knight, Pawn, PieceColor, Queen, Rook};

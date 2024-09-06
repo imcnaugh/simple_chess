@@ -1,9 +1,9 @@
 use std::fmt;
-use crate::pieces::peice::Piece;
+use crate::pieces::better_piece::Piece;
 
-pub struct BoardSquare {
-	_name: String,
-	piece: Option<Box<dyn Piece>>,
+pub struct BoardSquare<'a> {
+	pub name: String,
+	piece: Option<&'a Piece>,
 	color: SquareColor,
 }
 
@@ -25,21 +25,21 @@ pub enum Direction {
 	NorthWest,
 }
 
-impl BoardSquare {
-	pub fn new(name: String, color: SquareColor) -> BoardSquare {
+impl<'a> BoardSquare<'a> {
+	pub fn new(name: String, color: SquareColor) -> BoardSquare<'a> {
 		BoardSquare {
-			_name: name,
+			name,
 			piece: None,
 			color,
 		}
 	}
 
-	pub fn set_piece(&mut self, piece: Box<dyn Piece>) {
+	pub fn set_piece(&mut self, piece: &'a Piece) {
 		self.piece = Some(piece);
 	}
 }
 
-impl fmt::Display for BoardSquare {
+impl fmt::Display for BoardSquare<'_> {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		let bg_color = self.color.get_bg_color();
 		match &self.piece {

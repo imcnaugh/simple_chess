@@ -2,14 +2,14 @@ use std::fmt;
 use crate::{BoardSquare, SquareColor, Direction, Graph};
 use crate::base_converter;
 
-pub struct Board {
-    pub spaces: Graph<String, BoardSquare, Direction>,
+pub struct Board<'a> {
+    pub spaces: Graph<String, BoardSquare<'a>, Direction>,
     height: u8,
     width: u8,
 }
 
-impl Board {
-    pub fn new<'a>(height: u8, width: u8) -> Board {
+impl Board<'_> {
+    pub fn new<'a>(height: u8, width: u8) -> Board<'a> {
         let mut spaces = Graph::new();
 
         for h in 1..=height {
@@ -59,7 +59,7 @@ impl Board {
     }
 }
 
-impl fmt::Display for Board {
+impl fmt::Display for Board<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut response = String::new();
 
