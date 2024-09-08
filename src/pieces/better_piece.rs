@@ -9,6 +9,7 @@ pub enum ChessPiece {
     Pawn { _has_moved: bool },
 }
 
+#[derive(Clone)]
 pub enum PieceColor {
     White,
     Black,
