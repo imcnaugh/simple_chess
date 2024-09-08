@@ -22,7 +22,7 @@ fn place_pieces_on_board(
     black_pieces: Vec<ChessPiece>,
 ) {
     let mut white_pawns = vec![0, 1, 2, 3, 4, 5, 6, 7].into_iter();
-    let mut black_pawns = vec![0,1,2,3,4,5,6,7].into_iter();
+    let mut black_pawns = vec![0, 1, 2, 3, 4, 5, 6, 7].into_iter();
     let mut white_rooks = vec![0, 7].into_iter();
     let mut black_rooks = vec![0, 7].into_iter();
     let mut white_knights = vec![1, 6].into_iter();
@@ -34,22 +34,22 @@ fn place_pieces_on_board(
         match piece.get_piece_type() {
             PieceType::Pawn => {
                 board.place_piece(piece, white_pawns.next().unwrap(), 1);
-            },
+            }
             PieceType::Rook => {
                 board.place_piece(piece, white_rooks.next().unwrap(), 0);
-            },
+            }
             PieceType::Knight => {
                 board.place_piece(piece, white_knights.next().unwrap(), 0);
-            },
+            }
             PieceType::Bishop => {
                 board.place_piece(piece, white_bishops.next().unwrap(), 0);
-            },
+            }
             PieceType::Queen => {
                 board.place_piece(piece, 3, 0);
-            },
+            }
             PieceType::King => {
                 board.place_piece(piece, 4, 0);
-            },
+            }
         }
     }
 
@@ -57,22 +57,22 @@ fn place_pieces_on_board(
         match piece.get_piece_type() {
             PieceType::Pawn => {
                 board.place_piece(piece, black_pawns.next().unwrap(), 6);
-            },
+            }
             PieceType::Rook => {
                 board.place_piece(piece, black_rooks.next().unwrap(), 7);
-            },
+            }
             PieceType::Knight => {
                 board.place_piece(piece, black_knights.next().unwrap(), 7);
-            },
+            }
             PieceType::Bishop => {
                 board.place_piece(piece, black_bishops.next().unwrap(), 7);
-            },
+            }
             PieceType::Queen => {
                 board.place_piece(piece, 3, 7);
-            },
+            }
             PieceType::King => {
                 board.place_piece(piece, 4, 7);
-            },
+            }
         }
     }
 }

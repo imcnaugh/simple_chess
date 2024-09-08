@@ -26,26 +26,25 @@ impl ChessPiece {
 }
 
 impl PieceType {
-    fn ascii_representation(&self) -> &str {
+    fn get_as_utf_char(&self) -> char {
         match self {
-            PieceType::Pawn => "P",
-            PieceType::Rook => "R",
-            PieceType::Knight => "N",
-            PieceType::Bishop => "B",
-            PieceType::Queen => "Q",
-            PieceType::King => "K",
+            PieceType::Pawn => '♙',
+            PieceType::Rook => '♖',
+            PieceType::Knight => '♘',
+            PieceType::Bishop => '♗',
+            PieceType::Queen => '♕',
+            PieceType::King => '♔',
         }
     }
 }
 
 impl fmt::Display for ChessPiece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(
-            f,
-            "{}{}{}",
-            self.color.ascii_piece_color(),
-            self.piece_type.ascii_representation(),
-            "\x1b[0m"
-        )
+        let mut display_char = self.piece_type.get_as_utf_char();
+        if self.color == Color::Black {
+            display_char = char::from_u32(display_char as u32 + 6).unwrap();
+        }
+
+        write!(f, "{}", display_char,)
     }
 }
