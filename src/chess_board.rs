@@ -1,27 +1,27 @@
 use crate::chess_piece::ChessPiece;
 use std::fmt;
 
-pub struct ChessBoard<'a> {
-    board: [[Option<&'a ChessPiece>; 8]; 8],
+pub struct ChessBoard {
+    board: [[Option<ChessPiece>; 8]; 8],
 }
 
-impl<'a> ChessBoard<'a> {
-    pub fn new() -> ChessBoard<'a> {
+impl ChessBoard {
+    pub fn new() -> ChessBoard {
         ChessBoard {
-            board: [[None; 8]; 8],
+            board: Default::default(),
         }
     }
 
-    pub fn place_piece(&mut self, piece: &'a ChessPiece, x: usize, y: usize) {
+    pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
         self.board[y][x] = Some(piece);
     }
 
-    pub fn remove_piece(&mut self, x: usize, y: usize) -> Option<&ChessPiece> {
+    pub fn remove_piece(&mut self, x: usize, y: usize) -> Option<ChessPiece> {
         self.board[y][x].take()
     }
 }
 
-impl<'a> fmt::Display for ChessBoard<'a> {
+impl fmt::Display for ChessBoard {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();
         board_string.push_str("Printing board!\n");

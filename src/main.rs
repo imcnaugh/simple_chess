@@ -9,18 +9,18 @@ fn main() {
 
     let mut board = ChessBoard::new();
 
-    let mut board = place_pieces_on_board(&mut board, &white_pieces, &black_pieces);
+    place_pieces_on_board(&mut board, white_pieces, black_pieces);
 
-    &board.remove_piece(0, 1);
+    board.remove_piece(0, 1);
 
     println!("{}", &board);
 }
 
-fn place_pieces_on_board<'a>(
-    board: &'a mut ChessBoard<'a>,
-    white_pieces: &'a Vec<ChessPiece>,
-    black_pieces: &'a Vec<ChessPiece>,
-) -> &'a mut ChessBoard<'a> {
+fn place_pieces_on_board(
+    board: &mut ChessBoard,
+    white_pieces: Vec<ChessPiece>,
+    black_pieces: Vec<ChessPiece>,
+) {
     let mut white_pawns = vec![0, 1, 2, 3, 4, 5, 6, 7].into_iter();
     let mut black_pawns = vec![0,1,2,3,4,5,6,7].into_iter();
     let mut white_rooks = vec![0, 7].into_iter();
@@ -75,8 +75,6 @@ fn place_pieces_on_board<'a>(
             },
         }
     }
-
-    board
 }
 
 fn create_piece_set(color: Color) -> Vec<ChessPiece> {
