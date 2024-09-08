@@ -34,6 +34,10 @@ impl<'a> BoardSquare<'a> {
 		}
 	}
 
+	pub fn clear_piece(&mut self) {
+		self.piece = None;
+	}
+
 	pub fn set_piece(&mut self, piece: &'a Piece) {
 		self.piece = Some(piece);
 	}

@@ -1,9 +1,9 @@
 use std::fmt;
 
 pub enum ChessPiece {
-    King,
+    King { _has_moved: bool },
     Queen,
-    Rook,
+    Rook { _has_moved: bool },
     Bishop,
     Knight,
     Pawn { _has_moved: bool },
@@ -15,16 +15,17 @@ pub enum PieceColor {
 }
 
 pub struct Piece {
-    pub(crate) piece: ChessPiece,
-    pub(crate) color: PieceColor,
+    pub piece: ChessPiece,
+    pub color: PieceColor,
+    pub board_square_id: Option<String>,
 }
 
 impl fmt::Display for Piece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let piece = match &self.piece {
-            ChessPiece::King => "♔",
+            ChessPiece::King { _has_moved } => "♔",
             ChessPiece::Queen => "♕",
-            ChessPiece::Rook => "♖",
+            ChessPiece::Rook { _has_moved } => "♖",
             ChessPiece::Bishop => "♗",
             ChessPiece::Knight => "♘",
             ChessPiece::Pawn { _has_moved } => "♙",
