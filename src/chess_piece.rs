@@ -1,5 +1,5 @@
-use std::fmt;
 use crate::Color;
+use std::fmt;
 
 pub enum PieceType {
     Pawn,
@@ -17,10 +17,11 @@ pub struct ChessPiece {
 
 impl ChessPiece {
     pub fn new(color: Color, piece_type: PieceType) -> ChessPiece {
-        ChessPiece {
-            color,
-            piece_type,
-        }
+        ChessPiece { color, piece_type }
+    }
+
+    pub fn get_piece_type(&self) -> &PieceType {
+        &self.piece_type
     }
 }
 
@@ -39,6 +40,12 @@ impl PieceType {
 
 impl fmt::Display for ChessPiece {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}{}{}", self.color.ascii_piece_color(), self.piece_type.ascii_representation(),"\x1b[0m")
+        write!(
+            f,
+            "{}{}{}",
+            self.color.ascii_piece_color(),
+            self.piece_type.ascii_representation(),
+            "\x1b[0m"
+        )
     }
 }
