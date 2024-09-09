@@ -1,6 +1,8 @@
-pub mod chess_board;
-pub mod chess_piece;
+pub mod chess_game;
+
+mod chess_board;
+mod chess_piece;
 mod color;
 
-pub use chess_board::ChessBoard;
-pub use color::Color;
+use chess_board::ChessBoard;
+use color::Color;
