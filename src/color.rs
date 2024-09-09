@@ -7,12 +7,3 @@ pub enum Color {
     White,
     Black,
 }
-
-impl Color {
-    pub fn ascii_square_color(&self) -> &str {
-        match self {
-            Color::White => "\x1b[107m",
-            Color::Black => "\x1b[100m",
-        }
-    }
-}

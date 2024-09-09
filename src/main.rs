@@ -11,7 +11,7 @@ fn main() {
 
     place_pieces_on_board(&mut board, white_pieces, black_pieces);
 
-    board.remove_piece(0, 1);
+    // board.remove_piece(0, 1);
 
     println!("{}", &board);
 }
