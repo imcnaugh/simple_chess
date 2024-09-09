@@ -1,5 +1,7 @@
-use chess::chess_game;
+use chess::ChessGame;
 
 fn main() {
-    chess_game::start_game();
+    let game = ChessGame::new();
+
+    println!("{}", game.board);
 }
