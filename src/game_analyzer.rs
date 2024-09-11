@@ -1,3 +1,4 @@
+use crate::chess_piece::PieceType;
 use crate::color::Color;
 use crate::ChessGame;
 
@@ -33,7 +34,17 @@ fn get_legal_moves(game: ChessGame) -> Vec<String> {
 fn get_pawn_legal_moves(game: ChessGame) -> Vec<String> {
     let mut moves = vec![];
 
-    // for x in game.board
+    for (x, row) in game.board.get_board().iter().enumerate() {
+        for (y, square) in row.iter().enumerate() {
+            if let Some(piece) = square {
+                if piece.get_color() == game.current_turn {
+                    if piece.get_piece_type() == PieceType::Pawn {
+                        // moves.push(format!("Pawn at ({}, {})", x, y));
+                    }
+                }
+            }
+        }
+    }
 
     moves
 }

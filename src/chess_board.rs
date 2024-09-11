@@ -39,6 +39,10 @@ impl ChessBoard {
         board
     }
 
+    pub fn get_board(&self) -> &Vec<Vec<Option<ChessPiece>>> {
+        &self.board
+    }
+
     pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
         self.board[y][x] = Some(piece);
     }
