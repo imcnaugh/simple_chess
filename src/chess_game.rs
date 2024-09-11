@@ -4,6 +4,7 @@ use crate::{ChessBoard, Color};
 pub struct ChessGame {
     pub board: ChessBoard,
     current_turn: Color,
+    turn_number: u32,
 }
 
 impl ChessGame {
@@ -13,6 +14,7 @@ impl ChessGame {
         ChessGame {
             board,
             current_turn: Color::White,
+            turn_number: 1,
         }
     }
 
