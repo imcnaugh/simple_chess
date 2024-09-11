@@ -2,14 +2,32 @@ use crate::chess_piece::ChessPiece;
 use std::fmt;
 
 pub struct ChessBoard {
-    board: [[Option<ChessPiece>; 8]; 8],
+    board: Vec<Vec<Option<ChessPiece>>>,
+    pub width: usize,
+    pub height: usize,
 }
 
 impl ChessBoard {
     pub fn new() -> ChessBoard {
+        let board_width = 8;
+        let board_height = 8;
         ChessBoard {
-            board: Default::default(),
+            board: ChessBoard::generate_board(board_width, board_height),
+            width: board_width,
+            height: board_height,
         }
+    }
+
+    fn generate_board(width: usize, height: usize) -> Vec<Vec<Option<ChessPiece>>> {
+        let mut board = Vec::new();
+        for _ in 0..width {
+            let mut row = Vec::new();
+            for _ in 0..height {
+                row.push(None);
+            }
+            board.push(row);
+        }
+        board
     }
 
     pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {

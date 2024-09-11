@@ -5,6 +5,7 @@ pub struct ChessGame {
     pub board: ChessBoard,
     current_turn: Color,
     turn_number: u32,
+    moves: Vec<String>,
 }
 
 impl ChessGame {
@@ -15,6 +16,7 @@ impl ChessGame {
             board,
             current_turn: Color::White,
             turn_number: 1,
+            moves: vec![],
         }
     }
 
