@@ -8,9 +8,18 @@ pub struct ChessBoard {
 }
 
 impl ChessBoard {
-    pub fn new() -> ChessBoard {
+    pub fn new(width: usize, height: usize) -> ChessBoard {
+        ChessBoard {
+            board: ChessBoard::generate_board(width, height),
+            width,
+            height,
+        }
+    }
+
+    pub fn generate_chess_board() -> ChessBoard {
         let board_width = 8;
         let board_height = 8;
+
         ChessBoard {
             board: ChessBoard::generate_board(board_width, board_height),
             width: board_width,

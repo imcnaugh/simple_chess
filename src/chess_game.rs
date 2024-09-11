@@ -28,7 +28,7 @@ impl ChessGame {
     }
 
     fn create_board_with_starting_position() -> ChessBoard {
-        let mut board = ChessBoard::new();
+        let mut board = ChessBoard::generate_chess_board();
 
         for i in 0..8 {
             board.place_piece(

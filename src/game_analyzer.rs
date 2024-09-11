@@ -16,8 +16,6 @@ struct GameAnalysis {
 /// TODO - Implement this function.
 /// TODO - Return the game state as a GameState enum. as well as any legal moves that can be made.
 pub fn get_game_state(game: ChessGame) -> GameAnalysis {
-
-
     GameAnalysis {
         game_state: GameState::InProgress,
         legal_moves: vec![],
