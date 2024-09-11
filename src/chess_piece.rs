@@ -2,12 +2,12 @@ use crate::Color;
 use std::fmt;
 
 pub enum PieceType {
-    Pawn,
-    Rook,
+    Pawn { has_moved: bool },
+    Rook { has_moved: bool },
     Knight,
     Bishop,
     Queen,
-    King,
+    King { has_moved: bool },
 }
 
 pub struct ChessPiece {
@@ -24,12 +24,12 @@ impl ChessPiece {
 impl PieceType {
     fn get_as_utf_char(&self) -> char {
         match self {
-            PieceType::Pawn => '♙',
-            PieceType::Rook => '♖',
+            PieceType::Pawn { has_moved: _ } => '♙',
+            PieceType::Rook { has_moved: _ } => '♖',
             PieceType::Knight => '♘',
             PieceType::Bishop => '♗',
             PieceType::Queen => '♕',
-            PieceType::King => '♔',
+            PieceType::King { has_moved: _ } => '♔',
         }
     }
 }

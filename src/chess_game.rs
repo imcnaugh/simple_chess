@@ -29,14 +29,38 @@ impl ChessGame {
         let mut board = ChessBoard::new();
 
         for i in 0..8 {
-            board.place_piece(ChessPiece::new(Color::White, PieceType::Pawn), i, 1);
-            board.place_piece(ChessPiece::new(Color::Black, PieceType::Pawn), i, 6);
+            board.place_piece(
+                ChessPiece::new(Color::White, PieceType::Pawn { has_moved: false }),
+                i,
+                1,
+            );
+            board.place_piece(
+                ChessPiece::new(Color::Black, PieceType::Pawn { has_moved: false }),
+                i,
+                6,
+            );
         }
 
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Rook), 0, 0);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Rook), 7, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Rook), 0, 7);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Rook), 7, 7);
+        board.place_piece(
+            ChessPiece::new(Color::White, PieceType::Rook { has_moved: false }),
+            0,
+            0,
+        );
+        board.place_piece(
+            ChessPiece::new(Color::White, PieceType::Rook { has_moved: false }),
+            7,
+            0,
+        );
+        board.place_piece(
+            ChessPiece::new(Color::Black, PieceType::Rook { has_moved: false }),
+            0,
+            7,
+        );
+        board.place_piece(
+            ChessPiece::new(Color::Black, PieceType::Rook { has_moved: false }),
+            7,
+            7,
+        );
         board.place_piece(ChessPiece::new(Color::White, PieceType::Knight), 1, 0);
         board.place_piece(ChessPiece::new(Color::White, PieceType::Knight), 6, 0);
         board.place_piece(ChessPiece::new(Color::Black, PieceType::Knight), 1, 7);
@@ -47,8 +71,16 @@ impl ChessGame {
         board.place_piece(ChessPiece::new(Color::Black, PieceType::Bishop), 5, 7);
         board.place_piece(ChessPiece::new(Color::White, PieceType::Queen), 3, 0);
         board.place_piece(ChessPiece::new(Color::Black, PieceType::Queen), 3, 7);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::King), 4, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::King), 4, 7);
+        board.place_piece(
+            ChessPiece::new(Color::White, PieceType::King { has_moved: false }),
+            4,
+            0,
+        );
+        board.place_piece(
+            ChessPiece::new(Color::Black, PieceType::King { has_moved: false }),
+            4,
+            7,
+        );
 
         board
     }
