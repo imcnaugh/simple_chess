@@ -19,6 +19,14 @@ impl ChessPiece {
     pub fn new(color: Color, piece_type: PieceType) -> ChessPiece {
         ChessPiece { color, piece_type }
     }
+
+    pub fn get_piece_type(&self) -> &PieceType {
+        &self.piece_type
+    }
+
+    pub fn get_color(&self) -> &Color {
+        &self.color
+    }
 }
 
 impl PieceType {
