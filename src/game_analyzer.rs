@@ -1,4 +1,4 @@
-use crate::chess_piece::PieceType;
+use crate::chess_piece::{ChessPiece, PieceType};
 use crate::color::Color;
 use crate::ChessGame;
 
@@ -34,18 +34,29 @@ fn get_legal_moves(game: ChessGame) -> Vec<String> {
 fn get_pawn_legal_moves(game: ChessGame) -> Vec<String> {
     let mut moves = vec![];
 
+    let current_turn = &game.current_turn;
+
     for (x, row) in game.board.get_board().iter().enumerate() {
         for (y, square) in row.iter().enumerate() {
-            if let Some(piece) = square {
-                if let PieceType::Pawn { .. } = piece.get_piece_type() {
-                    if piece.get_color() == &game.current_turn {
-                        println!("Pawn at {}, {}", x, y);
-                    }
+            if let Some(ChessPiece {piece_type: PieceType::Pawn{ .. }, color }) = square {
+                if color == current_turn {
+                    println!("Pawn found at x: {}, y: {}", x, y);
                 }
-
             }
         }
     }
 
     moves
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_pawn_legal_moves() {
+
+        let moves = get_pawn_legal_moves(game);
+
+    }
 }

@@ -3,7 +3,7 @@ use crate::{ChessBoard, Color};
 
 pub struct ChessGame {
     pub board: ChessBoard,
-    pub(crate) current_turn: Color,
+    pub current_turn: Color,
     turn_number: u32,
     moves: Vec<String>,
 }
