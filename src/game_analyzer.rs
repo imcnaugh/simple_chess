@@ -38,7 +38,11 @@ fn get_pawn_legal_moves(game: &ChessGame) -> Vec<String> {
 
     for (x, row) in game.board.get_board().iter().enumerate() {
         for (y, square) in row.iter().enumerate() {
-            if let Some(ChessPiece {piece_type: PieceType::Pawn{ .. }, color }) = square {
+            if let Some(ChessPiece {
+                piece_type: PieceType::Pawn { .. },
+                color,
+            }) = square
+            {
                 if color == current_turn {
                     if color == &Color::White {
                         if y == 1 {

@@ -5,6 +5,7 @@ mod color;
 mod game_analyzer;
 
 use chess_board::ChessBoard;
-use color::Color;
 
 pub use chess_game::ChessGame;
+pub use chess_piece::{ChessPiece, PieceType};
+pub use color::Color;
