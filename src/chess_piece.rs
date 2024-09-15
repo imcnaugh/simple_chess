@@ -1,36 +1,20 @@
 use crate::Color;
 use std::fmt;
 
-/// Enum for the type of chess piece.
+/// # Enum for the type of chess piece.
+///
 /// The pawn, rook, and king have a boolean to track if they have moved.
 #[derive(Debug, PartialEq)]
 pub enum PieceType {
-    /// A pawn piece.
-    ///
-    /// The has_moved boolean is used to track if the pawn can move two spaces for its first move.
     Pawn { has_moved: bool },
-
-    /// A rook piece.
-    ///
-    /// The has_moved boolean is used to track if the rook can castle.
     Rook { has_moved: bool },
-
-    /// A knight piece.
     Knight,
-
-    /// A bishop piece.
     Bishop,
-
-    /// A queen piece.
     Queen,
-
-    /// A king piece.
-    ///
-    /// The has_moved boolean is used to track if the king can castle.
     King { has_moved: bool },
 }
 
-/// Struct for a chess piece.
+/// # Struct for a chess piece.
 pub struct ChessPiece {
     /// The color of the piece.
     pub color: Color,
@@ -70,6 +54,12 @@ impl ChessPiece {
     /// let white_pawn = ChessPiece::new(Color::White, PieceType::Pawn { has_moved: false });
     ///
     /// assert_eq!(white_pawn.get_piece_type(), &PieceType::Pawn { has_moved: false });
+    ///
+    /// if let &PieceType::Pawn { has_moved } = white_pawn.get_piece_type() {
+    ///    println!("This is a pawn, and it has moved: {}", has_moved);
+    /// } else {
+    ///     panic!("Expected a pawn");
+    /// }
     /// ```
     pub fn get_piece_type(&self) -> &PieceType {
         &self.piece_type
@@ -188,7 +178,8 @@ mod tests {
 
     #[test]
     fn has_moved_tests() {
-        let unmoved_white_rook = ChessPiece::new(Color::White, PieceType::Rook { has_moved: false });
+        let unmoved_white_rook =
+            ChessPiece::new(Color::White, PieceType::Rook { has_moved: false });
         let moved_black_king = ChessPiece::new(Color::Black, PieceType::King { has_moved: true });
 
         if let PieceType::Rook { has_moved } = unmoved_white_rook.piece_type {
