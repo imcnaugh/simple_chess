@@ -11,6 +11,9 @@ pub struct ChessBoard {
 }
 
 impl ChessBoard {
+    /// Create a new board of any size,
+    ///
+    /// TODO add validation that width/height are greater then 0
     pub fn new(width: usize, height: usize) -> ChessBoard {
         ChessBoard {
             board: ChessBoard::generate_board(width, height),
