@@ -1,6 +1,9 @@
 use crate::chess_piece::ChessPiece;
 use std::fmt;
 
+/// # Chess Board struct
+///
+/// stores a collection of board squares that may or may not have a single piece on them
 pub struct ChessBoard {
     board: Vec<Vec<Option<ChessPiece>>>,
     pub width: usize,
