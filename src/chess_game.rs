@@ -1,8 +1,8 @@
 use crate::chess_piece::{ChessPiece, PieceType};
-use crate::{ChessBoard, Color};
+use crate::{GameBoard, Color};
 
 pub struct ChessGame {
-    pub board: ChessBoard,
+    pub board: GameBoard,
     pub current_turn: Color,
     turn_number: u32,
     moves: Vec<String>,
@@ -27,8 +27,8 @@ impl ChessGame {
         }
     }
 
-    fn create_board_with_starting_position() -> ChessBoard {
-        let mut board = ChessBoard::generate_chess_board();
+    fn create_board_with_starting_position() -> GameBoard {
+        let mut board = GameBoard::build_chess_board();
 
         for i in 0..8 {
             board.place_piece(

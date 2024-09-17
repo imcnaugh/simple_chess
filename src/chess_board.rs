@@ -1,81 +1,95 @@
 use crate::chess_piece::ChessPiece;
 use std::fmt;
 
-/// # Chess Board struct
-///
-/// stores a collection of board squares that may or may not have a single piece on them
-pub struct ChessBoard {
-    board: Vec<Vec<Option<ChessPiece>>>,
-    pub width: usize,
-    pub height: usize,
+/// # Game Board struct
+/// A struct used to keep track of the spaces of a rectangular game board made up of spaces
+pub struct GameBoard {
+    squares: Vec<Option<ChessPiece>>,
+    width: usize,
+    height: usize,
 }
 
-impl ChessBoard {
+impl GameBoard {
     /// Create a new board of any size,
     ///
-    /// TODO add validation that width/height are greater then 0
-    pub fn new(width: usize, height: usize) -> ChessBoard {
-        ChessBoard {
-            board: ChessBoard::generate_board(width, height),
+    /// # Panics
+    /// The function will panic if either height or width is 0
+    pub fn build(width: usize, height: usize) -> GameBoard {
+        GameBoard {
+            squares: GameBoard::generate_board(width, height),
             width,
             height,
         }
     }
 
-    pub fn generate_chess_board() -> ChessBoard {
+    /// Builds a chess board that is 8 x 8 spaces big
+    pub fn build_chess_board() -> GameBoard {
         let board_width = 8;
         let board_height = 8;
 
-        ChessBoard {
-            board: ChessBoard::generate_board(board_width, board_height),
+        GameBoard {
+            squares: GameBoard::generate_board(board_width, board_height),
             width: board_width,
             height: board_height,
         }
     }
 
-    fn generate_board(width: usize, height: usize) -> Vec<Vec<Option<ChessPiece>>> {
-        let mut board = Vec::new();
-        for _ in 0..width {
-            let mut row = Vec::new();
-            for _ in 0..height {
-                row.push(None);
-            }
-            board.push(row);
+    fn generate_board(width: usize, height: usize) -> Vec<Option<ChessPiece>> {
+        assert!(width > 0 && height > 0);
+
+        let mut spaces = Vec::new();
+
+        for _ in 0 .. width*height {
+            spaces.push(None);
         }
-        board
+
+        spaces
     }
 
-    pub fn get_board(&self) -> &Vec<Vec<Option<ChessPiece>>> {
-        &self.board
+    /// the width of the board
+    pub fn get_width(&self) -> usize {
+        self.width
+    }
+
+    /// the height of the board
+    pub fn get_height(&self) -> usize {
+        self.height
     }
 
     pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
-        self.board[y][x] = Some(piece);
+        if x >= self.width || y >= self.height {
+            panic!("Out of bounds");
+        }
+
+        self.squares[x + y * self.width] = Some(piece);
     }
 
     pub fn remove_piece(&mut self, x: usize, y: usize) -> Option<ChessPiece> {
-        self.board[y][x].take()
+        if x >= self.width || y >= self.height {
+            panic!("Out of bounds");
+        }
+
+        self.squares[x + y * self.width].take()
     }
 }
 
-impl fmt::Display for ChessBoard {
+impl fmt::Display for GameBoard {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();
-        for (x, row) in self.board.iter().enumerate().rev() {
-            for (y, square) in row.iter().enumerate() {
-                let inner_char = match square {
-                    Some(piece) => format!("{}", piece),
-                    None => " ".to_string(),
-                };
-                let square_color = if (x + y) % 2 != 0 {
-                    "\x1b[107m"
-                } else {
-                    "\x1b[100m"
-                };
-                board_string.push_str(format!("{} {} \x1b[0m", square_color, inner_char).as_str());
-            }
-            board_string.push('\n');
+
+        for (index, square) in self.squares.iter().enumerate() {
+            let row = index / self.width;
+            let col = index % self.width;
+
+            let square_color = if (row + col) % 2 != 0 { "\x1b[107m" } else { "\x1b[100m" };
+
+            let inner_char = match square {
+                Some(piece) => format!("{}", piece),
+                None => " ".to_string(),
+            };
+            board_string.push_str(format!("{} {} \x1b[0m", square_color, inner_char).as_str());
         }
+
         write!(f, "{}", board_string)
     }
 }
