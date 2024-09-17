@@ -39,7 +39,7 @@ impl GameBoard {
 
         let mut spaces = Vec::new();
 
-        for _ in 0 .. width*height {
+        for _ in 0..width * height {
             spaces.push(None);
         }
 
@@ -77,17 +77,29 @@ impl fmt::Display for GameBoard {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();
 
-        for (index, square) in self.squares.iter().enumerate() {
-            let row = index / self.width;
-            let col = index % self.width;
+        let mut lines = vec![String::new(); self.get_height()];
 
-            let square_color = if (row + col) % 2 != 0 { "\x1b[107m" } else { "\x1b[100m" };
+        for y in 0..self.get_height() {
+            for x in 0..self.get_width() {
+                let index = (y * self.width) + x;
+                let square_color = if (y + x) % 2 != 0 {
+                    "\x1b[107m"
+                } else {
+                    "\x1b[100m"
+                };
 
-            let inner_char = match square {
-                Some(piece) => format!("{}", piece),
-                None => " ".to_string(),
-            };
-            board_string.push_str(format!("{} {} \x1b[0m", square_color, inner_char).as_str());
+                let inner_char = match &self.squares[index] {
+                    Some(piece) => format!("{}", piece),
+                    None => " ".to_string(),
+                };
+
+                lines[y].push_str(format!("{} {} \x1b[0m", square_color, inner_char).as_str());
+            }
+        }
+
+        for line in lines.iter().rev() {
+            board_string.push_str(line.as_str());
+            board_string.push('\n');
         }
 
         write!(f, "{}", board_string)

@@ -1,5 +1,5 @@
 use crate::chess_piece::{ChessPiece, PieceType};
-use crate::{GameBoard, Color};
+use crate::{Color, GameBoard};
 
 pub struct ChessGame {
     pub board: GameBoard,
