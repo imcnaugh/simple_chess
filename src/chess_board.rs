@@ -56,6 +56,7 @@ impl GameBoard {
         self.height
     }
 
+    /// Places a chess piece to the board
     pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
         if x >= self.width || y >= self.height {
             panic!("Out of bounds");
@@ -64,6 +65,7 @@ impl GameBoard {
         self.squares[x + y * self.width] = Some(piece);
     }
 
+    /// If the square identified has a chess piece, this removes it and returns ownership of that piece
     pub fn remove_piece(&mut self, x: usize, y: usize) -> Option<ChessPiece> {
         if x >= self.width || y >= self.height {
             panic!("Out of bounds");
