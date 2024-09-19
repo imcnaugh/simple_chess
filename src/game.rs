@@ -1,22 +1,31 @@
 use crate::chess_piece::{ChessPiece, PieceType};
 use crate::{Color, GameBoard};
 
-pub struct ChessGame {
+pub struct Game {
     pub board: GameBoard,
     pub current_turn: Color,
     turn_number: u32,
     moves: Vec<String>,
 }
 
-impl ChessGame {
-    pub fn new() -> ChessGame {
-        let board = ChessGame::create_board_with_starting_position();
-
-        ChessGame {
+impl Game {
+    pub fn new_game(board: GameBoard) -> Game {
+        Game {
             board,
             current_turn: Color::White,
             turn_number: 1,
-            moves: vec![],
+            moves: Vec::new(),
+        }
+    }
+
+    pub fn new_chess_game() -> Game {
+        let board = Game::create_board_with_starting_position();
+
+        Game {
+            board,
+            current_turn: Color::White,
+            turn_number: 1,
+            moves: Vec::new(),
         }
     }
 
