@@ -107,3 +107,56 @@ impl fmt::Display for GameBoard {
         write!(f, "{}", board_string)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{Color, PieceType};
+
+    #[test]
+    fn test_build_game_board() {
+        let board = GameBoard::build(10, 10);
+        assert_eq!(board.get_width(), 10);
+        assert_eq!(board.get_height(), 10);
+        for i in 0..100 {
+            assert!(board.squares[i].is_none());
+        }
+    }
+
+    #[test]
+    fn test_build_chess_board() {
+        let board = GameBoard::build_chess_board();
+        assert_eq!(board.get_width(), 8);
+        assert_eq!(board.get_height(), 8);
+    }
+
+    #[test]
+    fn test_place_and_remove_piece() {
+        let mut board = GameBoard::build_chess_board();
+        let piece = ChessPiece::new(Color::White, PieceType::Knight);
+
+        board.place_piece(piece, 0, 0);
+        assert!(board.squares[0].is_some());
+
+        let removed_piece = board.remove_piece(0, 0);
+        assert!(removed_piece.is_some());
+        assert!(board.squares[0].is_none());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_place_piece_out_of_bounds() {
+        let mut board = GameBoard::build_chess_board();
+        let piece = ChessPiece::new(Color::White, PieceType::Knight);
+
+        board.place_piece(piece, 8, 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_remove_piece_out_of_bounds() {
+        let mut board = GameBoard::build_chess_board();
+
+        board.remove_piece(8, 0);
+    }
+}

@@ -12,7 +12,6 @@ pub struct Game {
 }
 
 impl Game {
-
     /// Creates a new where like chess, but can take a custom board
     pub fn new_game(board: GameBoard) -> Game {
         Game {
