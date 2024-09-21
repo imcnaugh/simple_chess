@@ -1,6 +1,9 @@
 use crate::chess_piece::{ChessPiece, PieceType};
 use crate::{Color, GameBoard};
 
+/// # Game
+///
+/// Tracks a board game, typically for chess, but can be extended to modified versions of chess
 pub struct Game {
     pub board: GameBoard,
     pub current_turn: Color,
@@ -9,6 +12,8 @@ pub struct Game {
 }
 
 impl Game {
+
+    /// Creates a new where like chess, but can take a custom board
     pub fn new_game(board: GameBoard) -> Game {
         Game {
             board,
@@ -18,6 +23,7 @@ impl Game {
         }
     }
 
+    /// Creates a chess game and builds a board with the pieces in the starting positions
     pub fn new_chess_game() -> Game {
         let board = Game::create_board_with_starting_position();
 
