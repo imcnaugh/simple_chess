@@ -141,6 +141,9 @@ mod tests {
         let removed_piece = board.remove_piece(0, 0);
         assert!(removed_piece.is_some());
         assert!(board.squares[0].is_none());
+
+        board.place_piece(removed_piece.unwrap(), 0,1);
+        assert!(board.squares[8].is_some());
     }
 
     #[test]
