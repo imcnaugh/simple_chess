@@ -1,5 +1,6 @@
 use crate::chess_piece::ChessPiece;
 use std::fmt;
+use crate::{Color, PieceType};
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
@@ -32,6 +33,49 @@ impl GameBoard {
             width: board_width,
             height: board_height,
         }
+    }
+    
+    pub fn from_string(width: usize, height: usize, s: &str) -> Result<GameBoard, String> {
+        // validate and sanitize string
+        // remove newlines from string
+        let s = s.replace('\n', "");
+        
+        if s.len() != width * height {
+            return Err(format!("expected a string of length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()))
+        }
+        
+        let mut board = GameBoard::build(width, height);
+        
+        for i in width * height {
+            let mut index = 0;
+            for i in 0..height {
+                for j in 0..width {
+                    let piece = match &s[index..index + 1] {
+                        "P" => Some(ChessPiece { color: Color::White, piece_type: PieceType::Pawn }),
+                        "R" => Some(ChessPiece { color: Color::White, piece_type: PieceType::Rook }),
+                        "N" => Some(ChessPiece { color: Color::White, piece_type: PieceType::Knight }),
+                        "B" => Some(ChessPiece { color: Color::White, piece_type: PieceType::Bishop }),
+                        "Q" => Some(ChessPiece { color: Color::White, piece_type: PieceType::Queen }),
+                        "K" => Some(ChessPiece { color: Color::White, piece_type: PieceType::King }),
+                        "p" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::Pawn }),
+                        "r" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::Rook }),
+                        "n" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::Knight }),
+                        "b" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::Bishop }),
+                        "q" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::Queen }),
+                        "k" => Some(ChessPiece { color: Color::Black, piece_type: PieceType::King }),
+                        _ => None,
+                    };
+                    board.squares[i * width + j] = piece;
+                    index += 1;
+                }
+            }
+        }
+        
+        Ok(board)
+    }
+    
+    pub fn chess_board_from_string(s: &str) -> Result<GameBoard, String> {
+        Self::from_string(8, 8, s)
     }
 
     fn generate_board(width: usize, height: usize) -> Vec<Option<ChessPiece>> {
