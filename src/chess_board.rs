@@ -92,6 +92,11 @@ impl GameBoard {
         self.height
     }
 
+    pub fn check_space(&self, x: usize, y: usize) -> &Option<ChessPiece> {
+        let index = x + (y * self.width);
+        &gself.squares[index]
+    }
+
     /// Places a chess piece to the board
     pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
         if x >= self.width || y >= self.height {
