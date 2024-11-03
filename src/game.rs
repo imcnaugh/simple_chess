@@ -17,7 +17,7 @@ pub struct Game {
 
 impl Game {
     /// Creates a new chess game
-    pub fn new_game_chess() -> Game {
+    pub fn new_chess_game() -> Game {
         Game {
             board: GameBoard::build_chess_board(),
             current_turn: Color::White,
@@ -29,7 +29,7 @@ impl Game {
             black_can_castle_long: true,
         }
     }
-    
+
     fn change_turn(&mut self) {
         self.current_turn = match self.current_turn {
             Color::White => Color::Black,

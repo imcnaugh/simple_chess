@@ -62,7 +62,7 @@ impl GameBoard {
     pub fn from_string(width: usize, height: usize, s: &str) -> Result<GameBoard, String> {
         let s = s.replace('\n', "");
 
-        if s.len() < width * height {
+        if s.len() != width * height {
             return Err(format!("expected a string of at lest length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()));
         }
 
@@ -226,5 +226,40 @@ mod tests {
         let mut board = GameBoard::build_chess_board();
 
         board.remove_piece(8, 0);
+    }
+
+    #[test]
+    fn build_board_from_string() {
+        let board_as_string = concat!(
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n"
+        );
+
+        let board = GameBoard::from_string(8, 8, board_as_string);
+
+        assert!(board.is_ok());
+        let game_board = board.unwrap();
+        assert_eq!(game_board.get_width(), 8);
+        assert_eq!(game_board.get_height(), 8);
+
+        for x in 0..8 {
+            for y in 0..8 {
+                let piece = game_board.check_space(x, y);
+                assert!(piece.is_none());
+            }
+        }
+    }
+
+    #[test]
+    fn should_fail() {
+        let board = GameBoard::from_string(8, 8, "");
+
+        assert!(board.is_err());
     }
 }
