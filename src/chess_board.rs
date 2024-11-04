@@ -84,6 +84,15 @@ impl GameBoard {
                 '♚' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
                 _ => None,
             };
+
+            let column = index / width;
+            let row = index % width;
+
+            let column = 0 - column as isize;
+            let column = -column;
+
+            let index = (column  as usize * width) + row;
+
             board.squares[index] = piece;
         }
 
