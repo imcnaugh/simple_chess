@@ -62,8 +62,8 @@ impl GameBoard {
     pub fn from_string(width: usize, height: usize, s: &str) -> Result<GameBoard, String> {
         let s = s.replace('\n', "");
 
-        if s.len() != width * height {
-            return Err(format!("expected a string of at lest length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()));
+        if s.chars().count() != width * height {
+            return Err(format!("expected a string of length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()));
         }
 
         let mut board = GameBoard::build(width, height);
@@ -259,7 +259,19 @@ mod tests {
     #[test]
     fn should_fail() {
         let board = GameBoard::from_string(8, 8, "");
-
         assert!(board.is_err());
+    }
+
+    #[test]
+    fn should_be_able_to_detect_any_piece() {
+        let board_string = concat!(
+        "♜♞♝♛♚♝♞♜\n",
+        "♖♘♗♕♔♗♘♖\n",
+        "♟♙      "
+        );
+
+        let board = GameBoard::from_string(8, 3, board_string).unwrap();
+
+
     }
 }
