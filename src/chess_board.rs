@@ -75,21 +75,21 @@ impl GameBoard {
                 '♘' => Some(ChessPiece::new(Color::White, PieceType::Knight)),
                 '♗' => Some(ChessPiece::new(Color::White, PieceType::Bishop)),
                 '♕' => Some(ChessPiece::new(Color::White, PieceType::Queen)),
-                '♔' => Some(ChessPiece::new(Color::White, PieceType::Knight)),
+                '♔' => Some(ChessPiece::new(Color::White, PieceType::King)),
                 '♟' => Some(ChessPiece::new(Color::Black, PieceType::Pawn)),
                 '♜' => Some(ChessPiece::new(Color::Black, PieceType::Rook)),
                 '♞' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
                 '♝' => Some(ChessPiece::new(Color::Black, PieceType::Bishop)),
                 '♛' => Some(ChessPiece::new(Color::Black, PieceType::Queen)),
-                '♚' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
+                '♚' => Some(ChessPiece::new(Color::Black, PieceType::King)),
                 _ => None,
             };
 
             let column = index / width;
             let row = index % width;
 
-            let column = 0 - column as isize;
-            let column = -column;
+            let column = column as isize - (height - 1) as isize;
+            let column = column.abs();
 
             let index = (column  as usize * width) + row;
 
@@ -303,8 +303,9 @@ mod tests {
 
             assert_eq!(Color::White, white_piece.unwrap().color);
             assert_eq!(Color::Black, black_piece.unwrap().color);
-
         }
 
+        assert!(board.check_space(6, 0).is_none());
+        assert!(board.check_space(6, 1).is_none());
     }
 }
