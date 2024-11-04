@@ -68,23 +68,23 @@ impl GameBoard {
 
         let mut board = GameBoard::build(width, height);
 
-        for i in 0..(width * height) {
-            let piece = match &s[i..i + 1] {
-                "♙" => Some(ChessPiece::new(Color::White, PieceType::Pawn)),
-                "♖" => Some(ChessPiece::new(Color::White, PieceType::Rook)),
-                "♘" => Some(ChessPiece::new(Color::White, PieceType::Knight)),
-                "♗" => Some(ChessPiece::new(Color::White, PieceType::Bishop)),
-                "♕" => Some(ChessPiece::new(Color::White, PieceType::Queen)),
-                "♔" => Some(ChessPiece::new(Color::White, PieceType::Knight)),
-                "♟" => Some(ChessPiece::new(Color::Black, PieceType::Pawn)),
-                "♜" => Some(ChessPiece::new(Color::Black, PieceType::Rook)),
-                "♞" => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
-                "♝" => Some(ChessPiece::new(Color::Black, PieceType::Bishop)),
-                "♛" => Some(ChessPiece::new(Color::Black, PieceType::Queen)),
-                "♚" => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
+        for (index, char) in s.chars().enumerate() {
+            let piece = match char {
+                '♙' => Some(ChessPiece::new(Color::White, PieceType::Pawn)),
+                '♖' => Some(ChessPiece::new(Color::White, PieceType::Rook)),
+                '♘' => Some(ChessPiece::new(Color::White, PieceType::Knight)),
+                '♗' => Some(ChessPiece::new(Color::White, PieceType::Bishop)),
+                '♕' => Some(ChessPiece::new(Color::White, PieceType::Queen)),
+                '♔' => Some(ChessPiece::new(Color::White, PieceType::Knight)),
+                '♟' => Some(ChessPiece::new(Color::Black, PieceType::Pawn)),
+                '♜' => Some(ChessPiece::new(Color::Black, PieceType::Rook)),
+                '♞' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
+                '♝' => Some(ChessPiece::new(Color::Black, PieceType::Bishop)),
+                '♛' => Some(ChessPiece::new(Color::Black, PieceType::Queen)),
+                '♚' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
                 _ => None,
             };
-            board.squares[i] = piece;
+            board.squares[index] = piece;
         }
 
         Ok(board)
@@ -116,9 +116,13 @@ impl GameBoard {
         self.height
     }
 
-    pub fn check_space(&self, x: usize, y: usize) -> &Option<ChessPiece> {
+    pub fn check_space(&self, x: usize, y: usize) -> Option<&ChessPiece> {
         let index = x + (y * self.width);
-        &self.squares[index]
+        let board_square = &self.squares[index];
+        match board_square {
+            Some(piece) => Some(piece),
+            None => None
+        }
     }
 
     /// Places a chess piece to the board
@@ -177,6 +181,7 @@ impl fmt::Display for GameBoard {
 mod tests {
     use super::*;
     use crate::{Color, PieceType};
+    use crate::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 
     #[test]
     fn test_build_game_board() {
@@ -265,13 +270,32 @@ mod tests {
     #[test]
     fn should_be_able_to_detect_any_piece() {
         let board_string = concat!(
-        "♜♞♝♛♚♝♞♜\n",
-        "♖♘♗♕♔♗♘♖\n",
-        "♟♙      "
+        "♜♞♝♛♚♟ \n",
+        "♖♘♗♕♔♙ "
         );
 
-        let board = GameBoard::from_string(8, 3, board_string).unwrap();
+        let board = GameBoard::from_string(7, 2, board_string).unwrap();
 
+        let pieces = vec!(
+            Rook,
+            Knight,
+            Bishop,
+            Queen,
+            King,
+            Pawn
+        );
+
+        for col_index in 0..6 {
+            let white_piece = board.check_space(col_index, 0);
+            let black_piece = board.check_space(col_index, 1);
+
+            assert_eq!(pieces[col_index], white_piece.unwrap().piece_type);
+            assert_eq!(pieces[col_index], black_piece.unwrap().piece_type);
+
+            assert_eq!(Color::White, white_piece.unwrap().color);
+            assert_eq!(Color::Black, black_piece.unwrap().color);
+
+        }
 
     }
 }
