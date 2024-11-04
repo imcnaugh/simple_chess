@@ -91,7 +91,7 @@ impl GameBoard {
             let column = column as isize - (height - 1) as isize;
             let column = column.abs();
 
-            let index = (column  as usize * width) + row;
+            let index = (column as usize * width) + row;
 
             board.squares[index] = piece;
         }
@@ -130,7 +130,7 @@ impl GameBoard {
         let board_square = &self.squares[index];
         match board_square {
             Some(piece) => Some(piece),
-            None => None
+            None => None,
         }
     }
 
@@ -189,8 +189,8 @@ impl fmt::Display for GameBoard {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{Color, PieceType};
     use crate::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+    use crate::{Color, Game, PieceType};
 
     #[test]
     fn test_build_game_board() {
@@ -212,10 +212,12 @@ mod tests {
     #[test]
     fn test_place_and_remove_piece() {
         let mut board = GameBoard::build_chess_board();
-        let piece = ChessPiece::new(Color::White, PieceType::Knight);
+        let piece = ChessPiece::new(Color::White, Knight);
 
         board.place_piece(piece, 0, 0);
         assert!(board.squares[0].is_some());
+        assert_eq!(Knight, board.check_space(0, 0).unwrap().piece_type);
+        assert_eq!(Color::White, board.check_space(0, 0).unwrap().color);
 
         let removed_piece = board.remove_piece(0, 0);
         assert!(removed_piece.is_some());
@@ -223,6 +225,8 @@ mod tests {
 
         board.place_piece(removed_piece.unwrap(), 0, 1);
         assert!(board.squares[8].is_some());
+        assert_eq!(Knight, board.check_space(0, 1).unwrap().piece_type);
+        assert_eq!(Color::White, board.check_space(0, 1).unwrap().color);
     }
 
     #[test]
@@ -278,21 +282,11 @@ mod tests {
 
     #[test]
     fn should_be_able_to_detect_any_piece() {
-        let board_string = concat!(
-        "♜♞♝♛♚♟ \n",
-        "♖♘♗♕♔♙ "
-        );
+        let board_string = concat!("♜♞♝♛♚♟ \n", "♖♘♗♕♔♙ ");
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
 
-        let pieces = vec!(
-            Rook,
-            Knight,
-            Bishop,
-            Queen,
-            King,
-            Pawn
-        );
+        let pieces = vec![Rook, Knight, Bishop, Queen, King, Pawn];
 
         for col_index in 0..6 {
             let white_piece = board.check_space(col_index, 0);
@@ -307,5 +301,80 @@ mod tests {
 
         assert!(board.check_space(6, 0).is_none());
         assert!(board.check_space(6, 1).is_none());
+    }
+
+    #[test]
+    fn builds_starting_position_in_chess() {
+        let board = GameBoard::build_chess_board();
+
+        assert_eq!(8, board.height);
+        assert_eq!(8, board.width);
+
+        let pieces = vec![Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+
+        for col_index in 0..8 {
+            assert_eq!(
+                pieces[col_index],
+                board.check_space(col_index, 0).unwrap().piece_type
+            );
+            assert_eq!(Color::White, board.check_space(col_index, 0).unwrap().color);
+            assert_eq!(
+                pieces[col_index],
+                board.check_space(col_index, 7).unwrap().piece_type
+            );
+            assert_eq!(Color::Black, board.check_space(col_index, 7).unwrap().color);
+
+            assert_eq!(Pawn, board.check_space(col_index, 1).unwrap().piece_type);
+            assert_eq!(Color::White, board.check_space(col_index, 1).unwrap().color);
+            assert_eq!(Pawn, board.check_space(col_index, 6).unwrap().piece_type);
+            assert_eq!(Color::Black, board.check_space(col_index, 6).unwrap().color);
+
+            for empty_row_index in 2..6 {
+                assert!(board.check_space(col_index, empty_row_index).is_none());
+            }
+        }
+    }
+
+    #[test]
+    fn build_starting_position_from_string() {
+        let chess_board_as_string = concat!(
+            "♜♞♝♛♚♝♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "♙♙♙♙♙♙♙♙\n",
+            "♖♘♗♕♔♗♘♖\n"
+        );
+
+        let board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        assert_eq!(8, board.height);
+        assert_eq!(8, board.width);
+
+        let pieces = vec![Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+
+        for col_index in 0..8 {
+            assert_eq!(
+                pieces[col_index],
+                board.check_space(col_index, 0).unwrap().piece_type
+            );
+            assert_eq!(Color::White, board.check_space(col_index, 0).unwrap().color);
+            assert_eq!(
+                pieces[col_index],
+                board.check_space(col_index, 7).unwrap().piece_type
+            );
+            assert_eq!(Color::Black, board.check_space(col_index, 7).unwrap().color);
+
+            assert_eq!(Pawn, board.check_space(col_index, 1).unwrap().piece_type);
+            assert_eq!(Color::White, board.check_space(col_index, 1).unwrap().color);
+            assert_eq!(Pawn, board.check_space(col_index, 6).unwrap().piece_type);
+            assert_eq!(Color::Black, board.check_space(col_index, 6).unwrap().color);
+
+            for empty_row_index in 2..6 {
+                assert!(board.check_space(col_index, empty_row_index).is_none());
+            }
+        }
     }
 }
