@@ -125,8 +125,8 @@ impl GameBoard {
         self.height
     }
 
-    pub fn check_space(&self, x: usize, y: usize) -> Option<&ChessPiece> {
-        let index = x + (y * self.width);
+    pub fn check_space(&self, col: usize, row: usize) -> Option<&ChessPiece> {
+        let index = col + (row * self.width);
         let board_square = &self.squares[index];
         match board_square {
             Some(piece) => Some(piece),

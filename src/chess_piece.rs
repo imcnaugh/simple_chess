@@ -1,5 +1,6 @@
 use crate::Color;
 use std::fmt;
+use crate::chess_board::GameBoard;
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq)]
@@ -72,6 +73,19 @@ impl ChessPiece {
     /// ```
     pub fn get_color(&self) -> &Color {
         &self.color
+    }
+
+
+    pub fn get_legal_moves(&self, col: usize, row: usize, board: &GameBoard) -> Vec<String> {
+        match self.piece_type {
+            PieceType::Pawn => {}
+            PieceType::Rook => {}
+            PieceType::Knight => {}
+            PieceType::Bishop => {}
+            PieceType::Queen => {}
+            PieceType::King => {}
+        }
+        vec![]
     }
 }
 
