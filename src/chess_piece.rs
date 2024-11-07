@@ -79,7 +79,59 @@ impl ChessPiece {
     pub fn get_legal_moves(&self, col: usize, row: usize, board: &GameBoard) -> Vec<String> {
         let mut legal_moves = Vec::new();
         match self.piece_type {
-            PieceType::Pawn => {}
+            PieceType::Pawn => {
+                // TODO add en-passant
+                let one_ahead = match self.color {
+                    Color::White => row + 1,
+                    Color::Black => row - 1,
+                };
+
+                let promotion_row = match self.color {
+                    Color::White => board.get_height(),
+                    Color::Black => 0,
+                };
+
+                if row != promotion_row {
+                    if let None = board.check_space(col, one_ahead) {
+                        legal_moves.push(format!("{}{}", (col as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                        let starting_row = match self.color {
+                            Color::White => 2,
+                            Color::Black => board.get_height() - 2,
+                        };
+
+                        if row == starting_row {
+                            let two_ahead = match self.color {
+                                Color::White => row + 2,
+                                Color::Black => row - 2,
+                            };
+
+                            if two_ahead <= board.get_height() {
+                                if let None = board.check_space(col, two_ahead) {
+                                    legal_moves.push(format!("{}{}", (col as u8 + b'a') as char, (two_ahead as u8 + b'1') as char));
+                                }
+                            }
+                        }
+                    }
+
+                    if col > 0 {
+                        if let Some(piece) =  board.check_space(col - 1, one_ahead) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("x{}{}", ((col - 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                            }
+                        }
+                    }
+
+                    if col < board.get_width() {
+                        if let Some(piece) = board.check_space(col + 1, one_ahead) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("x{}{}", ((col + 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                            }
+                        }
+                    }
+                }
+
+
+            }
             PieceType::Rook => {
                 let directions = [(0, 1), (0, -1), (1, 0), (-1, 0)];
                 for dir in directions.iter() {
@@ -88,7 +140,7 @@ impl ChessPiece {
                     while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
                             }
                             break;
                         }
@@ -98,10 +150,60 @@ impl ChessPiece {
                     }
                 }
             }
-            PieceType::Knight => {}
-            PieceType::Bishop => {}
-            PieceType::Queen => {}
-            PieceType::King => {}
+            PieceType::Knight => {
+                let moves = [(1, 2), (1, -2), (-1, 2), (-1, -2), (2, 1), (2, -1), (-2, 1), (-2, -1)];
+                for mv in moves.iter() {
+                    let x = col as i32 + mv.0;
+                    let y = row as i32 + mv.1;
+                    if x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                        if let Some(piece) = board.check_space(x as usize, y as usize) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                            }
+                        } else {
+                            legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        }
+                    }
+                }
+            }
+            PieceType::Bishop => {
+                let directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)];
+                for dir in directions.iter() {
+                    let mut x = col as i32 + dir.0;
+                    let mut y = row as i32 + dir.1;
+                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                        if let Some(piece) = board.check_space(x as usize, y as usize) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                            }
+                            break;
+                        }
+                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        x += dir.0;
+                        y += dir.1;
+                    }
+                }
+            }
+            PieceType::Queen => {
+                let directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)];
+                for dir in directions.iter() {
+                    let mut x = col as i32 + dir.0;
+                    let mut y = row as i32 + dir.1;
+                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                        if let Some(piece) = board.check_space(x as usize, y as usize) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                            }
+                            break;
+                        }
+                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        x += dir.0;
+                        y += dir.1;
+                    }
+                }
+            }
+            PieceType::King => {
+            }
         }
         legal_moves
     }
@@ -209,6 +311,38 @@ mod tests {
         let rook = board.check_space(0, 1).unwrap();
 
         let moves = rook.get_legal_moves(0, 1, &board);
+
+        println!("{:?}", moves);
+    }
+
+    #[test]
+    fn rook_legal_moves_with_taking() {
+        let board_string = concat!(
+        "♜  ♟   \n",
+        "♘      ");
+
+        let board = GameBoard::from_string(7, 2, board_string).unwrap();
+
+        let rook = board.check_space(0, 1).unwrap();
+
+        let moves = rook.get_legal_moves(0, 1, &board);
+
+        println!("{:?}", moves);
+    }
+
+    #[test]
+    fn more_testing() {
+        let board_string = concat!(
+        "    \n",
+        "♟♟  \n",
+        " ♘♘ \n",
+        "   ♜");
+
+        let board = GameBoard::from_string(4, 4, board_string).unwrap();
+
+        let rook = board.check_space(0, 2).unwrap();
+
+        let moves = rook.get_legal_moves(0, 2, &board);
 
         println!("{:?}", moves);
     }
