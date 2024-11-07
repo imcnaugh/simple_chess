@@ -77,15 +77,33 @@ impl ChessPiece {
 
 
     pub fn get_legal_moves(&self, col: usize, row: usize, board: &GameBoard) -> Vec<String> {
+        let mut legal_moves = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {}
-            PieceType::Rook => {}
+            PieceType::Rook => {
+                let directions = [(0, 1), (0, -1), (1, 0), (-1, 0)];
+                for dir in directions.iter() {
+                    let mut x = col as i32 + dir.0;
+                    let mut y = row as i32 + dir.1;
+                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                        if let Some(piece) = board.check_space(x as usize, y as usize) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                            }
+                            break;
+                        }
+                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        x += dir.0;
+                        y += dir.1;
+                    }
+                }
+            }
             PieceType::Knight => {}
             PieceType::Bishop => {}
             PieceType::Queen => {}
             PieceType::King => {}
         }
-        vec![]
+        legal_moves
     }
 }
 
@@ -180,5 +198,18 @@ mod tests {
         assert_eq!(black_bishop.to_string(), "♝");
         assert_eq!(black_queen.to_string(), "♛");
         assert_eq!(black_king.to_string(), "♚");
+    }
+
+    #[test]
+    fn rook_legal_moves() {
+        let board_string = concat!("♜      \n", "       ");
+
+        let board = GameBoard::from_string(7, 2, board_string).unwrap();
+
+        let rook = board.check_space(0, 1).unwrap();
+
+        let moves = rook.get_legal_moves(0, 1, &board);
+
+        println!("{:?}", moves);
     }
 }
