@@ -1,6 +1,7 @@
 use crate::Color;
 use std::fmt;
 use crate::chess_board::GameBoard;
+use crate::chess_move::ChessMove;
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq)]
@@ -76,8 +77,8 @@ impl ChessPiece {
     }
 
 
-    pub fn get_legal_moves(&self, col: usize, row: usize, board: &GameBoard) -> Vec<String> {
-        let mut legal_moves = Vec::new();
+    pub fn get_legal_moves<'a>(&'a self, col: usize, row: usize, board: &'a GameBoard) -> Vec<ChessMove<'a>> {
+        let mut legal_moves: Vec<ChessMove> = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {
                 // TODO add en-passant
@@ -93,7 +94,12 @@ impl ChessPiece {
 
                 if row != promotion_row {
                     if let None = board.check_space(col, one_ahead) {
-                        legal_moves.push(format!("{}{}", (col as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                        legal_moves.push(ChessMove::build(
+                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                            format!("{}{}", (col as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                            self,
+                            None,
+                        ));
                         let starting_row = match self.color {
                             Color::White => 1,
                             Color::Black => board.get_height() - 2,
@@ -107,7 +113,12 @@ impl ChessPiece {
 
                             if two_ahead <= board.get_height() {
                                 if let None = board.check_space(col, two_ahead) {
-                                    legal_moves.push(format!("{}{}", (col as u8 + b'a') as char, (two_ahead as u8 + b'1') as char));
+                                    legal_moves.push(ChessMove::build(
+                                        format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                        format!("{}{}", (col as u8 + b'a') as char, (two_ahead as u8 + b'1') as char),
+                                        self,
+                                        None,
+                                    ));
                                 }
                             }
                         }
@@ -116,7 +127,12 @@ impl ChessPiece {
                     if col > 0 {
                         if let Some(piece) =  board.check_space(col - 1, one_ahead) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", ((col - 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", ((col - 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                         }
                     }
@@ -124,13 +140,16 @@ impl ChessPiece {
                     if col < board.get_width() {
                         if let Some(piece) = board.check_space(col + 1, one_ahead) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", ((col + 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", ((col + 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                         }
                     }
                 }
-
-
             }
             PieceType::Rook => {
                 let directions = [(0, 1), (0, -1), (1, 0), (-1, 0)];
@@ -140,11 +159,21 @@ impl ChessPiece {
                     while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                             break;
                         }
-                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        legal_moves.push(ChessMove::build(
+                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            self,
+                            None,
+                        ));
                         x += dir.0;
                         y += dir.1;
                     }
@@ -158,10 +187,20 @@ impl ChessPiece {
                     if x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                         } else {
-                            legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                            legal_moves.push(ChessMove::build(
+                                format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                self,
+                                None,
+                            ));
                         }
                     }
                 }
@@ -174,11 +213,21 @@ impl ChessPiece {
                     while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                             break;
                         }
-                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        legal_moves.push(ChessMove::build(
+                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            self,
+                            None,
+                        ));
                         x += dir.0;
                         y += dir.1;
                     }
@@ -192,11 +241,21 @@ impl ChessPiece {
                     while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(format!("x{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                                legal_moves.push(ChessMove::build(
+                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    self,
+                                    Some(piece),
+                                ));
                             }
                             break;
                         }
-                        legal_moves.push(format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char));
+                        legal_moves.push(ChessMove::build(
+                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
+                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            self,
+                            None,
+                        ));
                         x += dir.0;
                         y += dir.1;
                     }
@@ -312,7 +371,9 @@ mod tests {
 
         let moves = rook.get_legal_moves(0, 1, &board);
 
-        println!("{:?}", moves);
+        for m in moves {
+            println!("{}", m);
+        }
     }
 
     #[test]
@@ -327,7 +388,9 @@ mod tests {
 
         let moves = rook.get_legal_moves(0, 1, &board);
 
-        println!("{:?}", moves);
+        for m in moves {
+            println!("{}", m);
+        }
     }
 
     #[test]
@@ -344,6 +407,8 @@ mod tests {
 
         let moves = rook.get_legal_moves(2, 1, &board);
 
-        println!("{:?}", moves);
+        for m in moves {
+            println!("{}", m);
+        }
     }
 }
