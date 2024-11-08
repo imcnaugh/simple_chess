@@ -95,7 +95,7 @@ impl ChessPiece {
                     if let None = board.check_space(col, one_ahead) {
                         legal_moves.push(format!("{}{}", (col as u8 + b'a') as char, (one_ahead as u8 + b'1') as char));
                         let starting_row = match self.color {
-                            Color::White => 2,
+                            Color::White => 1,
                             Color::Black => board.get_height() - 2,
                         };
 
@@ -335,14 +335,14 @@ mod tests {
         let board_string = concat!(
         "    \n",
         "♟♟  \n",
-        " ♘♘ \n",
+        " ♘♙ \n",
         "   ♜");
 
         let board = GameBoard::from_string(4, 4, board_string).unwrap();
 
-        let rook = board.check_space(0, 2).unwrap();
+        let rook = board.check_space(2, 1).unwrap();
 
-        let moves = rook.get_legal_moves(0, 2, &board);
+        let moves = rook.get_legal_moves(2, 1, &board);
 
         println!("{:?}", moves);
     }
