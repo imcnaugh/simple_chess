@@ -121,4 +121,25 @@ mod tests {
             println!("{m}");
         }
     }
+
+    #[test]
+    fn test_legal_moves3() {
+        let chess_board_as_string = concat!(
+        "♜♞♝ ♚♝♞♜\n",
+        "♟♟♟♟♟♟♟♟\n",
+        "        \n",
+        "        \n",
+        "      ♙♛\n",
+        "     ♙  \n",
+        "♙♙♙♙♙  ♙\n",
+        "♖♘♗♕♔♗♘♖\n"
+        );
+        let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let mut game = Game::new_game(game_board, White);
+
+        let moves = get_all_moves(&mut game);
+
+        assert_eq!(0, moves.len());
+    }
 }
