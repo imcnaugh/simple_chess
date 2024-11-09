@@ -153,6 +153,31 @@ impl GameBoard {
     }
 }
 
+impl Clone for GameBoard {
+    fn clone(&self) -> Self {
+        // clone self.squares
+        let squares = self
+            .squares
+            .iter()
+            .map(|s| -> Option<ChessPiece> {
+                match s {
+                    Some(chess_piece) => Some(chess_piece.clone()),
+                    None => None,
+                }
+            }).collect();
+
+        Self{
+            squares,
+            height: self.height,
+            width: self.width
+        }
+    }
+
+    fn clone_from(&mut self, source: &Self) {
+        todo!()
+    }
+}
+
 impl fmt::Display for GameBoard {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();

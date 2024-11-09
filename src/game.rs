@@ -29,6 +29,19 @@ impl Game {
             black_can_castle_long: true,
         }
     }
+    
+    pub fn new_game(board: GameBoard, current_turn: Color) -> Self {
+        Self {
+            board,
+            current_turn,
+            turn_number: 1,
+            moves: Vec::new(),
+            white_can_castle_short: true,
+            white_can_castle_long: true,
+            black_can_castle_short: true,
+            black_can_castle_long: true
+        }
+    }
 
     fn change_turn(&mut self) {
         self.current_turn = match self.current_turn {

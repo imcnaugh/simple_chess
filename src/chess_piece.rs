@@ -4,7 +4,7 @@ use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
 
 /// # Enum for the type of chess piece.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum PieceType {
     Pawn,
     Rook,
@@ -15,6 +15,7 @@ pub enum PieceType {
 }
 
 /// # Struct for a chess piece.
+#[derive(Copy, Clone)]
 pub struct ChessPiece {
     /// The color of the piece.
     pub color: Color,
@@ -262,6 +263,30 @@ impl ChessPiece {
                 }
             }
             PieceType::King => {
+                let moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)];
+                for mv in moves.iter() {
+                    let x = col as i32 + mv.0;
+                    let y = row as i32 + mv.1;
+                    if x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                        if let Some(piece) = board.check_space(x as usize, y as usize) {
+                            if *piece.get_color() != self.color {
+                                legal_moves.push(ChessMove::build(
+                                    (col, row),
+                                    (x as usize, y as usize),
+                                    self,
+                                    Some(piece),
+                                ));
+                            }
+                        } else {
+                            legal_moves.push(ChessMove::build(
+                                (col, row),
+                                (x as usize, y as usize),
+                                self,
+                                None,
+                            ));
+                        }
+                    }
+                }
             }
         }
         legal_moves
