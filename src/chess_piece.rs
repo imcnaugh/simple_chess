@@ -95,8 +95,8 @@ impl ChessPiece {
                 if row != promotion_row {
                     if let None = board.check_space(col, one_ahead) {
                         legal_moves.push(ChessMove::build(
-                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                            format!("{}{}", (col as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                            (col, row),
+                            (col, one_ahead),
                             self,
                             None,
                         ));
@@ -114,8 +114,8 @@ impl ChessPiece {
                             if two_ahead <= board.get_height() {
                                 if let None = board.check_space(col, two_ahead) {
                                     legal_moves.push(ChessMove::build(
-                                        format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                        format!("{}{}", (col as u8 + b'a') as char, (two_ahead as u8 + b'1') as char),
+                                        (col, row),
+                                        (col, two_ahead),
                                         self,
                                         None,
                                     ));
@@ -128,8 +128,8 @@ impl ChessPiece {
                         if let Some(piece) =  board.check_space(col - 1, one_ahead) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", ((col - 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                                    (col, row),
+                                    (col - 1, one_ahead),
                                     self,
                                     Some(piece),
                                 ));
@@ -141,8 +141,8 @@ impl ChessPiece {
                         if let Some(piece) = board.check_space(col + 1, one_ahead) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", ((col + 1) as u8 + b'a') as char, (one_ahead as u8 + b'1') as char),
+                                    (col, row),
+                                    (col + 1, one_ahead),
                                     self,
                                     Some(piece),
                                 ));
@@ -160,8 +160,8 @@ impl ChessPiece {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    (col, row),
+                                    (x as usize, y as usize),
                                     self,
                                     Some(piece),
                                 ));
@@ -169,8 +169,8 @@ impl ChessPiece {
                             break;
                         }
                         legal_moves.push(ChessMove::build(
-                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            (col, row),
+                            (x as usize, y as usize),
                             self,
                             None,
                         ));
@@ -188,16 +188,16 @@ impl ChessPiece {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    (col, row),
+                                    (x as usize, y as usize),
                                     self,
                                     Some(piece),
                                 ));
                             }
                         } else {
                             legal_moves.push(ChessMove::build(
-                                format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                (col, row),
+                                (x as usize, y as usize),
                                 self,
                                 None,
                             ));
@@ -214,8 +214,8 @@ impl ChessPiece {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    (col, row),
+                                    (x as usize, y as usize),
                                     self,
                                     Some(piece),
                                 ));
@@ -223,8 +223,8 @@ impl ChessPiece {
                             break;
                         }
                         legal_moves.push(ChessMove::build(
-                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            (col, row),
+                            (x as usize, y as usize),
                             self,
                             None,
                         ));
@@ -242,8 +242,8 @@ impl ChessPiece {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
-                                    format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                                    format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                                    (col, row),
+                                    (x as usize, y as usize),
                                     self,
                                     Some(piece),
                                 ));
@@ -251,8 +251,8 @@ impl ChessPiece {
                             break;
                         }
                         legal_moves.push(ChessMove::build(
-                            format!("{}{}", (col as u8 + b'a') as char, (row as u8 + b'1') as char),
-                            format!("{}{}", (x as u8 + b'a') as char, (y as u8 + b'1') as char),
+                            (col, row),
+                            (x as usize, y as usize),
                             self,
                             None,
                         ));

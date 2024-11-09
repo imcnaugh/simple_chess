@@ -1,21 +1,23 @@
 use crate::{Color, Game, PieceType};
 use crate::chess_board::GameBoard;
+use crate::chess_move::ChessMove;
 
-pub fn get_legal_moves(game: &Game) {
+fn get_all_moves(game: &mut Game) -> Vec<ChessMove> {
     let current_turn = game.current_turn;
-
-    let mut in_check = false;
+    let mut legal_moves: Vec<ChessMove> = Vec::new();
+    let board = &mut game.board;
 
     for col in 0..8 {
         for row in 0..8 {
-            let piece = game.board.check_space(col, row);
-            if let Some(piece) = piece {
+            if let Some(piece) = board.check_space(col, row) {
                 if piece.color == current_turn {
-                    let moves = piece.get_legal_moves(col, row, &game.board);
+                    let moves = piece.get_legal_moves(col, row, board);
+                    legal_moves.extend(moves);
                 }
             }
         }
     }
+    legal_moves
 }
 
 fn is_color_in_check(board: &GameBoard, color: Color) -> bool {
@@ -52,5 +54,16 @@ mod tests {
         let is_in_check = is_color_in_check(&board, Color::White);
 
         assert_eq!(true, is_in_check)
+    }
+
+    #[test]
+    fn more () {
+        let mut game = Game::new_chess_game();
+
+        let moves = get_all_moves(&mut game);
+
+        for v in moves {
+            println!("{v}");
+        }
     }
 }

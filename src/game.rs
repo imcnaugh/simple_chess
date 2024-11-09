@@ -36,4 +36,8 @@ impl Game {
             Color::Black => Color::White,
         }
     }
+
+    pub fn get_board_mut(&mut self) -> &mut GameBoard {
+        &mut self.board
+    }
 }
