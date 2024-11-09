@@ -107,9 +107,9 @@ mod tests {
         let board = concat!(
         "  ♔  \n",
         "     \n",
+        "♗    \n",
         "     \n",
-        " ♗   \n",
-        "  ♜  ",
+        " ♜♜♜ ",
         );
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
