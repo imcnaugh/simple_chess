@@ -2,8 +2,21 @@ use crate::{Color, Game, PieceType};
 use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
 
-fn get_all_moves(game: &mut Game) -> Vec<ChessMove> {
+fn get_game_state(game: &mut Game) {
+    let moves = get_all_moves(game);
+    
+    if moves.is_empty() {
+        let is_player_in_check = is_color_in_check(&game.board, game.current_turn);
+        
+        if is_player_in_check {
+            // return Checkmate
+        } else {
+            // return stalemate
+        }
+    }
+}
 
+fn get_all_moves(game: &mut Game) -> Vec<ChessMove> {
     let width = game.board.get_width();
     let height = game.board.get_width();
 
