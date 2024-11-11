@@ -1,9 +1,10 @@
 mod chess_board;
+pub mod chess_move;
 mod chess_piece;
 mod color;
 mod game;
-mod game_analyser;
-mod chess_move;
+pub mod game_analyser;
+pub mod game_state;
 
 use chess_board::GameBoard;
 

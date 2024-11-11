@@ -164,12 +164,13 @@ impl Clone for GameBoard {
                     Some(chess_piece) => Some(chess_piece.clone()),
                     None => None,
                 }
-            }).collect();
+            })
+            .collect();
 
-        Self{
+        Self {
             squares,
             height: self.height,
-            width: self.width
+            width: self.width,
         }
     }
 

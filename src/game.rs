@@ -1,5 +1,6 @@
 use crate::chess_piece::{ChessPiece, PieceType};
 use crate::{Color, GameBoard};
+use crate::chess_move::ChessMove;
 
 /// # Game
 ///
@@ -29,7 +30,7 @@ impl Game {
             black_can_castle_long: true,
         }
     }
-    
+
     pub fn new_game(board: GameBoard, current_turn: Color) -> Self {
         Self {
             board,
@@ -39,7 +40,7 @@ impl Game {
             white_can_castle_short: true,
             white_can_castle_long: true,
             black_can_castle_short: true,
-            black_can_castle_long: true
+            black_can_castle_long: true,
         }
     }
 
@@ -52,5 +53,14 @@ impl Game {
 
     pub fn get_board_mut(&mut self) -> &mut GameBoard {
         &mut self.board
+    }
+    
+    pub fn get_board(&self) -> &GameBoard {
+        &self.board
+    }
+    
+    pub fn make_move(&mut self, chess_move: &ChessMove) {
+        self.board.place_piece(*chess_move.piece, chess_move.new_position.0, chess_move.new_position.1);
+        self.board.remove_piece(chess_move.original_position.0, chess_move.original_position.1);
     }
 }

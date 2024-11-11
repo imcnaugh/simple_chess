@@ -14,7 +14,7 @@ impl Color {
     pub fn opposite_color(&self) -> Color {
         match self {
             White => Black,
-            Black => White
+            Black => White,
         }
     }
 }

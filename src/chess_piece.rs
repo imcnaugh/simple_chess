@@ -1,7 +1,7 @@
-use crate::Color;
-use std::fmt;
 use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
+use crate::Color;
+use std::fmt;
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -77,8 +77,12 @@ impl ChessPiece {
         &self.color
     }
 
-
-    pub fn get_legal_moves<'a>(&'a self, col: usize, row: usize, board: &'a GameBoard) -> Vec<ChessMove<'a>> {
+    pub fn get_legal_moves<'a>(
+        &'a self,
+        col: usize,
+        row: usize,
+        board: &'a GameBoard,
+    ) -> Vec<ChessMove<'a>> {
         let mut legal_moves: Vec<ChessMove> = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {
@@ -126,7 +130,7 @@ impl ChessPiece {
                     }
 
                     if col > 0 {
-                        if let Some(piece) =  board.check_space(col - 1, one_ahead) {
+                        if let Some(piece) = board.check_space(col - 1, one_ahead) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
@@ -157,7 +161,11 @@ impl ChessPiece {
                 for dir in directions.iter() {
                     let mut x = col as i32 + dir.0;
                     let mut y = row as i32 + dir.1;
-                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                    while x >= 0
+                        && y >= 0
+                        && x < board.get_width() as i32
+                        && y < board.get_height() as i32
+                    {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
@@ -181,11 +189,24 @@ impl ChessPiece {
                 }
             }
             PieceType::Knight => {
-                let moves = [(1, 2), (1, -2), (-1, 2), (-1, -2), (2, 1), (2, -1), (-2, 1), (-2, -1)];
+                let moves = [
+                    (1, 2),
+                    (1, -2),
+                    (-1, 2),
+                    (-1, -2),
+                    (2, 1),
+                    (2, -1),
+                    (-2, 1),
+                    (-2, -1),
+                ];
                 for mv in moves.iter() {
                     let x = col as i32 + mv.0;
                     let y = row as i32 + mv.1;
-                    if x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                    if x >= 0
+                        && y >= 0
+                        && x < board.get_width() as i32
+                        && y < board.get_height() as i32
+                    {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
@@ -211,7 +232,11 @@ impl ChessPiece {
                 for dir in directions.iter() {
                     let mut x = col as i32 + dir.0;
                     let mut y = row as i32 + dir.1;
-                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                    while x >= 0
+                        && y >= 0
+                        && x < board.get_width() as i32
+                        && y < board.get_height() as i32
+                    {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
@@ -235,11 +260,24 @@ impl ChessPiece {
                 }
             }
             PieceType::Queen => {
-                let directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)];
+                let directions = [
+                    (0, 1),
+                    (0, -1),
+                    (1, 0),
+                    (-1, 0),
+                    (1, 1),
+                    (1, -1),
+                    (-1, 1),
+                    (-1, -1),
+                ];
                 for dir in directions.iter() {
                     let mut x = col as i32 + dir.0;
                     let mut y = row as i32 + dir.1;
-                    while x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                    while x >= 0
+                        && y >= 0
+                        && x < board.get_width() as i32
+                        && y < board.get_height() as i32
+                    {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
@@ -263,11 +301,24 @@ impl ChessPiece {
                 }
             }
             PieceType::King => {
-                let moves = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)];
+                let moves = [
+                    (0, 1),
+                    (0, -1),
+                    (1, 0),
+                    (-1, 0),
+                    (1, 1),
+                    (1, -1),
+                    (-1, 1),
+                    (-1, -1),
+                ];
                 for mv in moves.iter() {
                     let x = col as i32 + mv.0;
                     let y = row as i32 + mv.1;
-                    if x >= 0 && y >= 0 && x < board.get_width() as i32 && y < board.get_height() as i32 {
+                    if x >= 0
+                        && y >= 0
+                        && x < board.get_width() as i32
+                        && y < board.get_height() as i32
+                    {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
@@ -403,9 +454,7 @@ mod tests {
 
     #[test]
     fn rook_legal_moves_with_taking() {
-        let board_string = concat!(
-        "♜  ♟   \n",
-        "♘      ");
+        let board_string = concat!("♜  ♟   \n", "♘      ");
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
 
@@ -420,11 +469,7 @@ mod tests {
 
     #[test]
     fn more_testing() {
-        let board_string = concat!(
-        "    \n",
-        "♟♟  \n",
-        " ♘♙ \n",
-        "   ♜");
+        let board_string = concat!("    \n", "♟♟  \n", " ♘♙ \n", "   ♜");
 
         let board = GameBoard::from_string(4, 4, board_string).unwrap();
 
