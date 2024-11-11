@@ -8,8 +8,8 @@ use crate::chess_move::ChessMove;
 pub struct Game {
     pub board: GameBoard,
     pub current_turn: Color,
-    turn_number: u32,
-    moves: Vec<String>,
+    pub turn_number: u32,
+    moves: Vec<ChessMove>,
     white_can_castle_short: bool,
     white_can_castle_long: bool,
     black_can_castle_short: bool,
@@ -44,23 +44,21 @@ impl Game {
         }
     }
 
-    fn change_turn(&mut self) {
+    pub fn change_turn(&mut self, m: ChessMove) {
         self.current_turn = match self.current_turn {
             Color::White => Color::Black,
             Color::Black => Color::White,
-        }
+        };
+        
+        self.moves.push(m);
+        self.turn_number += 1;
     }
 
     pub fn get_board_mut(&mut self) -> &mut GameBoard {
         &mut self.board
     }
-    
+
     pub fn get_board(&self) -> &GameBoard {
         &self.board
-    }
-    
-    pub fn make_move(&mut self, chess_move: &ChessMove) {
-        self.board.place_piece(*chess_move.piece, chess_move.new_position.0, chess_move.new_position.1);
-        self.board.remove_piece(chess_move.original_position.0, chess_move.original_position.1);
     }
 }

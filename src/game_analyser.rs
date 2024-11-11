@@ -4,7 +4,7 @@ use crate::{Color, Game, PieceType};
 use crate::game_state::GameState;
 use crate::game_state::GameState::{Check, Checkmate, InProgress, Stalemate};
 
-pub fn get_game_state(game: &mut Game) -> (GameState, Vec<ChessMove>) {
+pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
     let is_in_check = is_color_in_check(game.get_board(), game.current_turn);
     let possible_next_moves = get_all_moves(game);
     
@@ -23,13 +23,13 @@ pub fn get_game_state(game: &mut Game) -> (GameState, Vec<ChessMove>) {
     (InProgress, possible_next_moves)
 }
 
-fn get_all_moves(game: &mut Game) -> Vec<ChessMove> {
+fn get_all_moves(game: &Game) -> Vec<ChessMove> {
     let width = game.board.get_width();
     let height = game.board.get_width();
 
     let current_turn = game.current_turn;
     let mut legal_moves: Vec<ChessMove> = Vec::new();
-    let board = game.get_board_mut();
+    let board = game.get_board();
 
     for col in 0..width {
         for row in 0..height {
@@ -37,13 +37,13 @@ fn get_all_moves(game: &mut Game) -> Vec<ChessMove> {
                 if piece.color == current_turn {
                     let moves = piece.get_legal_moves(col, row, board);
 
-                    for m in &moves {
+                    for m in moves {
                         let mut cloned_board = board.clone();
                         cloned_board.remove_piece(m.original_position.0, m.original_position.1);
-                        cloned_board.place_piece(*m.piece, m.new_position.0, m.new_position.1);
+                        cloned_board.place_piece(m.piece, m.new_position.0, m.new_position.1);
 
                         if !is_color_in_check(&cloned_board, current_turn) {
-                            legal_moves.push(*m);
+                            legal_moves.push(m);
                         }
                     }
                 }

@@ -82,7 +82,7 @@ impl ChessPiece {
         col: usize,
         row: usize,
         board: &'a GameBoard,
-    ) -> Vec<ChessMove<'a>> {
+    ) -> Vec<ChessMove> {
         let mut legal_moves: Vec<ChessMove> = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {
@@ -102,7 +102,7 @@ impl ChessPiece {
                         legal_moves.push(ChessMove::build(
                             (col, row),
                             (col, one_ahead),
-                            self,
+                            self.clone(),
                             None,
                         ));
                         let starting_row = match self.color {
@@ -121,7 +121,7 @@ impl ChessPiece {
                                     legal_moves.push(ChessMove::build(
                                         (col, row),
                                         (col, two_ahead),
-                                        self,
+                                        self.clone(),
                                         None,
                                     ));
                                 }
@@ -135,21 +135,21 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (col - 1, one_ahead),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                         }
                     }
 
-                    if col < board.get_width() {
+                    if col < board.get_width() - 1 {
                         if let Some(piece) = board.check_space(col + 1, one_ahead) {
                             if *piece.get_color() != self.color {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (col + 1, one_ahead),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                         }
@@ -171,8 +171,8 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (x as usize, y as usize),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                             break;
@@ -180,7 +180,7 @@ impl ChessPiece {
                         legal_moves.push(ChessMove::build(
                             (col, row),
                             (x as usize, y as usize),
-                            self,
+                            self.clone(),
                             None,
                         ));
                         x += dir.0;
@@ -212,15 +212,15 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (x as usize, y as usize),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                         } else {
                             legal_moves.push(ChessMove::build(
                                 (col, row),
                                 (x as usize, y as usize),
-                                self,
+                                self.clone(),
                                 None,
                             ));
                         }
@@ -242,8 +242,8 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (x as usize, y as usize),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                             break;
@@ -251,7 +251,7 @@ impl ChessPiece {
                         legal_moves.push(ChessMove::build(
                             (col, row),
                             (x as usize, y as usize),
-                            self,
+                            self.clone(),
                             None,
                         ));
                         x += dir.0;
@@ -283,8 +283,8 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (x as usize, y as usize),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                             break;
@@ -292,7 +292,7 @@ impl ChessPiece {
                         legal_moves.push(ChessMove::build(
                             (col, row),
                             (x as usize, y as usize),
-                            self,
+                            self.clone(),
                             None,
                         ));
                         x += dir.0;
@@ -324,15 +324,15 @@ impl ChessPiece {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (x as usize, y as usize),
-                                    self,
-                                    Some(piece),
+                                    self.clone(),
+                                    Some(piece.clone()),
                                 ));
                             }
                         } else {
                             legal_moves.push(ChessMove::build(
                                 (col, row),
                                 (x as usize, y as usize),
-                                self,
+                                self.clone(),
                                 None,
                             ));
                         }
