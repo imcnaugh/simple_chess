@@ -1,10 +1,10 @@
 use std::io::Write;
 use rand::Rng;
 use chess::chess_move::ChessMove;
-use chess::{Color, Game};
+use chess::{Color, Game, PieceType};
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
-use chess::PieceType::{Pawn, Queen};
+use chess::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
 
 fn main() {
     let mut game = Game::new_chess_game();
@@ -46,15 +46,33 @@ fn main() {
             Color::White => print_and_get_next_move(moves),
             Color::Black => pick_random_move(moves),
         };
-        
+
         if next_move.piece.piece_type == Pawn && (next_move.new_position.1 == 0 || next_move.new_position.1 == game.board.get_height()-1) {
-            next_move.piece.piece_type = Queen;
+            let promotion_piece = match game.current_turn {
+                Color::White => promote_pawn_selection(),
+                Color::Black => Queen
+            };
+            next_move.piece.piece_type = promotion_piece;
         }
         game.get_board_mut().place_piece(next_move.piece, next_move.new_position.0, next_move.new_position.1);
         game.get_board_mut().remove_piece(next_move.original_position.0, next_move.original_position.1);
 
         game.change_turn(next_move);
     }
+}
+
+fn promote_pawn_selection() -> PieceType {
+    let options = vec![Bishop, Knight, Rook, Queen];
+    for (index, piece_type) in options.iter().enumerate() {
+        println!("{index}: {:?}", piece_type);
+    }
+
+    let mut i = String::new();
+    std::io::stdin().read_line(&mut i);
+
+    let i: usize = i.trim().parse().expect("Please enter a valid index.");
+
+    options[i]
 }
 
 fn pick_random_move(moves: Vec<ChessMove>) -> ChessMove {
