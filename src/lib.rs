@@ -1,7 +1,7 @@
 mod chess_board;
 pub mod chess_move;
 mod chess_piece;
-mod color;
+pub mod color;
 mod game;
 pub mod game_analyser;
 pub mod game_state;

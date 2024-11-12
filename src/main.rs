@@ -1,6 +1,7 @@
 use std::io::Write;
 use rand::Rng;
-use chess::Game;
+use chess::chess_move::ChessMove;
+use chess::{Color, Game};
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
 use chess::PieceType::{Pawn, Queen};
@@ -41,9 +42,10 @@ fn main() {
             }
         }
 
-        // pick a random move from moves
-        let random_move_index = rand::thread_rng().gen_range(0..moves.len());
-        let mut next_move = moves[random_move_index];
+        let mut next_move = match game.current_turn {
+            Color::White => print_and_get_next_move(moves),
+            Color::Black => pick_random_move(moves),
+        };
 
         println!("{next_move}");
         if next_move.piece.piece_type == Pawn && (next_move.new_position.1 == 0 || next_move.new_position.1 == game.board.get_height()-1) {
@@ -54,10 +56,26 @@ fn main() {
         game.get_board_mut().remove_piece(next_move.original_position.0, next_move.original_position.1);
 
         game.change_turn(next_move);
-
-        // wait 1 second
-        std::thread::sleep(std::time::Duration::from_secs(1));
     }
+}
+
+fn pick_random_move(moves: Vec<ChessMove>) -> ChessMove {
+    let random_move_index = rand::thread_rng().gen_range(0..moves.len());
+    moves[random_move_index]
+}
+
+fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
+    for (index, m) in moves.iter().enumerate() {
+        println!("{index}: {m}");
+    }
+
+    // wait for the user to press the enter key
+    let mut i = String::new();
+    std::io::stdin().read_line(&mut i);
+
+    let i: usize = i.trim().parse().expect("Please enter a valid index.");
+
+    moves[i]
 }
 
 fn clear_console() {
