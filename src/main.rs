@@ -27,11 +27,14 @@ fn main() {
                 //     println!("{m}");
                 // }
             }
-            InProgress => {
-                println!("Game is in progress");
-                // for m in &moves {
-                //     println!("{m}");
-                // }
+            InProgress => {},
+            InsufficientMaterial => {
+                println!("Game is over due to Insufficient Material in {} moves", game.turn_number);
+                break;
+            },
+            FiftyMoveRule => {
+                println!("Game ends in draw by 50 move rule at move {}", game.turn_number);
+                break;
             }
         }
 
@@ -47,14 +50,8 @@ fn main() {
         game.get_board_mut().place_piece(next_move.piece, next_move.new_position.0, next_move.new_position.1);
         game.get_board_mut().remove_piece(next_move.original_position.0, next_move.original_position.1);
 
-
         println!("{}", game.board);
 
         game.change_turn(next_move);
-        
-        if game.turn_number > 400 {
-            println!("game went over 400 moves");
-            break;
-        }
     }
 }

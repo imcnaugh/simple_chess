@@ -5,4 +5,6 @@ pub enum GameState {
     Check,
     Checkmate,
     Stalemate,
+    InsufficientMaterial,
+    FiftyMoveRule,
 }
