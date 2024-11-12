@@ -190,7 +190,8 @@ impl fmt::Display for GameBoard {
             for x in 0..self.get_width() {
                 let index = (y * self.width) + x;
                 let square_color = if (y + x) % 2 != 0 {
-                    "\x1b[107m"
+                    // "\x1b[107m"
+                    ""
                 } else {
                     "\x1b[100m"
                 };

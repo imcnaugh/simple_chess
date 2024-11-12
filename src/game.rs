@@ -52,18 +52,18 @@ impl Game {
         if self.current_turn == Black {
             self.turn_number += 1;
         }
-        
+
         if m.takes.is_some() {
             self.fifty_move_rule_counter = 0;
         } else {
             self.fifty_move_rule_counter += 1;
         }
-        
+
         self.current_turn = match self.current_turn {
             White => Black,
             Black => White,
         };
-        
+
         self.moves.push(m);
     }
 
@@ -75,6 +75,10 @@ impl Game {
         &self.board
     }
     
+    pub fn get_moves(&self) -> &Vec<ChessMove> {
+        &self.moves
+    }
+
     pub fn can_trigger_fifty_move_rule(&self) -> bool {
         self.fifty_move_rule_counter >= 100
     }

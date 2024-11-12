@@ -4,7 +4,7 @@ use crate::{ChessPiece, Color, Game, PieceType};
 use crate::Color::White;
 use crate::game_state::GameState;
 use crate::game_state::GameState::{Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate};
-use crate::PieceType::{Bishop, King, Knight};
+use crate::PieceType::{Bishop, King, Knight, Pawn};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
     let is_in_check = is_color_in_check(game.get_board(), game.current_turn);
@@ -107,6 +107,8 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
             }
         }
     }
+    
+    
     legal_moves
 }
 
