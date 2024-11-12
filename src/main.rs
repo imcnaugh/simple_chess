@@ -46,10 +46,8 @@ fn main() {
             Color::White => print_and_get_next_move(moves),
             Color::Black => pick_random_move(moves),
         };
-
-        println!("{next_move}");
+        
         if next_move.piece.piece_type == Pawn && (next_move.new_position.1 == 0 || next_move.new_position.1 == game.board.get_height()-1) {
-            println!("Pawn promotes to a queen");
             next_move.piece.piece_type = Queen;
         }
         game.get_board_mut().place_piece(next_move.piece, next_move.new_position.0, next_move.new_position.1);
