@@ -7,7 +7,7 @@ use crate::game_state::GameState::{Check, Checkmate, FiftyMoveRule, InProgress, 
 use crate::PieceType::{Bishop, King, Knight, Pawn};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
-    let is_in_check = is_color_in_check(game.get_board(), game.current_turn);
+    let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
     let possible_next_moves = get_all_moves(game);
     
     if possible_next_moves.is_empty() {
@@ -42,7 +42,7 @@ pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
     if is_insufficient_material(active_white_pieces) && is_insufficient_material(active_black_pieces) {
         return (InsufficientMaterial, possible_next_moves)
     }
-    
+
     if game.can_trigger_fifty_move_rule() {
         return (FiftyMoveRule, possible_next_moves)
     }
@@ -92,14 +92,14 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
         for row in 0..height {
             if let Some(piece) = board.check_space(col, row) {
                 if piece.color == current_turn {
-                    let moves = piece.get_legal_moves(col, row, board);
+                    let moves = piece.get_legal_moves(col, row, board, game.get_moves().last());
 
                     for m in moves {
                         let mut cloned_board = board.clone();
                         cloned_board.remove_piece(m.original_position.0, m.original_position.1);
                         cloned_board.place_piece(m.piece, m.new_position.0, m.new_position.1);
 
-                        if !is_color_in_check(&cloned_board, current_turn) {
+                        if !is_color_in_check(&cloned_board, current_turn, game.get_moves().last()) {
                             legal_moves.push(m);
                         }
                     }
@@ -107,22 +107,22 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
             }
         }
     }
-    
-    
+
+
     legal_moves
 }
 
-fn is_color_in_check(board: &GameBoard, color: Color) -> bool {
+fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMove>) -> bool {
     let opposite_color = color.opposite_color();
 
     for col in 0..board.get_width() {
         for row in 0..board.get_height() {
             if let Some(piece) = board.check_space(col, row) {
                 if piece.color == opposite_color {
-                    let moves = piece.get_legal_moves(col, row, board);
+                    let moves = piece.get_legal_moves(col, row, board, last_move);
                     for mov in moves {
                         if let Some(takes_piece) = mov.takes {
-                            if takes_piece.get_piece_type() == &PieceType::King
+                            if takes_piece.get_piece_type() == &King
                                 && takes_piece.get_color() == &color
                             {
                                 return true;
@@ -145,7 +145,7 @@ mod tests {
     #[test]
     fn idk() {
         let board = GameBoard::from_string(2, 2, concat!(" ♛\n", "♔ ",)).unwrap();
-        let is_in_check = is_color_in_check(&board, Color::White);
+        let is_in_check = is_color_in_check(&board, Color::White, None);
 
         assert_eq!(true, is_in_check)
     }
@@ -234,5 +234,45 @@ mod tests {
         assert_eq!(7, only_move.new_position.1);
 
         println!("{only_move}");
+    }
+
+    #[test]
+    fn test_en_passant() {
+        let chess_board_as_string = concat!(
+        "  ♚\n",
+        "   \n",
+        "   \n",
+        "   \n",
+        " ♙ \n",
+        " ♔ "
+        );
+        let game_board = GameBoard::from_string(3, 6, chess_board_as_string).unwrap();
+
+        let mut game = Game::new_game(game_board, White);
+
+        println!("This is the board\n{}", game.get_board());
+
+        let (_, next_moves) = get_game_state(&game);
+
+        for m in &next_moves {
+            println!("{m}");
+        }
+
+        let move_pawn_to_b4 = *next_moves.iter().find(|p| p.new_position.0 == 1 && p.new_position.1 == 3).unwrap();
+        game.get_board_mut().remove_piece(move_pawn_to_b4.original_position.0, move_pawn_to_b4.original_position.1);
+        game.get_board_mut().place_piece(move_pawn_to_b4.piece, move_pawn_to_b4.new_position.0, move_pawn_to_b4.new_position.1);
+
+        game.change_turn(move_pawn_to_b4);
+
+        println!("{}", game.get_board());
+        let (state, moves) = get_game_state(&game);
+
+        println!("{:?}", state);
+
+        for m in &moves {
+            println!("{m}");
+        }
+
+        assert_eq!(3, moves.len());
     }
 }

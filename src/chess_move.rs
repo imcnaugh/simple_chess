@@ -7,6 +7,7 @@ pub struct ChessMove {
     pub new_position: (usize, usize),
     pub piece: ChessPiece,
     pub takes: Option<ChessPiece>,
+    pub taken_piece_position: Option<(usize, usize)>
 }
 
 impl ChessMove {
@@ -15,12 +16,14 @@ impl ChessMove {
         new_pos: (usize, usize),
         piece: ChessPiece,
         takes: Option<ChessPiece>,
+        taken_piece_position: Option<(usize, usize)>,
     ) -> Self {
         ChessMove {
             original_position: original_pos,
             new_position: new_pos,
             piece,
             takes,
+            taken_piece_position,
         }
     }
 }

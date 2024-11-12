@@ -14,6 +14,9 @@ fn main() {
 
         clear_console();
         println!("{}", game.get_board());
+        if let Some(last_move) = game.get_moves().last() {
+            println!("{last_move}");
+        }
 
         match state {
             Checkmate => {
@@ -54,6 +57,11 @@ fn main() {
             };
             next_move.piece.piece_type = promotion_piece;
         }
+        
+        if let Some((taken_col, taken_row)) = next_move.taken_piece_position {
+            game.get_board_mut().remove_piece(taken_col, taken_row);
+        }
+        
         game.get_board_mut().place_piece(next_move.piece, next_move.new_position.0, next_move.new_position.1);
         game.get_board_mut().remove_piece(next_move.original_position.0, next_move.original_position.1);
 

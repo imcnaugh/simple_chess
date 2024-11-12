@@ -1,5 +1,6 @@
 use crate::Color;
 
+#[derive(Debug)]
 pub enum GameState {
     InProgress,
     Check,

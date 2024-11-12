@@ -2,6 +2,7 @@ use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
 use crate::Color;
 use std::fmt;
+use crate::PieceType::Pawn;
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -82,11 +83,11 @@ impl ChessPiece {
         col: usize,
         row: usize,
         board: &'a GameBoard,
+        last_move: Option<&ChessMove>,
     ) -> Vec<ChessMove> {
         let mut legal_moves: Vec<ChessMove> = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {
-                // TODO add en-passant
                 let one_ahead = match self.color {
                     Color::White => row + 1,
                     Color::Black => row - 1,
@@ -103,6 +104,7 @@ impl ChessPiece {
                             (col, row),
                             (col, one_ahead),
                             self.clone(),
+                            None,
                             None,
                         ));
                         let starting_row = match self.color {
@@ -123,6 +125,7 @@ impl ChessPiece {
                                         (col, two_ahead),
                                         self.clone(),
                                         None,
+                                        None,
                                     ));
                                 }
                             }
@@ -137,6 +140,20 @@ impl ChessPiece {
                                     (col - 1, one_ahead),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((col - 1, one_ahead)),
+                                ));
+                            }
+                        }
+
+                        // En Passant
+                        if let Some(last_move) = last_move {
+                            if last_move.piece.piece_type == Pawn && last_move.new_position.0 == (col - 1) && last_move.new_position.1 == row && (last_move.new_position.1 as isize - last_move.original_position.1 as isize).abs() == 2 {
+                                legal_moves.push(ChessMove::build(
+                                    (col, row),
+                                    (col - 1, one_ahead),
+                                    self.clone(),
+                                    Some(last_move.piece),
+                                    Some((col - 1, row)),
                                 ));
                             }
                         }
@@ -150,6 +167,20 @@ impl ChessPiece {
                                     (col + 1, one_ahead),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((col + 1, one_ahead)),
+                                ));
+                            }
+                        }
+
+                        // En Passant
+                        if let Some(last_move) = last_move {
+                            if last_move.piece.piece_type == Pawn && last_move.new_position.0 == (col + 1) && last_move.new_position.1 == row && (last_move.new_position.1 as isize - last_move.original_position.1 as isize).abs() == 2 {
+                                legal_moves.push(ChessMove::build(
+                                    (col, row),
+                                    (col + 1, one_ahead),
+                                    self.clone(),
+                                    Some(last_move.piece),
+                                    Some((col + 1, row)),
                                 ));
                             }
                         }
@@ -173,6 +204,7 @@ impl ChessPiece {
                                     (x as usize, y as usize),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((x as usize, y as usize)),
                                 ));
                             }
                             break;
@@ -181,6 +213,7 @@ impl ChessPiece {
                             (col, row),
                             (x as usize, y as usize),
                             self.clone(),
+                            None,
                             None,
                         ));
                         x += dir.0;
@@ -214,6 +247,7 @@ impl ChessPiece {
                                     (x as usize, y as usize),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((x as usize, y as usize)),
                                 ));
                             }
                         } else {
@@ -221,6 +255,7 @@ impl ChessPiece {
                                 (col, row),
                                 (x as usize, y as usize),
                                 self.clone(),
+                                None,
                                 None,
                             ));
                         }
@@ -244,6 +279,7 @@ impl ChessPiece {
                                     (x as usize, y as usize),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((x as usize, y as usize)),
                                 ));
                             }
                             break;
@@ -252,6 +288,7 @@ impl ChessPiece {
                             (col, row),
                             (x as usize, y as usize),
                             self.clone(),
+                            None,
                             None,
                         ));
                         x += dir.0;
@@ -285,6 +322,7 @@ impl ChessPiece {
                                     (x as usize, y as usize),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((x as usize, y as usize)),
                                 ));
                             }
                             break;
@@ -293,6 +331,7 @@ impl ChessPiece {
                             (col, row),
                             (x as usize, y as usize),
                             self.clone(),
+                            None,
                             None,
                         ));
                         x += dir.0;
@@ -326,6 +365,7 @@ impl ChessPiece {
                                     (x as usize, y as usize),
                                     self.clone(),
                                     Some(piece.clone()),
+                                    Some((x as usize, y as usize)),
                                 ));
                             }
                         } else {
@@ -333,6 +373,7 @@ impl ChessPiece {
                                 (col, row),
                                 (x as usize, y as usize),
                                 self.clone(),
+                                None,
                                 None,
                             ));
                         }
@@ -445,7 +486,7 @@ mod tests {
 
         let rook = board.check_space(0, 1).unwrap();
 
-        let moves = rook.get_legal_moves(0, 1, &board);
+        let moves = rook.get_legal_moves(0, 1, &board, None);
 
         for m in moves {
             println!("{}", m);
@@ -460,7 +501,7 @@ mod tests {
 
         let rook = board.check_space(0, 1).unwrap();
 
-        let moves = rook.get_legal_moves(0, 1, &board);
+        let moves = rook.get_legal_moves(0, 1, &board, None);
 
         for m in moves {
             println!("{}", m);
@@ -475,7 +516,7 @@ mod tests {
 
         let rook = board.check_space(2, 1).unwrap();
 
-        let moves = rook.get_legal_moves(2, 1, &board);
+        let moves = rook.get_legal_moves(2, 1, &board, None);
 
         for m in moves {
             println!("{}", m);
