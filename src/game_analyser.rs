@@ -82,7 +82,7 @@ fn is_insufficient_material(pieces: Vec<&ChessPiece>) -> bool {
 
 fn get_all_moves(game: &Game) -> Vec<ChessMove> {
     let width = game.board.get_width();
-    let height = game.board.get_width();
+    let height = game.board.get_height();
 
     let current_turn = game.current_turn;
     let mut legal_moves: Vec<ChessMove> = Vec::new();
@@ -96,6 +96,9 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
 
                     for m in moves {
                         let mut cloned_board = board.clone();
+                        if let Some(taken_position) = m.taken_piece_position {
+                            cloned_board.remove_piece(taken_position.0, taken_position.1);
+                        }
                         cloned_board.remove_piece(m.original_position.0, m.original_position.1);
                         cloned_board.place_piece(m.piece, m.new_position.0, m.new_position.1);
 
@@ -239,14 +242,13 @@ mod tests {
     #[test]
     fn test_en_passant() {
         let chess_board_as_string = concat!(
-        "  ♚\n",
-        "   \n",
-        "   \n",
-        "   \n",
-        " ♙ \n",
-        " ♔ "
+        "♚ \n",
+        "♟ \n",
+        "  \n",
+        " ♙\n",
+        " ♔"
         );
-        let game_board = GameBoard::from_string(3, 6, chess_board_as_string).unwrap();
+        let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);
 
@@ -259,6 +261,45 @@ mod tests {
         }
 
         let move_pawn_to_b4 = *next_moves.iter().find(|p| p.new_position.0 == 1 && p.new_position.1 == 3).unwrap();
+        game.get_board_mut().remove_piece(move_pawn_to_b4.original_position.0, move_pawn_to_b4.original_position.1);
+        game.get_board_mut().place_piece(move_pawn_to_b4.piece, move_pawn_to_b4.new_position.0, move_pawn_to_b4.new_position.1);
+
+        game.change_turn(move_pawn_to_b4);
+
+        println!("{}", game.get_board());
+        let (state, moves) = get_game_state(&game);
+
+        println!("{:?}", state);
+
+        for m in &moves {
+            println!("{m}");
+        }
+
+        assert_eq!(3, moves.len());
+    }
+
+    #[test]
+    fn test_en_passant2() {
+        let chess_board_as_string = concat!(
+        " ♚\n",
+        " ♟\n",
+        "  \n",
+        "♙ \n",
+        " ♔"
+        );
+        let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
+
+        let mut game = Game::new_game(game_board, White);
+
+        println!("This is the board\n{}", game.get_board());
+
+        let (_, next_moves) = get_game_state(&game);
+
+        for m in &next_moves {
+            println!("{m}");
+        }
+
+        let move_pawn_to_b4 = *next_moves.iter().find(|p| p.new_position.0 == 0 && p.new_position.1 == 3).unwrap();
         game.get_board_mut().remove_piece(move_pawn_to_b4.original_position.0, move_pawn_to_b4.original_position.1);
         game.get_board_mut().place_piece(move_pawn_to_b4.piece, move_pawn_to_b4.new_position.0, move_pawn_to_b4.new_position.1);
 
