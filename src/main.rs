@@ -1,10 +1,10 @@
-use std::io::Write;
-use rand::Rng;
 use chess::chess_move::ChessMove;
-use chess::{Color, Game, PieceType};
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
 use chess::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
+use chess::{Color, Game, PieceType};
+use rand::Rng;
+use std::io::Write;
 
 fn main() {
     let mut game = Game::new_chess_game();
@@ -20,7 +20,11 @@ fn main() {
 
         match state {
             Checkmate => {
-                println!("Game ends in Checkmate {:?} wins in {} moves", game.current_turn.opposite_color(), game.turn_number);
+                println!(
+                    "Game ends in Checkmate {:?} wins in {} moves",
+                    game.current_turn.opposite_color(),
+                    game.turn_number
+                );
                 break;
             }
             Stalemate => {
@@ -34,13 +38,19 @@ fn main() {
                 // for m in &moves {
                 //     println!("{m}");
                 // }
-            },
+            }
             InsufficientMaterial => {
-                println!("Game is over due to Insufficient Material in {} moves", game.turn_number);
+                println!(
+                    "Game is over due to Insufficient Material in {} moves",
+                    game.turn_number
+                );
                 break;
-            },
+            }
             FiftyMoveRule => {
-                println!("Game ends in draw by 50 move rule at move {}", game.turn_number);
+                println!(
+                    "Game ends in draw by 50 move rule at move {}",
+                    game.turn_number
+                );
                 break;
             }
         }
@@ -50,20 +60,28 @@ fn main() {
             Color::Black => pick_random_move(moves),
         };
 
-        if next_move.piece.piece_type == Pawn && (next_move.new_position.1 == 0 || next_move.new_position.1 == game.board.get_height()-1) {
+        if next_move.piece.piece_type == Pawn
+            && (next_move.new_position.1 == 0
+                || next_move.new_position.1 == game.board.get_height() - 1)
+        {
             let promotion_piece = match game.current_turn {
                 Color::White => promote_pawn_selection(),
-                Color::Black => Queen
+                Color::Black => Queen,
             };
             next_move.piece.piece_type = promotion_piece;
         }
-        
+
         if let Some((taken_col, taken_row)) = next_move.taken_piece_position {
             game.get_board_mut().remove_piece(taken_col, taken_row);
         }
-        
-        game.get_board_mut().place_piece(next_move.piece, next_move.new_position.0, next_move.new_position.1);
-        game.get_board_mut().remove_piece(next_move.original_position.0, next_move.original_position.1);
+
+        game.get_board_mut().place_piece(
+            next_move.piece,
+            next_move.new_position.0,
+            next_move.new_position.1,
+        );
+        game.get_board_mut()
+            .remove_piece(next_move.original_position.0, next_move.original_position.1);
 
         game.change_turn(next_move);
     }

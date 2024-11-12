@@ -1,7 +1,7 @@
-use crate::chess_piece::{ChessPiece, PieceType};
-use crate::{Color, GameBoard};
 use crate::chess_move::ChessMove;
+use crate::chess_piece::{ChessPiece, PieceType};
 use crate::Color::{Black, White};
+use crate::{Color, GameBoard};
 
 /// # Game
 ///
@@ -74,7 +74,7 @@ impl Game {
     pub fn get_board(&self) -> &GameBoard {
         &self.board
     }
-    
+
     pub fn get_moves(&self) -> &Vec<ChessMove> {
         &self.moves
     }

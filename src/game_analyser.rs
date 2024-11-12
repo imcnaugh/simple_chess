@@ -1,15 +1,18 @@
 use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
-use crate::{ChessPiece, Color, Game, PieceType};
-use crate::Color::White;
 use crate::game_state::GameState;
-use crate::game_state::GameState::{Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate};
+use crate::game_state::GameState::{
+    Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
+};
+use crate::Color::White;
 use crate::PieceType::{Bishop, King, Knight, Pawn};
+use crate::{ChessPiece, Color, Game, PieceType};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
-    let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
+    let is_in_check =
+        is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
     let possible_next_moves = get_all_moves(game);
-    
+
     if possible_next_moves.is_empty() {
         return if is_in_check {
             (Checkmate, possible_next_moves)
@@ -19,15 +22,14 @@ pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
     }
 
     if is_in_check {
-        return (Check, possible_next_moves)
+        return (Check, possible_next_moves);
     }
-
 
     let mut active_white_pieces = Vec::new();
     let mut active_black_pieces = Vec::new();
 
     for col in 0..game.get_board().get_width() {
-        for row in 0..game.get_board().get_height(){
+        for row in 0..game.get_board().get_height() {
             let piece = game.get_board().check_space(col, row);
             if let Some(piece) = piece {
                 if piece.color == White {
@@ -39,17 +41,18 @@ pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
         }
     }
 
-    if is_insufficient_material(active_white_pieces) && is_insufficient_material(active_black_pieces) {
-        return (InsufficientMaterial, possible_next_moves)
+    if is_insufficient_material(active_white_pieces)
+        && is_insufficient_material(active_black_pieces)
+    {
+        return (InsufficientMaterial, possible_next_moves);
     }
 
     if game.can_trigger_fifty_move_rule() {
-        return (FiftyMoveRule, possible_next_moves)
+        return (FiftyMoveRule, possible_next_moves);
     }
 
     (InProgress, possible_next_moves)
 }
-
 
 fn is_insufficient_material(pieces: Vec<&ChessPiece>) -> bool {
     let king_count = pieces.iter().filter(|p| p.piece_type == King).count();
@@ -58,7 +61,7 @@ fn is_insufficient_material(pieces: Vec<&ChessPiece>) -> bool {
     let other_count = pieces.len() - knight_count - bishop_count - king_count;
 
     if other_count > 0 {
-        return false
+        return false;
     }
 
     if king_count == 0 {
@@ -66,15 +69,15 @@ fn is_insufficient_material(pieces: Vec<&ChessPiece>) -> bool {
     }
 
     if bishop_count == 0 && knight_count == 0 {
-        return true
+        return true;
     }
 
     if bishop_count == 1 && knight_count == 0 {
-        return true
+        return true;
     }
 
     if bishop_count == 0 && knight_count == 1 {
-        return true
+        return true;
     }
 
     false
@@ -102,7 +105,8 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
                         cloned_board.remove_piece(m.original_position.0, m.original_position.1);
                         cloned_board.place_piece(m.piece, m.new_position.0, m.new_position.1);
 
-                        if !is_color_in_check(&cloned_board, current_turn, game.get_moves().last()) {
+                        if !is_color_in_check(&cloned_board, current_turn, game.get_moves().last())
+                        {
                             legal_moves.push(m);
                         }
                     }
@@ -110,7 +114,6 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
             }
         }
     }
-
 
     legal_moves
 }
@@ -216,14 +219,14 @@ mod tests {
     #[test]
     fn forced_move() {
         let chess_board_as_string = concat!(
-        "  ♚♜    \n",
-        "♟♟♟ ♘   \n",
-        "  ♝   ♟ \n",
-        "    ♙♟  \n",
-        " ♙    ♙♜\n",
-        "♙   ♔  ♙\n",
-        "  ♙     \n",
-        "   ♖   ♖\n"
+            "  ♚♜    \n",
+            "♟♟♟ ♘   \n",
+            "  ♝   ♟ \n",
+            "    ♙♟  \n",
+            " ♙    ♙♜\n",
+            "♙   ♔  ♙\n",
+            "  ♙     \n",
+            "   ♖   ♖\n"
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
@@ -241,13 +244,7 @@ mod tests {
 
     #[test]
     fn test_en_passant() {
-        let chess_board_as_string = concat!(
-        "♚ \n",
-        "♟ \n",
-        "  \n",
-        " ♙\n",
-        " ♔"
-        );
+        let chess_board_as_string = concat!("♚ \n", "♟ \n", "  \n", " ♙\n", " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);
@@ -260,9 +257,19 @@ mod tests {
             println!("{m}");
         }
 
-        let move_pawn_to_b4 = *next_moves.iter().find(|p| p.new_position.0 == 1 && p.new_position.1 == 3).unwrap();
-        game.get_board_mut().remove_piece(move_pawn_to_b4.original_position.0, move_pawn_to_b4.original_position.1);
-        game.get_board_mut().place_piece(move_pawn_to_b4.piece, move_pawn_to_b4.new_position.0, move_pawn_to_b4.new_position.1);
+        let move_pawn_to_b4 = *next_moves
+            .iter()
+            .find(|p| p.new_position.0 == 1 && p.new_position.1 == 3)
+            .unwrap();
+        game.get_board_mut().remove_piece(
+            move_pawn_to_b4.original_position.0,
+            move_pawn_to_b4.original_position.1,
+        );
+        game.get_board_mut().place_piece(
+            move_pawn_to_b4.piece,
+            move_pawn_to_b4.new_position.0,
+            move_pawn_to_b4.new_position.1,
+        );
 
         game.change_turn(move_pawn_to_b4);
 
@@ -280,13 +287,7 @@ mod tests {
 
     #[test]
     fn test_en_passant2() {
-        let chess_board_as_string = concat!(
-        " ♚\n",
-        " ♟\n",
-        "  \n",
-        "♙ \n",
-        " ♔"
-        );
+        let chess_board_as_string = concat!(" ♚\n", " ♟\n", "  \n", "♙ \n", " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);
@@ -299,9 +300,19 @@ mod tests {
             println!("{m}");
         }
 
-        let move_pawn_to_b4 = *next_moves.iter().find(|p| p.new_position.0 == 0 && p.new_position.1 == 3).unwrap();
-        game.get_board_mut().remove_piece(move_pawn_to_b4.original_position.0, move_pawn_to_b4.original_position.1);
-        game.get_board_mut().place_piece(move_pawn_to_b4.piece, move_pawn_to_b4.new_position.0, move_pawn_to_b4.new_position.1);
+        let move_pawn_to_b4 = *next_moves
+            .iter()
+            .find(|p| p.new_position.0 == 0 && p.new_position.1 == 3)
+            .unwrap();
+        game.get_board_mut().remove_piece(
+            move_pawn_to_b4.original_position.0,
+            move_pawn_to_b4.original_position.1,
+        );
+        game.get_board_mut().place_piece(
+            move_pawn_to_b4.piece,
+            move_pawn_to_b4.new_position.0,
+            move_pawn_to_b4.new_position.1,
+        );
 
         game.change_turn(move_pawn_to_b4);
 

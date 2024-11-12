@@ -135,8 +135,7 @@ impl GameBoard {
     }
 
     /// Places a chess piece to the board
-    pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize
-    ) {
+    pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
         if x >= self.width || y >= self.height {
             panic!("Out of bounds");
         }

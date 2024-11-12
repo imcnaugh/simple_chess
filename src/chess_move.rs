@@ -7,7 +7,7 @@ pub struct ChessMove {
     pub new_position: (usize, usize),
     pub piece: ChessPiece,
     pub takes: Option<ChessPiece>,
-    pub taken_piece_position: Option<(usize, usize)>
+    pub taken_piece_position: Option<(usize, usize)>,
 }
 
 impl ChessMove {

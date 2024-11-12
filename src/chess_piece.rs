@@ -1,8 +1,8 @@
 use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
 use crate::Color;
-use std::fmt;
 use crate::PieceType::Pawn;
+use std::fmt;
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -147,7 +147,14 @@ impl ChessPiece {
 
                         // En Passant
                         if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn && last_move.new_position.0 == (col - 1) && last_move.new_position.1 == row && (last_move.new_position.1 as isize - last_move.original_position.1 as isize).abs() == 2 {
+                            if last_move.piece.piece_type == Pawn
+                                && last_move.new_position.0 == (col - 1)
+                                && last_move.new_position.1 == row
+                                && (last_move.new_position.1 as isize
+                                    - last_move.original_position.1 as isize)
+                                    .abs()
+                                    == 2
+                            {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (col - 1, one_ahead),
@@ -174,7 +181,14 @@ impl ChessPiece {
 
                         // En Passant
                         if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn && last_move.new_position.0 == (col + 1) && last_move.new_position.1 == row && (last_move.new_position.1 as isize - last_move.original_position.1 as isize).abs() == 2 {
+                            if last_move.piece.piece_type == Pawn
+                                && last_move.new_position.0 == (col + 1)
+                                && last_move.new_position.1 == row
+                                && (last_move.new_position.1 as isize
+                                    - last_move.original_position.1 as isize)
+                                    .abs()
+                                    == 2
+                            {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (col + 1, one_ahead),
