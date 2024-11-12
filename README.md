@@ -1,7 +1,6 @@
 # Rust Chess
 
 ## TODO
- - Add En Passant
  - Add castling
  - End game by repetition
  - Chess notation for moves
