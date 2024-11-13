@@ -305,7 +305,7 @@ mod tests {
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
 
-        let pieces = vec![Rook, Knight, Bishop, Queen, King, Pawn];
+        let pieces = [Rook, Knight, Bishop, Queen, King, Pawn];
 
         for col_index in 0..6 {
             let white_piece = board.check_space(col_index, 0);
@@ -329,7 +329,7 @@ mod tests {
         assert_eq!(8, board.height);
         assert_eq!(8, board.width);
 
-        let pieces = vec![Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+        let pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
 
         for col_index in 0..8 {
             assert_eq!(
@@ -372,7 +372,7 @@ mod tests {
         assert_eq!(8, board.height);
         assert_eq!(8, board.width);
 
-        let pieces = vec![Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+        let pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
 
         for col_index in 0..8 {
             assert_eq!(

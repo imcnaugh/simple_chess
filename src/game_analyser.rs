@@ -153,7 +153,7 @@ mod tests {
         let board = GameBoard::from_string(2, 2, concat!(" ♛\n", "♔ ",)).unwrap();
         let is_in_check = is_color_in_check(&board, Color::White, None);
 
-        assert_eq!(true, is_in_check)
+        assert!(is_in_check)
     }
 
     #[test]
