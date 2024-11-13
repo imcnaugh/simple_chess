@@ -175,7 +175,9 @@ impl Clone for GameBoard {
     }
 
     fn clone_from(&mut self, source: &Self) {
-        todo!()
+        self.squares = source.squares.clone();
+        self.width = source.width;
+        self.height = source.height;
     }
 }
 

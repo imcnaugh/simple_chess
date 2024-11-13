@@ -5,8 +5,8 @@ use crate::game_state::GameState::{
     Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
 };
 use crate::Color::White;
-use crate::PieceType::{Bishop, King, Knight, Pawn};
-use crate::{ChessPiece, Color, Game, PieceType};
+use crate::PieceType::{Bishop, King, Knight};
+use crate::{ChessPiece, Color, Game};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
     let is_in_check =

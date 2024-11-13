@@ -1,5 +1,4 @@
 use crate::chess_move::ChessMove;
-use crate::chess_piece::{ChessPiece, PieceType};
 use crate::Color::{Black, White};
 use crate::{Color, GameBoard};
 
