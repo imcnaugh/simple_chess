@@ -34,22 +34,24 @@ impl Display for ChessMove {
             Some(piece) => format!("Takes the {:?} {:?} at", piece.color, piece.piece_type),
             None => "Moves to".to_string(),
         };
+        let new_position = format!(
+            "{}{}",
+            (self.new_position.0 as u8 + b'a') as char,
+            (self.new_position.1 as u8 + b'1') as char
+        );
+        let old_position = format!(
+            "{}{}",
+            (self.original_position.0 as u8 + b'a') as char,
+            (self.original_position.1 as u8 + b'1') as char
+        );
         write!(
             f,
             "{:?} {:?} {} {} from {}",
             self.piece.color,
             self.piece.piece_type,
             action,
-            format!(
-                "{}{}",
-                (self.new_position.0 as u8 + b'a') as char,
-                (self.new_position.1 as u8 + b'1') as char
-            ),
-            format!(
-                "{}{}",
-                (self.original_position.0 as u8 + b'a') as char,
-                (self.original_position.1 as u8 + b'1') as char
-            )
+            new_position,
+            old_position
         )
     }
 }

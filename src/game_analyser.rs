@@ -158,9 +158,9 @@ mod tests {
 
     #[test]
     fn more() {
-        let mut game = Game::new_chess_game();
+        let game = Game::new_chess_game();
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for v in moves {
             println!("{v}");
@@ -169,12 +169,18 @@ mod tests {
 
     #[test]
     fn test_legal_moves() {
-        let board = concat!("  ♔  \n", "  ♗  \n", "     \n", "     \n", "  ♜  ",);
+        let board = concat!(
+            "  ♔  \n",
+            "  ♗  \n",
+            "     \n",
+            "     \n",
+            "  ♜  ", 
+        );
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for m in moves {
             println!("{m}");
@@ -186,9 +192,9 @@ mod tests {
         let board = concat!("  ♔  \n", "     \n", "♗    \n", "     \n", " ♜♜♜ ",);
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for m in moves {
             println!("{m}");
@@ -209,9 +215,9 @@ mod tests {
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         assert_eq!(0, moves.len());
     }
@@ -230,9 +236,9 @@ mod tests {
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
-        let mut game = Game::new_game(game_board, Black);
+        let game = Game::new_game(game_board, Black);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         assert_eq!(1, moves.len());
         let only_move = moves.first().unwrap();
