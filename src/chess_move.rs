@@ -28,7 +28,7 @@ impl ChessMove {
     }
 }
 
-impl<'a> Display for ChessMove {
+impl Display for ChessMove {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let action = match self.takes {
             Some(piece) => format!("Takes the {:?} {:?} at", piece.color, piece.piece_type),

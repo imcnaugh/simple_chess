@@ -155,17 +155,7 @@ impl GameBoard {
 
 impl Clone for GameBoard {
     fn clone(&self) -> Self {
-        // clone self.squares
-        let squares = self
-            .squares
-            .iter()
-            .map(|s| -> Option<ChessPiece> {
-                match s {
-                    Some(chess_piece) => Some(chess_piece.clone()),
-                    None => None,
-                }
-            })
-            .collect();
+        let squares = self.squares.to_vec();
 
         Self {
             squares,
@@ -219,7 +209,7 @@ impl fmt::Display for GameBoard {
 mod tests {
     use super::*;
     use crate::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
-    use crate::{Color, Game, PieceType};
+    use crate::{Color, PieceType};
 
     #[test]
     fn test_build_game_board() {

@@ -88,7 +88,7 @@ fn main() {
 }
 
 fn promote_pawn_selection() -> PieceType {
-    let options = vec![Bishop, Knight, Rook, Queen];
+    let options = [Bishop, Knight, Rook, Queen];
     for (index, piece_type) in options.iter().enumerate() {
         println!("{index}: {:?}", piece_type);
     }
