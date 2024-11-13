@@ -11,10 +11,10 @@ pub struct Game {
     pub turn_number: u32,
     moves: Vec<ChessMove>,
     fifty_move_rule_counter: usize,
-    _white_can_castle_short: bool,
-    _white_can_castle_long: bool,
-    _black_can_castle_short: bool,
-    _black_can_castle_long: bool,
+    pub white_can_castle_short: bool,
+    pub white_can_castle_long: bool,
+    pub black_can_castle_short: bool,
+    pub black_can_castle_long: bool,
 }
 
 impl Game {
@@ -26,10 +26,10 @@ impl Game {
             turn_number: 1,
             moves: Vec::new(),
             fifty_move_rule_counter: 0,
-            _white_can_castle_short: true,
-            _white_can_castle_long: true,
-            _black_can_castle_short: true,
-            _black_can_castle_long: true,
+            white_can_castle_short: true,
+            white_can_castle_long: true,
+            black_can_castle_short: true,
+            black_can_castle_long: true,
         }
     }
 
@@ -40,10 +40,10 @@ impl Game {
             turn_number: 1,
             moves: Vec::new(),
             fifty_move_rule_counter: 0,
-            _white_can_castle_short: true,
-            _white_can_castle_long: true,
-            _black_can_castle_short: true,
-            _black_can_castle_long: true,
+            white_can_castle_short: true,
+            white_can_castle_long: true,
+            black_can_castle_short: true,
+            black_can_castle_long: true,
         }
     }
 
