@@ -4,7 +4,7 @@ use crate::game_state::GameState;
 use crate::game_state::GameState::{
     Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
 };
-use crate::Color::{White, Black};
+use crate::Color::{Black, White};
 use crate::PieceType::{Bishop, King, Knight, Rook};
 use crate::{ChessPiece, Color, Game};
 
@@ -95,11 +95,7 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
         for row in 0..height {
             if let Some(piece) = board.check_space(col, row) {
                 if piece.color == current_turn {
-                    let moves = piece.get_legal_moves(
-                        col,
-                        row,
-                        board,
-                        game.get_moves().last());
+                    let moves = piece.get_legal_moves(col, row, board, game.get_moves().last());
 
                     for m in moves {
                         let mut cloned_board = board.clone();
@@ -121,13 +117,13 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
 
     match current_turn {
         White => {
-            if game.white_can_castle_long && can_castle_long(White, board){
+            if game.white_can_castle_long && can_castle_long(White, board) {
                 // TODO refactor chess move for castling
             }
             if game.white_can_castle_short && can_castle_short(White, board) {
                 // TODO refactor chess move for castling
             }
-        },
+        }
         Black => {
             if game.black_can_castle_long && can_castle_long(Black, board) {
                 // TODO refactor chess move for castling
@@ -135,7 +131,7 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
             if game.black_can_castle_short && can_castle_short(Black, board) {
                 // TODO refactor chess move for castling
             }
-        },
+        }
     }
 
     legal_moves
@@ -149,31 +145,31 @@ fn can_castle_long(color: Color, board: &GameBoard) -> bool {
 
     if let Some(piece) = board.check_space(0, row) {
         if piece.piece_type != Rook {
-            return false
+            return false;
         }
 
         for col in 1..board.get_width() {
             if let Some(piece) = board.check_space(col, row) {
                 if piece.piece_type != King {
-                    return false
+                    return false;
                 }
                 if is_color_in_check(board, color, None) {
-                    return false
+                    return false;
                 }
                 let mut board_clone = board.clone();
                 let king = board_clone.remove_piece(col, row).unwrap();
                 board_clone.place_piece(king, col - 1, row);
                 if is_color_in_check(&board_clone, color, None) {
-                    return false
+                    return false;
                 }
                 let mut board_clone = board.clone();
                 let king = board_clone.remove_piece(col, row).unwrap();
                 board_clone.place_piece(king, col - 2, row);
                 if is_color_in_check(&board_clone, color, None) {
-                    return false
+                    return false;
                 }
 
-                return true
+                return true;
             };
         }
     }
@@ -188,7 +184,7 @@ fn can_castle_short(color: Color, board: &GameBoard) -> bool {
 
     if let Some(piece) = board.check_space(board.get_width() - 1, row) {
         if piece.piece_type != Rook {
-            return false
+            return false;
         }
 
         let range = 0..board.get_width() - 1;
@@ -197,25 +193,25 @@ fn can_castle_short(color: Color, board: &GameBoard) -> bool {
         for col in range {
             if let Some(piece) = board.check_space(col, row) {
                 if piece.piece_type != King {
-                    return false
+                    return false;
                 }
                 if is_color_in_check(board, color, None) {
-                    return false
+                    return false;
                 }
                 let mut board_clone = board.clone();
                 let king = board_clone.remove_piece(col, row).unwrap();
                 board_clone.place_piece(king, col - 1, row);
                 if is_color_in_check(&board_clone, color, None) {
-                    return false
+                    return false;
                 }
                 let mut board_clone = board.clone();
                 let king = board_clone.remove_piece(col, row).unwrap();
                 board_clone.place_piece(king, col - 2, row);
                 if is_color_in_check(&board_clone, color, None) {
-                    return false
+                    return false;
                 }
 
-                return true
+                return true;
             };
         }
     }
@@ -273,13 +269,7 @@ mod tests {
 
     #[test]
     fn test_legal_moves() {
-        let board = concat!(
-            "  ♔  \n",
-            "  ♗  \n",
-            "     \n",
-            "     \n",
-            "  ♜  ",
-        );
+        let board = concat!("  ♔  \n", "  ♗  \n", "     \n", "     \n", "  ♜  ",);
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
         let game = Game::new_game(game_board, White);
@@ -441,14 +431,14 @@ mod tests {
     #[test]
     fn can_black_castle_long() {
         let chess_board_as_string = concat!(
-        "♜   ♚ ♞♜\n",
-        "♟♟♟♟♟♟♟♟\n",
-        "        \n",
-        "        \n",
-        "      ♙♛\n",
-        "     ♙  \n",
-        "♙♙♙♙♙  ♙\n",
-        "♖♘♗♕♔♗♘♖\n"
+            "♜   ♚ ♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "     ♙  \n",
+            "♙♙♙♙♙  ♙\n",
+            "♖♘♗♕♔♗♘♖\n"
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
@@ -460,14 +450,14 @@ mod tests {
     #[test]
     fn can_white_castle_long() {
         let chess_board_as_string = concat!(
-        "♜ ♞ ♚ ♞♜\n",
-        "♟♟♟♟♟♟♟♟\n",
-        "        \n",
-        "        \n",
-        "     ♛  \n",
-        "        \n",
-        "♙♙♙♙   ♙\n",
-        "♖   ♔♗♘♖"
+            "♜ ♞ ♚ ♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "     ♛  \n",
+            "        \n",
+            "♙♙♙♙   ♙\n",
+            "♖   ♔♗♘♖"
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
@@ -478,16 +468,15 @@ mod tests {
 
     #[test]
     fn cant_black_castle_short() {
-
         let chess_board_as_string = concat!(
-        "♜  ♞♚  ♜\n",
-        "♟♟♟♟♟♟♟♟\n",
-        "        \n",
-        "        \n",
-        "      ♙♛\n",
-        "     ♙  \n",
-        "♙♙♙♙♙  ♙\n",
-        "♖♘♗♕♔♗♘♖\n"
+            "♜  ♞♚  ♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "     ♙  \n",
+            "♙♙♙♙♙  ♙\n",
+            "♖♘♗♕♔♗♘♖\n"
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
@@ -498,16 +487,15 @@ mod tests {
 
     #[test]
     fn cant_white_castle_short() {
-
         let chess_board_as_string = concat!(
-        "♜  ♞♚  ♜\n",
-        "♟♟♟♟♟♟♟♟\n",
-        "        \n",
-        "        \n",
-        "      ♙♛\n",
-        "        \n",
-        "♙♙♙♙♙♙ ♙\n",
-        "♖♘♗♕♔  ♖\n"
+            "♜  ♞♚  ♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "        \n",
+            "♙♙♙♙♙♙ ♙\n",
+            "♖♘♗♕♔  ♖\n"
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 

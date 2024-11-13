@@ -2,6 +2,13 @@ use crate::chess_piece::ChessPiece;
 use crate::{Color, PieceType};
 use std::fmt;
 
+pub struct BoardSquare {
+    column_index: usize,
+    row_index: usize,
+    piece: Option<ChessPiece>,
+    color: Color,
+}
+
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
 pub struct GameBoard {

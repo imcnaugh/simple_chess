@@ -94,7 +94,9 @@ fn promote_pawn_selection() -> PieceType {
     }
 
     let mut i = String::new();
-    std::io::stdin().read_line(&mut i).expect("TODO: panic message");
+    std::io::stdin()
+        .read_line(&mut i)
+        .expect("TODO: panic message");
 
     let i: usize = i.trim().parse().expect("Please enter a valid index.");
 
@@ -113,7 +115,9 @@ fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
 
     // wait for the user to press the enter key
     let mut i = String::new();
-    std::io::stdin().read_line(&mut i).expect("TODO: panic message");
+    std::io::stdin()
+        .read_line(&mut i)
+        .expect("TODO: panic message");
 
     let i: usize = i.trim().parse().expect("Please enter a valid index.");
 

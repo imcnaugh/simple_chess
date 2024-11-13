@@ -1,6 +1,13 @@
 use crate::ChessPiece;
 use std::fmt::{Display, Formatter};
 
+pub enum ChessMoveType {
+    Move,
+    Take,
+    EnPassant,
+    Castle,
+}
+
 #[derive(Copy, Clone)]
 pub struct ChessMove {
     pub original_position: (usize, usize),
@@ -47,11 +54,7 @@ impl Display for ChessMove {
         write!(
             f,
             "{:?} {:?} {} {} from {}",
-            self.piece.color,
-            self.piece.piece_type,
-            action,
-            new_position,
-            old_position
+            self.piece.color, self.piece.piece_type, action, new_position, old_position
         )
     }
 }

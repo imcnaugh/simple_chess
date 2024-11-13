@@ -118,7 +118,9 @@ impl ChessPiece {
                                 Color::Black => row - 2,
                             };
 
-                            if two_ahead <= board.get_height() && board.check_space(col, two_ahead).is_none() {
+                            if two_ahead <= board.get_height()
+                                && board.check_space(col, two_ahead).is_none()
+                            {
                                 legal_moves.push(ChessMove::build(
                                     (col, row),
                                     (col, two_ahead),
