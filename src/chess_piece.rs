@@ -1,7 +1,6 @@
 use crate::chess_board::GameBoard;
 use crate::chess_move::ChessMove;
 use crate::Color;
-use crate::PieceType::Pawn;
 use std::fmt;
 
 /// # Enum for the type of chess piece.
@@ -87,7 +86,7 @@ impl ChessPiece {
     ) -> Vec<ChessMove> {
         let mut legal_moves: Vec<ChessMove> = Vec::new();
         match self.piece_type {
-            Pawn => {
+            PieceType::Pawn => {
                 let one_ahead = match self.color {
                     Color::White => row + 1,
                     Color::Black => row - 1,
@@ -147,7 +146,7 @@ impl ChessPiece {
 
                         // En Passant
                         if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn
+                            if last_move.piece.piece_type == PieceType::Pawn
                                 && last_move.new_position.0 == (col - 1)
                                 && last_move.new_position.1 == row
                                 && (last_move.new_position.1 as isize
@@ -181,7 +180,7 @@ impl ChessPiece {
 
                         // En Passant
                         if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn
+                            if last_move.piece.piece_type == PieceType::Pawn
                                 && last_move.new_position.0 == (col + 1)
                                 && last_move.new_position.1 == row
                                 && (last_move.new_position.1 as isize

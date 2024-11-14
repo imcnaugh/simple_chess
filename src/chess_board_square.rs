@@ -1,19 +1,77 @@
 use core::fmt;
-use std::fmt::Formatter;
+use std::fmt::{format, Display, Formatter};
+use crate::{ChessPiece, Color};
+
+#[derive(Copy, Clone)]
+pub struct Square {
+    id: SquareId,
+    color: Color,
+    piece: Option<ChessPiece>,
+}
+
+impl Square {
+    pub fn build(column: usize, row: usize) -> Self {
+        let color = if (column + row) % 2 == 0 { Color::White } else { Color::Black };
+        Square {
+            id: SquareId::build(column, row),
+            color,
+            piece: None,
+        }
+    }
+
+    pub fn get_id(&self) -> &SquareId {
+        &self.id
+    }
+
+    pub fn place_piece(&mut self, piece: ChessPiece) {
+        self.piece = Some(piece);
+    }
+
+    pub fn get_piece(&self) -> Option<&ChessPiece> {
+        self.piece.as_ref()
+    }
+
+    pub fn clear_piece(&mut self) -> Option<ChessPiece>{
+        let piece = self.piece;
+        self.piece = None;
+        piece
+    }
+}
+
+impl fmt::Display for Square {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let square_color = match self.color {
+            Color::White => "",
+            Color::Black => "\x1b[100m",
+        };
+        let inner_char = match self.piece {
+            Some(piece) => format!("{piece}"),
+            None => " ".to_string(),
+        };
+        write!(f, "{} {} \x1b[0m", square_color, inner_char)
+    }
+}
 
 /// # Square Id
-///
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Hash, Copy, Clone)]
 pub struct SquareId {
     column: usize,
     row: usize,
 }
 
 impl SquareId {
+    /// # Build
+    ///
+    /// Creates a new square id from a row and a column
+    ///
+    /// Column and row are usize, and can scale beyond the typical size of a chess board.
     pub fn build(column: usize, row: usize) -> Self {
         Self { column, row }
     }
 
+    /// # From string
+    ///
+    /// Create a square id from a string
     pub fn from_string(s: &str) -> Result<Self, &str> {
         let mut col_as_string = String::new();
         let mut row_as_string = String::new();
@@ -82,7 +140,6 @@ impl fmt::Display for SquareId {
 
 #[cfg(test)]
 mod tests {
-    use std::fmt::format;
     use rand::Rng;
     use super::*;
 

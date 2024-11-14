@@ -1,18 +1,14 @@
+use std::collections::HashMap;
 use crate::chess_piece::ChessPiece;
 use crate::{Color, PieceType};
 use std::fmt;
-
-pub struct BoardSquare {
-    column_index: usize,
-    row_index: usize,
-    piece: Option<ChessPiece>,
-    color: Color,
-}
+use std::ops::Index;
+use crate::chess_board_square::{Square, SquareId};
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
 pub struct GameBoard {
-    squares: Vec<Option<ChessPiece>>,
+    squares: HashMap<SquareId, Square>,
     width: usize,
     height: usize,
 }
@@ -92,15 +88,16 @@ impl GameBoard {
                 _ => None,
             };
 
-            let column = index / width;
-            let row = index % width;
+            if let Some(piece) = piece {
+                let column = index % width;
+                let row = index / width;
 
-            let column = column as isize - (height - 1) as isize;
-            let column = column.abs();
-
-            let index = (column as usize * width) + row;
-
-            board.squares[index] = piece;
+                let row = row as isize - (height - 1) as isize;
+                let row = row.unsigned_abs();
+                let square_id = SquareId::build(column, row);
+                let square = board.squares.get_mut(&square_id).unwrap();
+                square.place_piece(piece);
+            }
         }
 
         Ok(board)
@@ -110,13 +107,18 @@ impl GameBoard {
         Self::from_string(8, 8, s)
     }
 
-    fn generate_board(width: usize, height: usize) -> Vec<Option<ChessPiece>> {
+    fn generate_board(width: usize, height: usize) -> HashMap<SquareId, Square> {
         assert!(width > 0 && height > 0);
 
-        let mut spaces = Vec::new();
+        let mut spaces = HashMap::new();
 
-        for _ in 0..width * height {
-            spaces.push(None);
+        for col in 0..width {
+            for row in 0..width {
+                let square = Square::build(col, row);
+                let id = square.get_id();
+
+                spaces.insert(*id, square);
+            }
         }
 
         spaces
@@ -133,39 +135,27 @@ impl GameBoard {
     }
 
     pub fn check_space(&self, col: usize, row: usize) -> Option<&ChessPiece> {
-        let index = col + (row * self.width);
-        let board_square = &self.squares[index];
-        match board_square {
-            Some(piece) => Some(piece),
-            None => None,
-        }
+        let space_id = SquareId::build(col, row);
+        self.squares.get(&space_id).unwrap().get_piece()
     }
 
     /// Places a chess piece to the board
-    pub fn place_piece(&mut self, piece: ChessPiece, x: usize, y: usize) {
-        if x >= self.width || y >= self.height {
-            panic!("Out of bounds");
-        }
-
-        self.squares[x + y * self.width] = Some(piece);
+    pub fn place_piece(&mut self, piece: ChessPiece, col: usize, row: usize) {
+        let space_id = SquareId::build(col, row);
+        self.squares.get_mut(&space_id).unwrap().place_piece(piece);
     }
 
     /// If the square identified has a chess piece, this removes it and returns ownership of that piece
-    pub fn remove_piece(&mut self, x: usize, y: usize) -> Option<ChessPiece> {
-        if x >= self.width || y >= self.height {
-            panic!("Out of bounds");
-        }
-
-        self.squares[x + y * self.width].take()
+    pub fn remove_piece(&mut self, col: usize, row: usize) -> Option<ChessPiece> {
+        let space_id = SquareId::build(col, row);
+        self.squares.get_mut(&space_id)?.clear_piece()
     }
 }
 
 impl Clone for GameBoard {
     fn clone(&self) -> Self {
-        let squares = self.squares.to_vec();
-
         Self {
-            squares,
+            squares: self.squares.clone(),
             height: self.height,
             width: self.width,
         }
@@ -186,20 +176,9 @@ impl fmt::Display for GameBoard {
 
         for y in 0..self.get_height() {
             for x in 0..self.get_width() {
-                let index = (y * self.width) + x;
-                let square_color = if (y + x) % 2 != 0 {
-                    // "\x1b[107m"
-                    ""
-                } else {
-                    "\x1b[100m"
-                };
-
-                let inner_char = match &self.squares[index] {
-                    Some(piece) => format!("{}", piece),
-                    None => " ".to_string(),
-                };
-
-                lines[y].push_str(format!("{} {} \x1b[0m", square_color, inner_char).as_str());
+                let square_id = SquareId::build(x, y);
+                let square = self.squares.get(&square_id).unwrap();
+                lines[y].push_str(format!("{square}", ).as_str());
             }
         }
 
@@ -223,8 +202,11 @@ mod tests {
         let board = GameBoard::build(10, 10);
         assert_eq!(board.get_width(), 10);
         assert_eq!(board.get_height(), 10);
-        for i in 0..100 {
-            assert!(board.squares[i].is_none());
+        for x in 0..10 {
+            for y in 0..10 {
+                let square_id = SquareId::build(x, y);
+                assert!(board.squares.get(&square_id).unwrap().get_piece().is_none());
+            }
         }
     }
 
@@ -241,16 +223,19 @@ mod tests {
         let piece = ChessPiece::new(Color::White, Knight);
 
         board.place_piece(piece, 0, 0);
-        assert!(board.squares[0].is_some());
+
+        let square_id = SquareId::build(0,0);
+        assert!(board.squares.get(&square_id).unwrap().get_piece().is_some());
         assert_eq!(Knight, board.check_space(0, 0).unwrap().piece_type);
         assert_eq!(Color::White, board.check_space(0, 0).unwrap().color);
 
         let removed_piece = board.remove_piece(0, 0);
         assert!(removed_piece.is_some());
-        assert!(board.squares[0].is_none());
+        assert!(board.squares.get(&square_id).unwrap().get_piece().is_none());
 
         board.place_piece(removed_piece.unwrap(), 0, 1);
-        assert!(board.squares[8].is_some());
+        let space_a2_id = SquareId::build(0,1);
+        assert!(board.squares.get(&space_a2_id).unwrap().get_piece().is_some());
         assert_eq!(Knight, board.check_space(0, 1).unwrap().piece_type);
         assert_eq!(Color::White, board.check_space(0, 1).unwrap().color);
     }
@@ -269,7 +254,7 @@ mod tests {
     fn test_remove_piece_out_of_bounds() {
         let mut board = GameBoard::build_chess_board();
 
-        board.remove_piece(8, 0);
+        let piece = board.remove_piece(8, 0).unwrap();
     }
 
     #[test]
@@ -308,7 +293,9 @@ mod tests {
 
     #[test]
     fn should_be_able_to_detect_any_piece() {
-        let board_string = concat!("♜♞♝♛♚♟ \n", "♖♘♗♕♔♙ ");
+        let board_string = concat!(
+        "♜♞♝♛♚♟ \n",
+        "♖♘♗♕♔♙ ");
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
 
