@@ -32,7 +32,7 @@ fn main() {
                 break;
             }
             Check => {
-                println!("{:?} is in check", game.current_turn);
+                // println!("{:?} is in check", game.current_turn);
             }
             InProgress => {
                 // for m in &moves {
