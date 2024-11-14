@@ -12,11 +12,11 @@ fn main() {
     loop {
         let (state, moves) = get_game_state(&game);
 
-        clear_console();
-        println!("{}", game.get_board());
-        if let Some(last_move) = game.get_moves().last() {
-            println!("{last_move}");
-        }
+        // clear_console();
+        // println!("{}", game.get_board());
+        // if let Some(last_move) = game.get_moves().last() {
+        //     println!("{last_move}");
+        // }
 
         match state {
             Checkmate => {
@@ -56,7 +56,8 @@ fn main() {
         }
 
         let mut next_move = match game.current_turn {
-            Color::White => print_and_get_next_move(moves),
+            // Color::White => print_and_get_next_move(moves),
+            Color::White => pick_random_move(moves),
             Color::Black => pick_random_move(moves),
         };
 
@@ -65,7 +66,8 @@ fn main() {
                 || next_move.new_position.1 == game.board.get_height() - 1)
         {
             let promotion_piece = match game.current_turn {
-                Color::White => promote_pawn_selection(),
+                // Color::White => promote_pawn_selection(),
+                Color::White => Queen,
                 Color::Black => Queen,
             };
             next_move.piece.piece_type = promotion_piece;
