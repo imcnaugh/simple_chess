@@ -11,7 +11,7 @@ pub struct Square {
 
 impl Square {
     pub fn build(column: usize, row: usize) -> Self {
-        let color = if (column + row) % 2 == 0 { Color::White } else { Color::Black };
+        let color = if (column + row) % 2 == 1 { Color::White } else { Color::Black };
         Square {
             id: SquareId::build(column, row),
             color,

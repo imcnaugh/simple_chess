@@ -344,7 +344,12 @@ mod tests {
 
     #[test]
     fn test_en_passant() {
-        let chess_board_as_string = concat!("♚ \n", "♟ \n", "  \n", " ♙\n", " ♔");
+        let chess_board_as_string = concat!(
+        "♚ \n", 
+        "♟ \n", 
+        "  \n", 
+        " ♙\n", 
+        " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);

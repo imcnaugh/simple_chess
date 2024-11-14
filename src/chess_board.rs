@@ -113,7 +113,7 @@ impl GameBoard {
         let mut spaces = HashMap::new();
 
         for col in 0..width {
-            for row in 0..width {
+            for row in 0..height {
                 let square = Square::build(col, row);
                 let id = square.get_id();
 
@@ -298,6 +298,7 @@ mod tests {
         "♖♘♗♕♔♙ ");
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
+        println!("{board}");
 
         let pieces = [Rook, Knight, Bishop, Queen, King, Pawn];
 
