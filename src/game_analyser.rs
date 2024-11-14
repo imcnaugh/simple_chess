@@ -330,6 +330,8 @@ mod tests {
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
+        println!("{game_board}");
+
         let game = Game::new_game(game_board, Black);
 
         let moves = get_all_moves(&game);
