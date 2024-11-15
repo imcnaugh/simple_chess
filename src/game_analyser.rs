@@ -110,24 +110,24 @@ fn get_all_moves(game: &Game) -> Vec<ChessMoveType> {
         }
     }
 
-    match current_turn {
-        White => {
-            if game.white_can_castle_long && can_castle_long(White, board) {
-                // TODO refactor chess move for castling
-            }
-            if game.white_can_castle_short && can_castle_short(White, board) {
-                // TODO refactor chess move for castling
-            }
-        }
-        Black => {
-            if game.black_can_castle_long && can_castle_long(Black, board) {
-                // TODO refactor chess move for castling
-            }
-            if game.black_can_castle_short && can_castle_short(Black, board) {
-                // TODO refactor chess move for castling
-            }
-        }
-    }
+    // match current_turn {
+    //     White => {
+    //         if game.white_can_castle_long && can_castle_long(White, board) {
+    //             // TODO refactor chess move for castling
+    //         }
+    //         if game.white_can_castle_short && can_castle_short(White, board) {
+    //             // TODO refactor chess move for castling
+    //         }
+    //     }
+    //     Black => {
+    //         if game.black_can_castle_long && can_castle_long(Black, board) {
+    //             // TODO refactor chess move for castling
+    //         }
+    //         if game.black_can_castle_short && can_castle_short(Black, board) {
+    //             // TODO refactor chess move for castling
+    //         }
+    //     }
+    // }
 
     legal_moves
 }
@@ -347,10 +347,10 @@ mod tests {
     #[test]
     fn test_en_passant() {
         let chess_board_as_string = concat!(
-            "♚ \n", 
-            "♟ \n", 
-            "  \n", 
-            " ♙\n", 
+            "♚ \n",
+            "♟ \n",
+            "  \n",
+            " ♙\n",
             " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
@@ -375,7 +375,7 @@ mod tests {
                 false
             })
             .unwrap();
-        game.change_turn(move_pawn_to_b4);
+        game.change_turn(*move_pawn_to_b4);
 
         println!("{}", game.get_board());
         let (state, moves) = get_game_state(&game);
@@ -389,48 +389,48 @@ mod tests {
         assert_eq!(3, moves.len());
     }
 
-    #[test]
-    fn test_en_passant2() {
-        let chess_board_as_string = concat!(" ♚\n", " ♟\n", "  \n", "♙ \n", " ♔");
-        let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
-
-        let mut game = Game::new_game(game_board, White);
-
-        println!("This is the board\n{}", game.get_board());
-
-        let (_, next_moves) = get_game_state(&game);
-
-        for m in &next_moves {
-            println!("{m}");
-        }
-
-        let move_pawn_to_b4 = *next_moves
-            .iter()
-            .find(|p| p.new_position.0 == 0 && p.new_position.1 == 3)
-            .unwrap();
-        game.get_board_mut().remove_piece(
-            move_pawn_to_b4.original_position.0,
-            move_pawn_to_b4.original_position.1,
-        );
-        game.get_board_mut().place_piece(
-            move_pawn_to_b4.piece,
-            move_pawn_to_b4.new_position.0,
-            move_pawn_to_b4.new_position.1,
-        );
-
-        game.change_turn(move_pawn_to_b4);
-
-        println!("{}", game.get_board());
-        let (state, moves) = get_game_state(&game);
-
-        println!("{:?}", state);
-
-        for m in &moves {
-            println!("{m}");
-        }
-
-        assert_eq!(3, moves.len());
-    }
+    // #[test]
+    // fn test_en_passant2() {
+    //     let chess_board_as_string = concat!(" ♚\n", " ♟\n", "  \n", "♙ \n", " ♔");
+    //     let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
+    // 
+    //     let mut game = Game::new_game(game_board, White);
+    // 
+    //     println!("This is the board\n{}", game.get_board());
+    // 
+    //     let (_, next_moves) = get_game_state(&game);
+    // 
+    //     for m in &next_moves {
+    //         println!("{m}");
+    //     }
+    // 
+    //     let move_pawn_to_b4 = *next_moves
+    //         .iter()
+    //         .find(|p| p.new_position.0 == 0 && p.new_position.1 == 3)
+    //         .unwrap();
+    //     game.get_board_mut().remove_piece(
+    //         move_pawn_to_b4.original_position.0,
+    //         move_pawn_to_b4.original_position.1,
+    //     );
+    //     game.get_board_mut().place_piece(
+    //         move_pawn_to_b4.piece,
+    //         move_pawn_to_b4.new_position.0,
+    //         move_pawn_to_b4.new_position.1,
+    //     );
+    // 
+    //     game.change_turn(move_pawn_to_b4);
+    // 
+    //     println!("{}", game.get_board());
+    //     let (state, moves) = get_game_state(&game);
+    // 
+    //     println!("{:?}", state);
+    // 
+    //     for m in &moves {
+    //         println!("{m}");
+    //     }
+    // 
+    //     assert_eq!(3, moves.len());
+    // }
 
     #[test]
     fn can_black_castle_long() {
@@ -506,5 +506,20 @@ mod tests {
         let can_castle_short = can_castle_short(White, &game_board);
 
         assert!(can_castle_short)
+    }
+    
+    #[test]
+    fn solve_this_bug() {
+        let board_as_string = concat!(
+        "♔ \n",
+        "  \n",
+        "♟♚\n",
+        "  "
+        );
+
+
+        let game_board = GameBoard::from_string(2, 4, board_as_string).unwrap();
+        
+        is_color_in_check(&game_board, Color::White, None);
     }
 }

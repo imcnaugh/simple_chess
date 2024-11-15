@@ -1,8 +1,7 @@
 use crate::chess_board::GameBoard;
-use crate::chess_move::{ChessMove, ChessMoveType};
+use crate::chess_move::{ChessMoveType};
 use crate::Color;
 use std::fmt;
-use std::num::FpCategory::Subnormal;
 use crate::chess_board_square::SquareId;
 use crate::chess_move::ChessMoveType::{EnPassant, Move, Take};
 
@@ -95,108 +94,101 @@ impl ChessPiece {
                     Color::Black => row - 1,
                 };
 
-                let promotion_row = match self.color {
-                    Color::White => board.get_height(),
-                    Color::Black => 0,
-                };
+                if board.check_space(col, one_ahead).is_none() {
+                    legal_moves.push(Move {
+                        original_position: SquareId::build(col, row),
+                        new_position: SquareId::build(col, one_ahead),
+                        piece: *self
+                    });
+                    let starting_row = match self.color {
+                        Color::White => 1,
+                        Color::Black => board.get_height() - 2,
+                    };
 
-                if row != promotion_row {
-                    if board.check_space(col, one_ahead).is_none() {
-                        legal_moves.push(Move {
-                            original_position: SquareId::build(col, row),
-                            new_position: SquareId::build(col, one_ahead),
-                            piece: *self
-                        });
-                        let starting_row = match self.color {
-                            Color::White => 1,
-                            Color::Black => board.get_height() - 2,
+                    if row == starting_row {
+                        let two_ahead = match self.color {
+                            Color::White => row + 2,
+                            Color::Black => row - 2,
                         };
 
-                        if row == starting_row {
-                            let two_ahead = match self.color {
-                                Color::White => row + 2,
-                                Color::Black => row - 2,
-                            };
+                        if two_ahead <= board.get_height()
+                            && board.check_space(col, two_ahead).is_none()
+                        {
+                            legal_moves.push(Move {
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(col, two_ahead),
+                                piece: *self,
+                            });
+                        }
+                    }
+                }
 
-                            if two_ahead <= board.get_height()
-                                && board.check_space(col, two_ahead).is_none()
-                            {
-                                legal_moves.push(Move {
-                                    original_position: SquareId::build(col, row),
-                                    new_position: SquareId::build(col, two_ahead),
-                                    piece: *self,
-                                });
-                            }
+                if col > 0 {
+                    if let Some(piece) = board.check_space(col - 1, one_ahead) {
+                        if *piece.get_color() != self.color {
+                            legal_moves.push(Take {
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(col - 1, row),
+                                piece: *self,
+                                taken_piece: *piece,
+                            })
                         }
                     }
 
-                    if col > 0 {
-                        if let Some(piece) = board.check_space(col - 1, one_ahead) {
-                            if *piece.get_color() != self.color {
-                                legal_moves.push(Take {
-                                    original_position: SquareId::build(col, row),
-                                    new_position: SquareId::build(col - 1, row),
-                                    piece: *self,
-                                    taken_piece: *piece,
-                                })
-                            }
-                        }
+                    // En Passant
+                    if let Some(last_move) = last_move {
+                        if let Move { original_position, new_position, piece } = last_move {
+                            if piece.piece_type == PieceType::Pawn {
+                                let rows_moved = if original_position.get_row() < new_position.get_row() {
+                                    new_position.get_row() - original_position.get_row()
+                                } else {
+                                    original_position.get_row() - new_position.get_row()
+                                };
 
-                        // En Passant
-                        if let Some(last_move) = last_move {
-                            if let Move { original_position, new_position, piece } = last_move {
-                                if self.piece_type == PieceType::Pawn {
-                                    let rows_moved = if original_position.get_row() < new_position.get_row() {
-                                        new_position.get_row() - original_position.get_row()
-                                    } else {
-                                        original_position.get_row() - new_position.get_row()
-                                    };
-                                    
-                                    if rows_moved == 2 {
-                                        legal_moves.push(EnPassant {
-                                            original_position: SquareId::build(col, row),
-                                            new_position: SquareId::build(col - 1, one_ahead),
-                                            piece: *self,
-                                            taken_piece: *piece,
-                                            taken_piece_position: SquareId::build(col-1, row),
-                                        })
-                                    }
+                                if rows_moved == 2 && new_position.get_row() == row && new_position.get_column() == col - 1 {
+                                    legal_moves.push(EnPassant {
+                                        original_position: SquareId::build(col, row),
+                                        new_position: SquareId::build(col - 1, one_ahead),
+                                        piece: *self,
+                                        taken_piece: *piece,
+                                        taken_piece_position: SquareId::build(col-1, row),
+                                    })
                                 }
                             }
                         }
                     }
+                }
 
-                    if col < board.get_width() - 1 {
-                        if let Some(piece) = board.check_space(col + 1, one_ahead) {
-                            if *piece.get_color() != self.color {
-                                legal_moves.push(Take {
-                                    original_position: SquareId::build(col, row),
-                                    new_position: SquareId::build(col+1, one_ahead),
-                                    piece: *self,
-                                    taken_piece: *piece,
-                                })
-                            }
+                if col < board.get_width() - 1 {
+                    if let Some(piece) = board.check_space(col + 1, one_ahead) {
+                        if *piece.get_color() != self.color {
+                            legal_moves.push(Take {
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(col+1, one_ahead),
+                                piece: *self,
+                                taken_piece: *piece,
+                            })
                         }
+                    }
 
-                        // En Passant
-                        if let Some(last_move) = last_move {
-                            if let Move { original_position, new_position, piece } = last_move {
-                                if self.piece_type == PieceType::Pawn {
-                                    let rows_moved = if original_position.get_row() < new_position.get_row() {
-                                        new_position.get_row() - original_position.get_row()
-                                    } else {
-                                        original_position.get_row() - new_position.get_row()
-                                    };
+                    // En Passant
+                    if let Some(last_move) = last_move {
+                        if let Move { original_position, new_position, piece } = last_move {
+                            if piece.piece_type == PieceType::Pawn {
+                                let rows_moved = if original_position.get_row() < new_position.get_row() {
+                                    new_position.get_row() - original_position.get_row()
+                                } else {
+                                    original_position.get_row() - new_position.get_row()
+                                };
 
-                                    if rows_moved == 2 {
-                                        legal_moves.push(EnPassant {
-                                            original_position: SquareId::build(col, row),
-                                            new_position: SquareId::build(col + 1, one_ahead),
-                                            piece: *self,
-                                            taken_piece: *piece,
-                                            taken_piece_position: SquareId::build(col+1, row),
-                                        })
-                                    }
+                                if rows_moved == 2 && new_position.get_row() == row && new_position.get_column() == col + 1  {
+                                    legal_moves.push(EnPassant {
+                                        original_position: SquareId::build(col, row),
+                                        new_position: SquareId::build(col + 1, one_ahead),
+                                        piece: *self,
+                                        taken_piece: *piece,
+                                        taken_piece_position: SquareId::build(col+1, row),
+                                    })
                                 }
                             }
                         }

@@ -1,9 +1,10 @@
 use std::fmt;
 use crate::chess_board_square::SquareId;
 use crate::ChessPiece;
-use std::fmt::{write, Display, Formatter};
+use std::fmt::{Display, Formatter};
 use crate::chess_board::GameBoard;
 
+#[derive(Copy, Clone)]
 pub enum ChessMoveType {
     Move {
         original_position: SquareId,

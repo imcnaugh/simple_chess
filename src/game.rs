@@ -63,6 +63,8 @@ impl Game {
             White => Black,
             Black => White,
         };
+        
+        m.make_move(&mut self.board);
 
         self.moves.push(m);
     }

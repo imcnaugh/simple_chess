@@ -141,7 +141,7 @@ impl GameBoard {
             panic!("column outside of board bounds");
         }
         if row >= self.height {
-            panic!("width is outside of board bounds");
+            panic!("row is outside of board bounds");
         }
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].get_piece()
