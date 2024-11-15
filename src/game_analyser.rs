@@ -9,6 +9,7 @@ use crate::PieceType::{Bishop, King, Knight, Rook};
 use crate::{ChessPiece, Color, Game};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMoveType>) {
+    println!("getting game state");
     let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
     let possible_next_moves = get_all_moves(game);
 
@@ -214,6 +215,7 @@ fn can_castle_short(color: Color, board: &GameBoard) -> bool {
 }
 
 fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMoveType>) -> bool {
+    println!("checking if in check");
     let opposite_color = color.opposite_color();
 
     for col in 0..board.get_width() {
@@ -393,17 +395,17 @@ mod tests {
     // fn test_en_passant2() {
     //     let chess_board_as_string = concat!(" ♚\n", " ♟\n", "  \n", "♙ \n", " ♔");
     //     let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
-    // 
+    //
     //     let mut game = Game::new_game(game_board, White);
-    // 
+    //
     //     println!("This is the board\n{}", game.get_board());
-    // 
+    //
     //     let (_, next_moves) = get_game_state(&game);
-    // 
+    //
     //     for m in &next_moves {
     //         println!("{m}");
     //     }
-    // 
+    //
     //     let move_pawn_to_b4 = *next_moves
     //         .iter()
     //         .find(|p| p.new_position.0 == 0 && p.new_position.1 == 3)
@@ -417,18 +419,18 @@ mod tests {
     //         move_pawn_to_b4.new_position.0,
     //         move_pawn_to_b4.new_position.1,
     //     );
-    // 
+    //
     //     game.change_turn(move_pawn_to_b4);
-    // 
+    //
     //     println!("{}", game.get_board());
     //     let (state, moves) = get_game_state(&game);
-    // 
+    //
     //     println!("{:?}", state);
-    // 
+    //
     //     for m in &moves {
     //         println!("{m}");
     //     }
-    // 
+    //
     //     assert_eq!(3, moves.len());
     // }
 
@@ -507,7 +509,7 @@ mod tests {
 
         assert!(can_castle_short)
     }
-    
+
     #[test]
     fn solve_this_bug() {
         let board_as_string = concat!(
@@ -519,7 +521,7 @@ mod tests {
 
 
         let game_board = GameBoard::from_string(2, 4, board_as_string).unwrap();
-        
+
         is_color_in_check(&game_board, Color::White, None);
     }
 }

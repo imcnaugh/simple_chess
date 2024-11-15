@@ -58,26 +58,7 @@ fn main() {
         let move_count = moves.len();
         let random_move_index = rand::thread_rng().gen_range(0..move_count);
         let next_move = &moves[random_move_index];
-
-        let promotion_row = match game.current_turn {
-            Color::White => game.board.get_height() - 1,
-            Color::Black => 0,
-        };
-
-        match next_move {
-            ChessMoveType::Take {mut piece, new_position, ..} => {
-                if piece.piece_type == Pawn && new_position.get_row() == promotion_row {
-                    piece = ChessPiece::new(game.current_turn, Queen);
-                }
-            },
-            ChessMoveType::Move {mut piece, new_position, ..} => {
-                if piece.piece_type == Pawn && new_position.get_row() == promotion_row {
-                    piece = ChessPiece::new(game.current_turn, Queen);
-                }
-            },
-            _ => {}
-        };
-
+        
         game.change_turn(*next_move);
     }
 }

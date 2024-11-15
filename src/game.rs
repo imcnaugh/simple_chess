@@ -48,6 +48,7 @@ impl Game {
     }
 
     pub fn change_turn(&mut self, m: ChessMoveType) {
+        println!("making move {m}");
         if self.current_turn == Black {
             self.turn_number += 1;
         }

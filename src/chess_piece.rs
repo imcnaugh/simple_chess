@@ -89,6 +89,7 @@ impl ChessPiece {
         let mut legal_moves: Vec<ChessMoveType> = Vec::new();
         match self.piece_type {
             PieceType::Pawn => {
+                println!("col: {col}, row: {row}, color: {:?}", self.color);
                 let one_ahead = match self.color {
                     Color::White => row + 1,
                     Color::Black => row - 1,
@@ -100,6 +101,7 @@ impl ChessPiece {
                         new_position: SquareId::build(col, one_ahead),
                         piece: *self
                     });
+                    
                     let starting_row = match self.color {
                         Color::White => 1,
                         Color::Black => board.get_height() - 2,
@@ -111,8 +113,7 @@ impl ChessPiece {
                             Color::Black => row - 2,
                         };
 
-                        if two_ahead <= board.get_height()
-                            && board.check_space(col, two_ahead).is_none()
+                        if board.check_space(col, two_ahead).is_none()
                         {
                             legal_moves.push(Move {
                                 original_position: SquareId::build(col, row),
@@ -128,7 +129,7 @@ impl ChessPiece {
                         if *piece.get_color() != self.color {
                             legal_moves.push(Take {
                                 original_position: SquareId::build(col, row),
-                                new_position: SquareId::build(col - 1, row),
+                                new_position: SquareId::build(col - 1, one_ahead),
                                 piece: *self,
                                 taken_piece: *piece,
                             })

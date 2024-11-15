@@ -1,6 +1,6 @@
 use std::fmt;
 use crate::chess_board_square::SquareId;
-use crate::ChessPiece;
+use crate::{ChessPiece};
 use std::fmt::{Display, Formatter};
 use crate::chess_board::GameBoard;
 
@@ -88,13 +88,13 @@ impl fmt::Display for ChessMoveType {
             ChessMoveType::Move {
                 original_position, new_position, piece
             } => {
-                write!(f, "{:?} at {} moves to {}", piece.piece_type, original_position, new_position)
+                write!(f, "{:?} {:?} at {} moves to {}", piece.color, piece.piece_type, original_position, new_position)
             }
             ChessMoveType::Take { original_position, new_position, piece, taken_piece } => {
-                write!(f, "{:?} at {} takes {:?} at {}", piece.piece_type, original_position, taken_piece.piece_type, new_position)
+                write!(f, "{:?} {:?} at {} takes {:?} at {}", piece.color, piece.piece_type, original_position, taken_piece.piece_type, new_position)
             }
             ChessMoveType::EnPassant { original_position, new_position, piece, taken_piece, .. } => {
-                write!(f, "{:?} at {}, En Passant's {:?} at {}", piece.piece_type, original_position, taken_piece.piece_type, new_position)
+                write!(f, "{:?} {:?} at {}, En Passant's {:?} at {}", piece.color, piece.piece_type, original_position, taken_piece.piece_type, new_position)
             }
             ChessMoveType::Castle { .. } => {
                 write!(f, "Castles")
