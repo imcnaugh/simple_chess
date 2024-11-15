@@ -1,4 +1,4 @@
-use crate::chess_move::{ChessMove, ChessMoveType};
+use crate::chess_move::{ChessMoveType};
 use crate::Color::{Black, White};
 use crate::{ChessPiece, Color, GameBoard};
 use crate::PieceType::{Pawn, Queen};
@@ -49,14 +49,19 @@ impl Game {
     }
 
     pub fn change_turn(&mut self, m: ChessMoveType) {
-        println!("making move {m}");
         if self.current_turn == Black {
             self.turn_number += 1;
         }
 
         match m {
             ChessMoveType::EnPassant {..} => self.fifty_move_rule_counter = 0,
-            ChessMoveType::Move {..} => self.fifty_move_rule_counter += 1,
+            ChessMoveType::Move {taken_piece, ..} => {
+                if taken_piece.is_some() {
+                    self.fifty_move_rule_counter = 0
+                } else {
+                    self.fifty_move_rule_counter += 1
+                }
+            },
             ChessMoveType::Castle {..} => self.fifty_move_rule_counter += 1,
         };
 
@@ -66,20 +71,6 @@ impl Game {
         };
 
         m.make_move(&mut self.board);
-
-        let promotion_row = match self.current_turn {
-            White => self.board.get_height() - 1,
-            Black => 0,
-        };
-
-        for col in 0..self.board.get_width() {
-            if let Some(piece) = self.get_board().check_space(col, promotion_row){
-                if piece.piece_type == Pawn {
-                    println!("promoting pawn to queen");
-                    self.board.place_piece(ChessPiece::new(self.current_turn, Queen), col, promotion_row);
-                }
-            }
-        }
 
         self.moves.push(m);
     }

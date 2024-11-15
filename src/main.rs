@@ -1,8 +1,6 @@
-use chess::chess_move::{ChessMove, ChessMoveType};
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
-use chess::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
-use chess::{ChessPiece, Color, Game, PieceType};
+use chess::{Game};
 use rand::Rng;
 use std::io::Write;
 
@@ -57,48 +55,27 @@ fn main() {
 
         let move_count = moves.len();
         let random_move_index = rand::thread_rng().gen_range(0..move_count);
-        let mut next_move = &moves[random_move_index];
-        
-        let promotion_row = match game.current_turn {
-            Color::White => game.board.get_height() - 1,
-            Color::Black => 0,
-        };
+        let next_move = &moves[random_move_index];
         
         game.change_turn(*next_move);
     }
 }
 
-fn promote_pawn_selection() -> PieceType {
-    let options = [Bishop, Knight, Rook, Queen];
-    for (index, piece_type) in options.iter().enumerate() {
-        println!("{index}: {:?}", piece_type);
-    }
-
-    let mut i = String::new();
-    std::io::stdin()
-        .read_line(&mut i)
-        .expect("TODO: panic message");
-
-    let i: usize = i.trim().parse().expect("Please enter a valid index.");
-
-    options[i]
-}
-
-fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
-    for (index, m) in moves.iter().enumerate() {
-        println!("{index}: {m}");
-    }
-
-    // wait for the user to press the enter key
-    let mut i = String::new();
-    std::io::stdin()
-        .read_line(&mut i)
-        .expect("TODO: panic message");
-
-    let i: usize = i.trim().parse().expect("Please enter a valid index.");
-
-    moves[i]
-}
+// fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
+//     for (index, m) in moves.iter().enumerate() {
+//         println!("{index}: {m}");
+//     }
+// 
+//     // wait for the user to press the enter key
+//     let mut i = String::new();
+//     std::io::stdin()
+//         .read_line(&mut i)
+//         .expect("TODO: panic message");
+// 
+//     let i: usize = i.trim().parse().expect("Please enter a valid index.");
+// 
+//     moves[i]
+// }
 
 fn clear_console() {
     // Print the escape code to clear the console

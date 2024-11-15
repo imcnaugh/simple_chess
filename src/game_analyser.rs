@@ -1,5 +1,5 @@
 use crate::chess_board::GameBoard;
-use crate::chess_move::{ChessMove, ChessMoveType};
+use crate::chess_move::{ChessMoveType};
 use crate::game_state::GameState;
 use crate::game_state::GameState::{
     Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
@@ -9,7 +9,6 @@ use crate::PieceType::{Bishop, King, Knight, Rook};
 use crate::{ChessPiece, Color, Game};
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMoveType>) {
-    println!("getting game state");
     let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
     let possible_next_moves = get_all_moves(game);
 
@@ -215,7 +214,6 @@ fn can_castle_short(color: Color, board: &GameBoard) -> bool {
 }
 
 fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMoveType>) -> bool {
-    println!("checking if in check");
     let opposite_color = color.opposite_color();
 
     for col in 0..board.get_width() {
@@ -224,11 +222,13 @@ fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMo
                 if piece.color == opposite_color {
                     let moves = piece.get_legal_moves(col, row, board, last_move);
                     for mov in moves {
-                        if let ChessMoveType::Take {taken_piece, ..} = mov {
-                            if taken_piece.get_piece_type() == &King
-                                && taken_piece.get_color() == &color
-                            {
-                                return true;
+                        if let ChessMoveType::Move {taken_piece, ..} = mov {
+                            if let Some(taken_piece) = taken_piece {
+                                if taken_piece.get_piece_type() == &King
+                                    && taken_piece.get_color() == &color
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -336,7 +336,7 @@ mod tests {
         assert_eq!(1, moves.len());
         let only_move = moves.first().unwrap();
 
-        if let ChessMoveType::Move { original_position, new_position, piece } = only_move {
+        if let ChessMoveType::Move { original_position, new_position, piece, .. } = only_move {
             assert_eq!(1, new_position.get_column());
             assert_eq!(7, new_position.get_row());
         }else {
@@ -369,7 +369,7 @@ mod tests {
         let move_pawn_to_b4 = next_moves
             .iter()
             .find(|p| -> bool {
-                if let ChessMoveType::Move { original_position: _, new_position, piece: _ } = p {
+                if let ChessMoveType::Move { new_position, ..} = p {
                     if new_position.get_column() == 1 && new_position.get_row() == 3 {
                         return true
                     }
