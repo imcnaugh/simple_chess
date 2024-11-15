@@ -57,7 +57,12 @@ fn main() {
 
         let move_count = moves.len();
         let random_move_index = rand::thread_rng().gen_range(0..move_count);
-        let next_move = &moves[random_move_index];
+        let mut next_move = &moves[random_move_index];
+        
+        let promotion_row = match game.current_turn {
+            Color::White => game.board.get_height() - 1,
+            Color::Black => 0,
+        };
         
         game.change_turn(*next_move);
     }

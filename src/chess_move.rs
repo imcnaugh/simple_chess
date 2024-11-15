@@ -10,12 +10,8 @@ pub enum ChessMoveType {
         original_position: SquareId,
         new_position: SquareId,
         piece: ChessPiece,
-    },
-    Take {
-        original_position: SquareId,
-        new_position: SquareId,
-        piece: ChessPiece,
-        taken_piece: ChessPiece,
+        taken_piece: Option<ChessPiece>,
+        promotion: Option<ChessPiece>
     },
     EnPassant {
         original_position: SquareId,
@@ -41,18 +37,15 @@ impl ChessMoveType {
                 original_position,
                 new_position,
                 piece,
+                promotion,
+                ..
             } => {
                 board.remove_piece(original_position.get_column(), original_position.get_row());
-                board.place_piece(*piece, new_position.get_column(), new_position.get_row());
-            }
-            ChessMoveType::Take {
-                original_position,
-                new_position,
-                piece,
-                taken_piece: _taken_piece,
-            } => {
-                board.remove_piece(original_position.get_column(), original_position.get_row());
-                board.place_piece(*piece, new_position.get_column(), new_position.get_row());
+                if let Some(promotion) = promotion {
+                    board.place_piece(*promotion, new_position.get_column(), new_position.get_row());
+                } else {
+                    board.place_piece(*piece, new_position.get_column(), new_position.get_row());
+                }
             }
             ChessMoveType::EnPassant {
                 original_position,
@@ -86,12 +79,18 @@ impl fmt::Display for ChessMoveType {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
             ChessMoveType::Move {
-                original_position, new_position, piece
+                original_position, new_position, piece, taken_piece, promotion
             } => {
-                write!(f, "{:?} {:?} at {} moves to {}", piece.color, piece.piece_type, original_position, new_position)
-            }
-            ChessMoveType::Take { original_position, new_position, piece, taken_piece } => {
-                write!(f, "{:?} {:?} at {} takes {:?} at {}", piece.color, piece.piece_type, original_position, taken_piece.piece_type, new_position)
+                let promotion_message = match promotion { 
+                    Some(promotion_piece) => format!(" and promotes to {:?}", promotion_piece.piece_type),
+                    None => String::new(),
+                };
+                
+                if let Some(taken_piece) = taken_piece {
+                    write!(f, "{:?} {:?} takes {:?} at {} from {} {}", piece.color, piece.piece_type, taken_piece.piece_type ,new_position, original_position, promotion_message)
+                } else {
+                    write!(f, "{:?} {:?} moves to {} from {} {}", piece.color, piece.piece_type, new_position, original_position, promotion_message)
+                }
             }
             ChessMoveType::EnPassant { original_position, new_position, piece, taken_piece, .. } => {
                 write!(f, "{:?} {:?} at {}, En Passant's {:?} at {}", piece.color, piece.piece_type, original_position, taken_piece.piece_type, new_position)

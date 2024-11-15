@@ -3,7 +3,8 @@ use crate::chess_move::{ChessMoveType};
 use crate::Color;
 use std::fmt;
 use crate::chess_board_square::SquareId;
-use crate::chess_move::ChessMoveType::{EnPassant, Move, Take};
+use crate::chess_move::ChessMoveType::{EnPassant, Move};
+use crate::PieceType::{Bishop, Knight, Queen, Rook, Pawn, King};
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -90,18 +91,39 @@ impl ChessPiece {
         match self.piece_type {
             PieceType::Pawn => {
                 println!("col: {col}, row: {row}, color: {:?}", self.color);
+                let promotion_row = match self.color {
+                    Color::White => board.get_height() - 1,
+                    Color::Black => 0,
+                };
+                let promotion_options = [Queen, Rook, Knight, Bishop];
+
                 let one_ahead = match self.color {
                     Color::White => row + 1,
                     Color::Black => row - 1,
                 };
 
                 if board.check_space(col, one_ahead).is_none() {
-                    legal_moves.push(Move {
-                        original_position: SquareId::build(col, row),
-                        new_position: SquareId::build(col, one_ahead),
-                        piece: *self
-                    });
-                    
+                    if one_ahead == promotion_row {
+                        for promotion_piece in promotion_options {
+                            legal_moves.push(Move {
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(col, one_ahead),
+                                piece: *self,
+                                taken_piece: None,
+                                promotion: Some(ChessPiece::new(self.color, promotion_piece)),
+                            });
+                        }
+
+                    } else {
+                        legal_moves.push(Move {
+                            original_position: SquareId::build(col, row),
+                            new_position: SquareId::build(col, one_ahead),
+                            piece: *self,
+                            taken_piece: None,
+                            promotion: None,
+                        });
+                    }
+
                     let starting_row = match self.color {
                         Color::White => 1,
                         Color::Black => board.get_height() - 2,
@@ -119,6 +141,8 @@ impl ChessPiece {
                                 original_position: SquareId::build(col, row),
                                 new_position: SquareId::build(col, two_ahead),
                                 piece: *self,
+                                taken_piece: None,
+                                promotion: None
                             });
                         }
                     }
@@ -378,17 +402,28 @@ impl ChessPiece {
         }
         legal_moves
     }
+
+    fn get_notation_char(&self) -> &str {
+        match self.piece_type {
+            Pawn => "",
+            Rook => "R",
+            Knight => "N",
+            Bishop => "B",
+            Queen => "Q",
+            King => "K",
+        }
+    }
 }
 
 impl PieceType {
     fn get_as_utf_char(&self) -> char {
         match self {
-            PieceType::Pawn => '♙',
-            PieceType::Rook => '♖',
-            PieceType::Knight => '♘',
-            PieceType::Bishop => '♗',
-            PieceType::Queen => '♕',
-            PieceType::King => '♔',
+            Pawn => '♙',
+            Rook => '♖',
+            Knight => '♘',
+            Bishop => '♗',
+            Queen => '♕',
+            King => '♔',
         }
     }
 }
