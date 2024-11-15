@@ -30,7 +30,7 @@ fn main() {
                 break;
             }
             Check => {
-                // println!("{:?} is in check", game.current_turn);
+                println!("{:?} is in check", game.current_turn);
             }
             InProgress => {
                 // for m in &moves {
@@ -56,7 +56,7 @@ fn main() {
         let move_count = moves.len();
         let random_move_index = rand::thread_rng().gen_range(0..move_count);
         let next_move = &moves[random_move_index];
-        
+
         game.change_turn(*next_move);
     }
 }
@@ -65,15 +65,15 @@ fn main() {
 //     for (index, m) in moves.iter().enumerate() {
 //         println!("{index}: {m}");
 //     }
-// 
+//
 //     // wait for the user to press the enter key
 //     let mut i = String::new();
 //     std::io::stdin()
 //         .read_line(&mut i)
 //         .expect("TODO: panic message");
-// 
+//
 //     let i: usize = i.trim().parse().expect("Please enter a valid index.");
-// 
+//
 //     moves[i]
 // }
 

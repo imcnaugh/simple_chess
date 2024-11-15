@@ -1,6 +1,6 @@
 use crate::chess_move::{ChessMoveType};
 use crate::Color::{Black, White};
-use crate::{ChessPiece, Color, GameBoard};
+use crate::{Color, GameBoard};
 use crate::PieceType::{Pawn, Queen};
 
 /// # Game
@@ -55,12 +55,13 @@ impl Game {
 
         match m {
             ChessMoveType::EnPassant {..} => self.fifty_move_rule_counter = 0,
-            ChessMoveType::Move {taken_piece, ..} => {
-                if taken_piece.is_some() {
+            ChessMoveType::Move {taken_piece, piece, ..} => {
+                if taken_piece.is_some() || piece.piece_type == Pawn {
                     self.fifty_move_rule_counter = 0
                 } else {
                     self.fifty_move_rule_counter += 1
                 }
+                
             },
             ChessMoveType::Castle {..} => self.fifty_move_rule_counter += 1,
         };
