@@ -1,6 +1,6 @@
+use crate::{ChessPiece, Color};
 use core::fmt;
 use std::fmt::{format, Display, Formatter};
-use crate::{ChessPiece, Color};
 
 #[derive(Copy, Clone)]
 pub struct Square {
@@ -11,7 +11,11 @@ pub struct Square {
 
 impl Square {
     pub fn build(column: usize, row: usize) -> Self {
-        let color = if (column + row) % 2 == 1 { Color::White } else { Color::Black };
+        let color = if (column + row) % 2 == 1 {
+            Color::White
+        } else {
+            Color::Black
+        };
         Square {
             id: SquareId::build(column, row),
             color,
@@ -31,7 +35,7 @@ impl Square {
         self.piece.as_ref()
     }
 
-    pub fn clear_piece(&mut self) -> Option<ChessPiece>{
+    pub fn clear_piece(&mut self) -> Option<ChessPiece> {
         let piece = self.piece;
         self.piece = None;
         piece
@@ -103,9 +107,9 @@ impl SquareId {
         }
 
         let row: usize = row_as_string.parse().unwrap();
-        Ok(Self{
+        Ok(Self {
             column: column - 1,
-            row: row - 1
+            row: row - 1,
         })
     }
 
@@ -140,8 +144,8 @@ impl fmt::Display for SquareId {
 
 #[cfg(test)]
 mod tests {
-    use rand::Rng;
     use super::*;
+    use rand::Rng;
 
     #[test]
     fn col_row_turn_into_id() {

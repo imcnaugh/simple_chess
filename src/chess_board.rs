@@ -1,8 +1,8 @@
+use crate::chess_board_square::{Square, SquareId};
 use crate::chess_piece::ChessPiece;
 use crate::{Color, PieceType};
 use std::fmt;
 use std::ops::Index;
-use crate::chess_board_square::{Square, SquareId};
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
@@ -113,7 +113,7 @@ impl GameBoard {
     fn generate_board(width: usize, height: usize) -> Vec<Square> {
         assert!(width > 0 && height > 0);
 
-        let mut spaces = vec![Square::build(0,0); width * height];
+        let mut spaces = vec![Square::build(0, 0); width * height];
 
         for col in 0..width {
             for row in 0..height {
@@ -198,7 +198,7 @@ impl fmt::Display for GameBoard {
             for x in 0..self.get_width() {
                 let square_index = self.get_square_index(x, y);
                 let square = self.squares[square_index];
-                lines[y].push_str(format!("{square}", ).as_str());
+                lines[y].push_str(format!("{square}",).as_str());
             }
         }
 
@@ -254,7 +254,7 @@ mod tests {
         assert!(board.squares[square_index].get_piece().is_none());
 
         board.place_piece(removed_piece.unwrap(), 0, 1);
-        let square_index_a2 = board.get_square_index(0,1);
+        let square_index_a2 = board.get_square_index(0, 1);
         assert!(board.squares[square_index_a2].get_piece().is_some());
         assert_eq!(Knight, board.check_space(0, 1).unwrap().piece_type);
         assert_eq!(Color::White, board.check_space(0, 1).unwrap().color);
@@ -313,9 +313,7 @@ mod tests {
 
     #[test]
     fn should_be_able_to_detect_any_piece() {
-        let board_string = concat!(
-        "♜♞♝♛♚♟ \n",
-        "♖♘♗♕♔♙ ");
+        let board_string = concat!("♜♞♝♛♚♟ \n", "♖♘♗♕♔♙ ");
 
         let board = GameBoard::from_string(7, 2, board_string).unwrap();
         println!("{board}");

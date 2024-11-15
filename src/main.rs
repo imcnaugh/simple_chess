@@ -1,4 +1,4 @@
-use chess::chess_move::ChessMove;
+use chess::chess_move::{ChessMove, ChessMoveType};
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
 use chess::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
@@ -12,11 +12,11 @@ fn main() {
     loop {
         let (state, moves) = get_game_state(&game);
 
-        // clear_console();
-        // println!("{}", game.get_board());
-        // if let Some(last_move) = game.get_moves().last() {
-        //     println!("{last_move}");
-        // }
+        clear_console();
+        println!("{}", game.get_board());
+        if let Some(last_move) = game.get_moves().last() {
+            println!("{last_move}");
+        }
 
         match state {
             Checkmate => {
@@ -105,7 +105,7 @@ fn promote_pawn_selection() -> PieceType {
     options[i]
 }
 
-fn pick_random_move(moves: Vec<ChessMove>) -> ChessMove {
+fn pick_random_move(moves: Vec<&ChessMoveType>) -> &ChessMoveType {
     let random_move_index = rand::thread_rng().gen_range(0..moves.len());
     moves[random_move_index]
 }

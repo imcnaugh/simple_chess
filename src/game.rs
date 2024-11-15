@@ -1,4 +1,4 @@
-use crate::chess_move::ChessMove;
+use crate::chess_move::{ChessMove, ChessMoveType};
 use crate::Color::{Black, White};
 use crate::{Color, GameBoard};
 
@@ -9,7 +9,7 @@ pub struct Game {
     pub board: GameBoard,
     pub current_turn: Color,
     pub turn_number: u32,
-    moves: Vec<ChessMove>,
+    moves: Vec<ChessMoveType>,
     fifty_move_rule_counter: usize,
     pub white_can_castle_short: bool,
     pub white_can_castle_long: bool,
@@ -47,16 +47,17 @@ impl Game {
         }
     }
 
-    pub fn change_turn(&mut self, m: ChessMove) {
+    pub fn change_turn(&mut self, m: ChessMoveType) {
         if self.current_turn == Black {
             self.turn_number += 1;
         }
-
-        if m.takes.is_some() {
-            self.fifty_move_rule_counter = 0;
-        } else {
-            self.fifty_move_rule_counter += 1;
-        }
+        
+        match m {
+            ChessMoveType::Take {..} => self.fifty_move_rule_counter = 0,
+            ChessMoveType::EnPassant {..} => self.fifty_move_rule_counter = 0,
+            ChessMoveType::Move {..} => self.fifty_move_rule_counter += 1,
+            ChessMoveType::Castle {..} => self.fifty_move_rule_counter += 1,
+        };
 
         self.current_turn = match self.current_turn {
             White => Black,
@@ -74,7 +75,7 @@ impl Game {
         &self.board
     }
 
-    pub fn get_moves(&self) -> &Vec<ChessMove> {
+    pub fn get_moves(&self) -> &Vec<ChessMoveType> {
         &self.moves
     }
 
