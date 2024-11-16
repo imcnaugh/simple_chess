@@ -84,8 +84,6 @@ impl Game {
             }
         }
         
-        
-        
         self.current_turn = match self.current_turn {
             White => Black,
             Black => White,

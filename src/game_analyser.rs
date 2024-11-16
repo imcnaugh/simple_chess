@@ -156,6 +156,8 @@ fn can_castle_long(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
         if piece.piece_type != Rook {
             return None;
         }
+    } else {
+        return None;
     }
 
     let mut king_col = None;
@@ -212,6 +214,8 @@ fn can_castle_short(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
         if piece.piece_type != Rook {
             return None;
         }
+    } else {
+        return None;
     }
 
     let range = 0..board.get_width() - 1;
