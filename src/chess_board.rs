@@ -1,8 +1,7 @@
-use crate::chess_board_square::{Square, SquareId};
+use crate::chess_board_square::Square;
 use crate::chess_piece::ChessPiece;
 use crate::{Color, PieceType};
 use std::fmt;
-use std::ops::Index;
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
@@ -273,8 +272,7 @@ mod tests {
     #[should_panic]
     fn test_remove_piece_out_of_bounds() {
         let mut board = GameBoard::build_chess_board();
-
-        let piece = board.remove_piece(8, 0).unwrap();
+        board.remove_piece(8, 0).unwrap();
     }
 
     #[test]

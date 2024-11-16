@@ -1,9 +1,9 @@
+use chess::chess_move::ChessMoveType;
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
 use chess::{Color, Game};
 use rand::Rng;
 use std::io::Write;
-use chess::chess_move::ChessMoveType;
 
 fn main() {
     let mut game = Game::new_chess_game();
@@ -53,12 +53,12 @@ fn main() {
                 break;
             }
         }
-        
-        let next_move =  match game.current_turn {
+
+        let next_move = match game.current_turn {
             Color::White => print_and_get_next_move(moves),
             Color::Black => get_random_move(moves),
         };
-        
+
         game.change_turn(&next_move);
     }
 }

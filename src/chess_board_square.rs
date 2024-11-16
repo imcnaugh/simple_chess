@@ -1,6 +1,6 @@
 use crate::{ChessPiece, Color};
 use core::fmt;
-use std::fmt::{format, Display, Formatter};
+use std::fmt::Formatter;
 
 #[derive(Copy, Clone)]
 pub struct Square {
