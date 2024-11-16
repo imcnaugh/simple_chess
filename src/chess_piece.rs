@@ -1,8 +1,10 @@
 use crate::chess_board::GameBoard;
-use crate::chess_move::ChessMove;
+use crate::chess_move::{ChessMoveType};
 use crate::Color;
-use crate::PieceType::Pawn;
 use std::fmt;
+use crate::chess_board_square::SquareId;
+use crate::chess_move::ChessMoveType::{EnPassant, Move};
+use crate::PieceType::{Bishop, Knight, Queen, Rook, Pawn, King};
 
 /// # Enum for the type of chess piece.
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -83,125 +85,130 @@ impl ChessPiece {
         col: usize,
         row: usize,
         board: &'a GameBoard,
-        last_move: Option<&ChessMove>,
-    ) -> Vec<ChessMove> {
-        let mut legal_moves: Vec<ChessMove> = Vec::new();
+        last_move: Option<&ChessMoveType>,
+    ) -> Vec<ChessMoveType> {
+        let mut legal_moves: Vec<ChessMoveType> = Vec::new();
         match self.piece_type {
-            PieceType::Pawn => {
+            Pawn => {
+                let promotion_row = match self.color {
+                    Color::White => board.get_height() - 1,
+                    Color::Black => 0,
+                };
+                let promotion_options = [Queen, Rook, Knight, Bishop];
+
                 let one_ahead = match self.color {
                     Color::White => row + 1,
                     Color::Black => row - 1,
                 };
 
-                let promotion_row = match self.color {
-                    Color::White => board.get_height(),
-                    Color::Black => 0,
-                };
+                if board.check_space(col, one_ahead).is_none() {
+                    legal_moves.append(&mut create_moves(
+                        (col, row),
+                        (col, one_ahead),
+                        *self,
+                        None,
+                        one_ahead==promotion_row
+                    ));
 
-                if row != promotion_row {
-                    if let None = board.check_space(col, one_ahead) {
-                        legal_moves.push(ChessMove::build(
-                            (col, row),
-                            (col, one_ahead),
-                            self.clone(),
-                            None,
-                            None,
-                        ));
-                        let starting_row = match self.color {
-                            Color::White => 1,
-                            Color::Black => board.get_height() - 2,
+                    let starting_row = match self.color {
+                        Color::White => 1,
+                        Color::Black => board.get_height() - 2,
+                    };
+
+                    if row == starting_row {
+                        let two_ahead = match self.color {
+                            Color::White => row + 2,
+                            Color::Black => row - 2,
                         };
 
-                        if row == starting_row {
-                            let two_ahead = match self.color {
-                                Color::White => row + 2,
-                                Color::Black => row - 2,
-                            };
+                        if board.check_space(col, two_ahead).is_none()
+                        {
+                            legal_moves.append(&mut create_moves(
+                                (col, row),
+                                (col, two_ahead),
+                                *self,
+                                None,
+                                one_ahead==promotion_row
+                            ));
+                        }
+                    }
+                }
 
-                            if two_ahead <= board.get_height() {
-                                if let None = board.check_space(col, two_ahead) {
-                                    legal_moves.push(ChessMove::build(
-                                        (col, row),
-                                        (col, two_ahead),
-                                        self.clone(),
-                                        None,
-                                        None,
-                                    ));
+                if col > 0 {
+                    if let Some(piece) = board.check_space(col - 1, one_ahead) {
+                        if *piece.get_color() != self.color {
+                            legal_moves.append(&mut create_moves(
+                                (col, row),
+                                (col - 1, one_ahead),
+                                *self,
+                                Some(*piece),
+                                one_ahead==promotion_row
+                            ));
+                        }
+                    }
+
+                    // En Passant
+                    if let Some(last_move) = last_move {
+                        if let Move { original_position, new_position, piece, .. } = last_move {
+                            if piece.piece_type == PieceType::Pawn {
+                                let rows_moved = if original_position.get_row() < new_position.get_row() {
+                                    new_position.get_row() - original_position.get_row()
+                                } else {
+                                    original_position.get_row() - new_position.get_row()
+                                };
+
+                                if rows_moved == 2 && new_position.get_row() == row && new_position.get_column() == col - 1 {
+                                    legal_moves.push(EnPassant {
+                                        original_position: SquareId::build(col, row),
+                                        new_position: SquareId::build(col - 1, one_ahead),
+                                        piece: *self,
+                                        taken_piece: *piece,
+                                        taken_piece_position: SquareId::build(col-1, row),
+                                    })
                                 }
                             }
                         }
                     }
+                }
 
-                    if col > 0 {
-                        if let Some(piece) = board.check_space(col - 1, one_ahead) {
-                            if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (col - 1, one_ahead),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((col - 1, one_ahead)),
-                                ));
-                            }
-                        }
-
-                        // En Passant
-                        if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn
-                                && last_move.new_position.0 == (col - 1)
-                                && last_move.new_position.1 == row
-                                && (last_move.new_position.1 as isize
-                                    - last_move.original_position.1 as isize)
-                                    .abs()
-                                    == 2
-                            {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (col - 1, one_ahead),
-                                    self.clone(),
-                                    Some(last_move.piece),
-                                    Some((col - 1, row)),
-                                ));
-                            }
+                if col < board.get_width() - 1 {
+                    if let Some(piece) = board.check_space(col + 1, one_ahead) {
+                        if *piece.get_color() != self.color {
+                            legal_moves.append(&mut create_moves(
+                                (col, row),
+                                (col + 1, one_ahead),
+                                *self,
+                                Some(*piece),
+                                one_ahead==promotion_row
+                            ));
                         }
                     }
 
-                    if col < board.get_width() - 1 {
-                        if let Some(piece) = board.check_space(col + 1, one_ahead) {
-                            if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (col + 1, one_ahead),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((col + 1, one_ahead)),
-                                ));
-                            }
-                        }
+                    // En Passant
+                    if let Some(last_move) = last_move {
+                        if let Move { original_position, new_position, piece, .. } = last_move {
+                            if piece.piece_type == PieceType::Pawn {
+                                let rows_moved = if original_position.get_row() < new_position.get_row() {
+                                    new_position.get_row() - original_position.get_row()
+                                } else {
+                                    original_position.get_row() - new_position.get_row()
+                                };
 
-                        // En Passant
-                        if let Some(last_move) = last_move {
-                            if last_move.piece.piece_type == Pawn
-                                && last_move.new_position.0 == (col + 1)
-                                && last_move.new_position.1 == row
-                                && (last_move.new_position.1 as isize
-                                    - last_move.original_position.1 as isize)
-                                    .abs()
-                                    == 2
-                            {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (col + 1, one_ahead),
-                                    self.clone(),
-                                    Some(last_move.piece),
-                                    Some((col + 1, row)),
-                                ));
+                                if rows_moved == 2 && new_position.get_row() == row && new_position.get_column() == col + 1  {
+                                    legal_moves.push(EnPassant {
+                                        original_position: SquareId::build(col, row),
+                                        new_position: SquareId::build(col + 1, one_ahead),
+                                        piece: *self,
+                                        taken_piece: *piece,
+                                        taken_piece_position: SquareId::build(col+1, row),
+                                    })
+                                }
                             }
                         }
                     }
                 }
             }
-            PieceType::Rook => {
+            Rook => {
                 let directions = [(0, 1), (0, -1), (1, 0), (-1, 0)];
                 for dir in directions.iter() {
                     let mut x = col as i32 + dir.0;
@@ -213,23 +220,24 @@ impl ChessPiece {
                     {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (x as usize, y as usize),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((x as usize, y as usize)),
-                                ));
+                                legal_moves.push(Move {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(x as usize, y as usize),
+                                    piece: *self,
+                                    taken_piece: Some(*piece),
+                                    promotion: None,
+                                })
                             }
                             break;
                         }
-                        legal_moves.push(ChessMove::build(
-                            (col, row),
-                            (x as usize, y as usize),
-                            self.clone(),
-                            None,
-                            None,
-                        ));
+                        legal_moves.push(Move {
+                            original_position: SquareId::build(col, row),
+                            new_position: SquareId::build(x as usize, y as usize),
+                            piece: *self,
+                            taken_piece: None,
+                            promotion: None
+                        });
+
                         x += dir.0;
                         y += dir.1;
                     }
@@ -256,22 +264,22 @@ impl ChessPiece {
                     {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (x as usize, y as usize),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((x as usize, y as usize)),
-                                ));
+                                legal_moves.push(Move{
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(x as usize, y as usize),
+                                    piece: *self,
+                                    taken_piece: Some(*piece),
+                                    promotion: None
+                                });
                             }
                         } else {
-                            legal_moves.push(ChessMove::build(
-                                (col, row),
-                                (x as usize, y as usize),
-                                self.clone(),
-                                None,
-                                None,
-                            ));
+                            legal_moves.push(Move{
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(x as usize, y as usize),
+                                piece: *self,
+                                taken_piece: None,
+                                promotion: None
+                            });
                         }
                     }
                 }
@@ -288,23 +296,23 @@ impl ChessPiece {
                     {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (x as usize, y as usize),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((x as usize, y as usize)),
-                                ));
+                                legal_moves.push(Move {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(x as usize, y as usize),
+                                    piece: *self,
+                                    taken_piece: Some(*piece),
+                                    promotion: None
+                                });
                             }
                             break;
                         }
-                        legal_moves.push(ChessMove::build(
-                            (col, row),
-                            (x as usize, y as usize),
-                            self.clone(),
-                            None,
-                            None,
-                        ));
+                        legal_moves.push(Move {
+                            original_position: SquareId::build(col, row),
+                            new_position: SquareId::build(x as usize, y as usize),
+                            piece: *self,
+                            taken_piece: None,
+                            promotion: None
+                        });
                         x += dir.0;
                         y += dir.1;
                     }
@@ -331,23 +339,23 @@ impl ChessPiece {
                     {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (x as usize, y as usize),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((x as usize, y as usize)),
-                                ));
+                                legal_moves.push(Move {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(x as usize, y as usize),
+                                    piece: *self,
+                                    taken_piece: Some(*piece),
+                                    promotion: None
+                                });
                             }
                             break;
                         }
-                        legal_moves.push(ChessMove::build(
-                            (col, row),
-                            (x as usize, y as usize),
-                            self.clone(),
-                            None,
-                            None,
-                        ));
+                        legal_moves.push(Move {
+                            original_position: SquareId::build(col, row),
+                            new_position: SquareId::build(x as usize, y as usize),
+                            piece: *self,
+                            taken_piece: None,
+                            promotion: None
+                        });
                         x += dir.0;
                         y += dir.1;
                     }
@@ -374,22 +382,22 @@ impl ChessPiece {
                     {
                         if let Some(piece) = board.check_space(x as usize, y as usize) {
                             if *piece.get_color() != self.color {
-                                legal_moves.push(ChessMove::build(
-                                    (col, row),
-                                    (x as usize, y as usize),
-                                    self.clone(),
-                                    Some(piece.clone()),
-                                    Some((x as usize, y as usize)),
-                                ));
+                                legal_moves.push(Move {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(x as usize, y as usize),
+                                    piece: *self,
+                                    taken_piece: Some(*piece),
+                                    promotion: None
+                                });
                             }
                         } else {
-                            legal_moves.push(ChessMove::build(
-                                (col, row),
-                                (x as usize, y as usize),
-                                self.clone(),
-                                None,
-                                None,
-                            ));
+                            legal_moves.push(Move {
+                                original_position: SquareId::build(col, row),
+                                new_position: SquareId::build(x as usize, y as usize),
+                                piece: *self,
+                                taken_piece: None,
+                                promotion: None
+                            });
                         }
                     }
                 }
@@ -397,17 +405,59 @@ impl ChessPiece {
         }
         legal_moves
     }
+
+    fn get_notation_char(&self) -> &str {
+        match self.piece_type {
+            Pawn => "",
+            Rook => "R",
+            Knight => "N",
+            Bishop => "B",
+            Queen => "Q",
+            King => "K",
+        }
+    }
+}
+
+fn create_moves(
+    o_pos: (usize, usize),
+    n_pos: (usize, usize),
+    piece: ChessPiece,
+    taken_piece: Option<ChessPiece>,
+    can_promote: bool,
+) -> Vec<ChessMoveType> {
+    let mut moves = Vec::new();
+    if can_promote {
+        let promotion_options = [Queen, Rook, Knight, Bishop];
+        for promotion_piece in promotion_options {
+            moves.push(Move {
+                original_position: SquareId::build(o_pos.0, o_pos.1),
+                new_position: SquareId::build(n_pos.0, n_pos.1),
+                piece,
+                taken_piece,
+                promotion: Some(ChessPiece::new(piece.color, promotion_piece))
+            })
+        }
+    } else {
+        moves.push(Move {
+            original_position: SquareId::build(o_pos.0, o_pos.1),
+            new_position: SquareId::build(n_pos.0, n_pos.1),
+            piece,
+            taken_piece,
+            promotion: None
+        })
+    }
+    moves
 }
 
 impl PieceType {
     fn get_as_utf_char(&self) -> char {
         match self {
-            PieceType::Pawn => '♙',
-            PieceType::Rook => '♖',
-            PieceType::Knight => '♘',
-            PieceType::Bishop => '♗',
-            PieceType::Queen => '♕',
-            PieceType::King => '♔',
+            Pawn => '♙',
+            Rook => '♖',
+            Knight => '♘',
+            Bishop => '♗',
+            Queen => '♕',
+            King => '♔',
         }
     }
 }

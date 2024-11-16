@@ -1,4 +1,5 @@
 mod chess_board;
+mod chess_board_square;
 pub mod chess_move;
 mod chess_piece;
 pub mod color;

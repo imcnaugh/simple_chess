@@ -1,10 +1,9 @@
-use chess::chess_move::ChessMove;
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
-use chess::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
-use chess::{Color, Game, PieceType};
+use chess::{Color, Game};
 use rand::Rng;
 use std::io::Write;
+use chess::chess_move::ChessMoveType;
 
 fn main() {
     let mut game = Game::new_chess_game();
@@ -13,10 +12,10 @@ fn main() {
         let (state, moves) = get_game_state(&game);
 
         clear_console();
-        println!("{}", game.get_board());
         if let Some(last_move) = game.get_moves().last() {
             println!("{last_move}");
         }
+        println!("{}", game.get_board());
 
         match state {
             Checkmate => {
@@ -54,66 +53,30 @@ fn main() {
                 break;
             }
         }
-
-        let mut next_move = match game.current_turn {
+        
+        let next_move =  match game.current_turn {
             Color::White => print_and_get_next_move(moves),
-            Color::Black => pick_random_move(moves),
+            Color::Black => {
+                let move_count = moves.len();
+                let random_move_index = rand::thread_rng().gen_range(0..move_count);
+                moves[random_move_index]
+            }
         };
-
-        if next_move.piece.piece_type == Pawn
-            && (next_move.new_position.1 == 0
-                || next_move.new_position.1 == game.board.get_height() - 1)
-        {
-            let promotion_piece = match game.current_turn {
-                Color::White => promote_pawn_selection(),
-                Color::Black => Queen,
-            };
-            next_move.piece.piece_type = promotion_piece;
-        }
-
-        if let Some((taken_col, taken_row)) = next_move.taken_piece_position {
-            game.get_board_mut().remove_piece(taken_col, taken_row);
-        }
-
-        game.get_board_mut().place_piece(
-            next_move.piece,
-            next_move.new_position.0,
-            next_move.new_position.1,
-        );
-        game.get_board_mut()
-            .remove_piece(next_move.original_position.0, next_move.original_position.1);
-
-        game.change_turn(next_move);
+        
+        game.change_turn(&next_move);
     }
 }
 
-fn promote_pawn_selection() -> PieceType {
-    let options = vec![Bishop, Knight, Rook, Queen];
-    for (index, piece_type) in options.iter().enumerate() {
-        println!("{index}: {:?}", piece_type);
-    }
-
-    let mut i = String::new();
-    std::io::stdin().read_line(&mut i);
-
-    let i: usize = i.trim().parse().expect("Please enter a valid index.");
-
-    options[i]
-}
-
-fn pick_random_move(moves: Vec<ChessMove>) -> ChessMove {
-    let random_move_index = rand::thread_rng().gen_range(0..moves.len());
-    moves[random_move_index]
-}
-
-fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
+fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
     for (index, m) in moves.iter().enumerate() {
         println!("{index}: {m}");
     }
 
     // wait for the user to press the enter key
     let mut i = String::new();
-    std::io::stdin().read_line(&mut i);
+    std::io::stdin()
+        .read_line(&mut i)
+        .expect("TODO: panic message");
 
     let i: usize = i.trim().parse().expect("Please enter a valid index.");
 

@@ -1,16 +1,16 @@
 use crate::chess_board::GameBoard;
-use crate::chess_move::ChessMove;
+use crate::chess_move::{ChessMoveType};
 use crate::game_state::GameState;
 use crate::game_state::GameState::{
     Check, Checkmate, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
 };
-use crate::Color::White;
-use crate::PieceType::{Bishop, King, Knight, Pawn};
-use crate::{ChessPiece, Color, Game, PieceType};
+use crate::Color::{Black, White};
+use crate::PieceType::{Bishop, King, Knight, Rook};
+use crate::{ChessPiece, Color, Game};
+use crate::chess_board_square::SquareId;
 
-pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMove>) {
-    let is_in_check =
-        is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
+pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMoveType>) {
+    let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
     let possible_next_moves = get_all_moves(game);
 
     if possible_next_moves.is_empty() {
@@ -83,12 +83,12 @@ fn is_insufficient_material(pieces: Vec<&ChessPiece>) -> bool {
     false
 }
 
-fn get_all_moves(game: &Game) -> Vec<ChessMove> {
+fn get_all_moves(game: &Game) -> Vec<ChessMoveType> {
     let width = game.board.get_width();
     let height = game.board.get_height();
 
     let current_turn = game.current_turn;
-    let mut legal_moves: Vec<ChessMove> = Vec::new();
+    let mut legal_moves: Vec<ChessMoveType> = Vec::new();
     let board = game.get_board();
 
     for col in 0..width {
@@ -99,11 +99,7 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
 
                     for m in moves {
                         let mut cloned_board = board.clone();
-                        if let Some(taken_position) = m.taken_piece_position {
-                            cloned_board.remove_piece(taken_position.0, taken_position.1);
-                        }
-                        cloned_board.remove_piece(m.original_position.0, m.original_position.1);
-                        cloned_board.place_piece(m.piece, m.new_position.0, m.new_position.1);
+                        m.make_move(&mut cloned_board);
 
                         if !is_color_in_check(&cloned_board, current_turn, game.get_moves().last())
                         {
@@ -115,10 +111,152 @@ fn get_all_moves(game: &Game) -> Vec<ChessMove> {
         }
     }
 
+    match current_turn {
+        White => {
+            if game.white_can_castle_long {
+                if let Some(m) = can_castle_long(White, board){
+                    legal_moves.push(m);
+                }
+            }
+            if game.white_can_castle_short {
+                if let Some(m) = can_castle_short(White, board) {
+                    legal_moves.push(m);
+
+                }
+            }
+        }
+        Black => {
+            if game.black_can_castle_long {
+                if let Some(m) = can_castle_long(Black, board) {
+                    legal_moves.push(m);
+                }
+            }
+            if game.black_can_castle_short {
+                if let Some(m) = can_castle_short(Black, board){
+                    legal_moves.push(m);
+                }
+            }
+        }
+    }
+
     legal_moves
 }
 
-fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMove>) -> bool {
+fn can_castle_long(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
+    let row = match color {
+        White => 0,
+        Black => board.get_height() - 1,
+    };
+
+    if is_color_in_check(board, color, None) {
+        return None;
+    }
+
+    if let Some(piece) = board.check_space(0, row) {
+        if piece.piece_type != Rook {
+            return None;
+        }
+    }
+
+    let mut king_col = None;
+    for col in 1..board.get_width() {
+        if let Some(piece) = board.check_space(col, row) {
+            if piece.piece_type != King {
+                return None;
+            } else {
+                king_col = Some(col);
+                break;
+            }
+        }
+    }
+
+    if king_col? < 2 {
+        return None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? - 1, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return  None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? - 2, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+
+    Some(ChessMoveType::Castle {
+        king: *board.check_space(king_col?, row).unwrap(),
+        original_king_position: SquareId::build(king_col?, row),
+        new_king_position: SquareId::build(king_col? - 2, row),
+        rook: *board.check_space(0, row).unwrap(),
+        original_rook_position: SquareId::build(0, row),
+        new_rook_position: SquareId::build(king_col? - 1 , row),
+    })
+}
+
+fn can_castle_short(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
+    let row = match color {
+        White => 0,
+        Black => board.get_height() - 1,
+    };
+
+    if is_color_in_check(board, color, None) {
+        return None;
+    }
+
+    if let Some(piece) = board.check_space(board.get_width() - 1, row) {
+        if piece.piece_type != Rook {
+            return None;
+        }
+    }
+
+    let range = 0..board.get_width() - 1;
+    let range = range.rev();
+
+    let mut king_col = None;
+    for col in range {
+        if let Some(piece) = board.check_space(col, row) {
+            if piece.piece_type != King {
+                return None;
+            } else {
+                king_col = Some(col);
+                break;
+            }
+        };
+    }
+
+    if board.get_width() < 3 || king_col? > (board.get_width() - 3) {
+        return None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? + 1, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? + 2, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+
+    Some(ChessMoveType::Castle {
+        king: *board.check_space(king_col?, row).unwrap(),
+        original_king_position: SquareId::build(king_col?, row),
+        new_king_position: SquareId::build(king_col? + 2, row),
+        rook: *board.check_space(board.get_width() - 1, row).unwrap(),
+        original_rook_position: SquareId::build(board.get_width() - 1, row),
+        new_rook_position: SquareId::build(king_col? + 1 , row),
+    })
+}
+
+fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMoveType>) -> bool {
     let opposite_color = color.opposite_color();
 
     for col in 0..board.get_width() {
@@ -127,11 +265,13 @@ fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMo
                 if piece.color == opposite_color {
                     let moves = piece.get_legal_moves(col, row, board, last_move);
                     for mov in moves {
-                        if let Some(takes_piece) = mov.takes {
-                            if takes_piece.get_piece_type() == &King
-                                && takes_piece.get_color() == &color
-                            {
-                                return true;
+                        if let ChessMoveType::Move {taken_piece, ..} = mov {
+                            if let Some(taken_piece) = taken_piece {
+                                if taken_piece.get_piece_type() == &King
+                                    && taken_piece.get_color() == &color
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -153,14 +293,14 @@ mod tests {
         let board = GameBoard::from_string(2, 2, concat!(" ♛\n", "♔ ",)).unwrap();
         let is_in_check = is_color_in_check(&board, Color::White, None);
 
-        assert_eq!(true, is_in_check)
+        assert!(is_in_check)
     }
 
     #[test]
     fn more() {
-        let mut game = Game::new_chess_game();
+        let game = Game::new_chess_game();
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for v in moves {
             println!("{v}");
@@ -172,9 +312,9 @@ mod tests {
         let board = concat!("  ♔  \n", "  ♗  \n", "     \n", "     \n", "  ♜  ",);
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for m in moves {
             println!("{m}");
@@ -186,9 +326,9 @@ mod tests {
         let board = concat!("  ♔  \n", "     \n", "♗    \n", "     \n", " ♜♜♜ ",);
         let game_board = GameBoard::from_string(5, 5, board).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         for m in moves {
             println!("{m}");
@@ -209,9 +349,9 @@ mod tests {
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
-        let mut game = Game::new_game(game_board, White);
+        let game = Game::new_game(game_board, White);
 
-        let moves = get_all_moves(&mut game);
+        let moves = get_all_moves(&game);
 
         assert_eq!(0, moves.len());
     }
@@ -230,21 +370,33 @@ mod tests {
         );
         let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
 
-        let mut game = Game::new_game(game_board, Black);
+        println!("{game_board}");
 
-        let moves = get_all_moves(&mut game);
+        let game = Game::new_game(game_board, Black);
+
+        let moves = get_all_moves(&game);
 
         assert_eq!(1, moves.len());
         let only_move = moves.first().unwrap();
-        assert_eq!(1, only_move.new_position.0);
-        assert_eq!(7, only_move.new_position.1);
+
+        if let ChessMoveType::Move { original_position, new_position, piece, .. } = only_move {
+            assert_eq!(1, new_position.get_column());
+            assert_eq!(7, new_position.get_row());
+        }else {
+            panic!("Should be a move")
+        }
 
         println!("{only_move}");
     }
 
     #[test]
     fn test_en_passant() {
-        let chess_board_as_string = concat!("♚ \n", "♟ \n", "  \n", " ♙\n", " ♔");
+        let chess_board_as_string = concat!(
+            "♚ \n",
+            "♟ \n",
+            "  \n",
+            " ♙\n",
+            " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);
@@ -257,20 +409,17 @@ mod tests {
             println!("{m}");
         }
 
-        let move_pawn_to_b4 = *next_moves
+        let move_pawn_to_b4 = next_moves
             .iter()
-            .find(|p| p.new_position.0 == 1 && p.new_position.1 == 3)
+            .find(|p| -> bool {
+                if let ChessMoveType::Move { new_position, ..} = p {
+                    if new_position.get_column() == 1 && new_position.get_row() == 3 {
+                        return true
+                    }
+                };
+                false
+            })
             .unwrap();
-        game.get_board_mut().remove_piece(
-            move_pawn_to_b4.original_position.0,
-            move_pawn_to_b4.original_position.1,
-        );
-        game.get_board_mut().place_piece(
-            move_pawn_to_b4.piece,
-            move_pawn_to_b4.new_position.0,
-            move_pawn_to_b4.new_position.1,
-        );
-
         game.change_turn(move_pawn_to_b4);
 
         println!("{}", game.get_board());
@@ -287,7 +436,12 @@ mod tests {
 
     #[test]
     fn test_en_passant2() {
-        let chess_board_as_string = concat!(" ♚\n", " ♟\n", "  \n", "♙ \n", " ♔");
+        let chess_board_as_string = concat!(
+            " ♚\n",
+            " ♟\n",
+            "  \n",
+            "♙ \n",
+            " ♔");
         let game_board = GameBoard::from_string(2, 5, chess_board_as_string).unwrap();
 
         let mut game = Game::new_game(game_board, White);
@@ -300,19 +454,17 @@ mod tests {
             println!("{m}");
         }
 
-        let move_pawn_to_b4 = *next_moves
+        let move_pawn_to_b4 = next_moves
             .iter()
-            .find(|p| p.new_position.0 == 0 && p.new_position.1 == 3)
+            .find(|p| -> bool {
+                if let ChessMoveType::Move{new_position, ..} = p {
+                    if new_position.get_column() == 0 && new_position.get_row() == 3 {
+                        return true;
+                    }
+                }
+                false
+            })
             .unwrap();
-        game.get_board_mut().remove_piece(
-            move_pawn_to_b4.original_position.0,
-            move_pawn_to_b4.original_position.1,
-        );
-        game.get_board_mut().place_piece(
-            move_pawn_to_b4.piece,
-            move_pawn_to_b4.new_position.0,
-            move_pawn_to_b4.new_position.1,
-        );
 
         game.change_turn(move_pawn_to_b4);
 
@@ -326,5 +478,96 @@ mod tests {
         }
 
         assert_eq!(3, moves.len());
+    }
+
+    #[test]
+    fn can_black_castle_long() {
+        let chess_board_as_string = concat!(
+            "♜   ♚ ♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "     ♙  \n",
+            "♙♙♙♙♙  ♙\n",
+            "♖♘♗♕♔♗♘♖\n"
+        );
+        let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let can_castle_long = can_castle_long(Black, &game_board);
+
+        assert!(can_castle_long.is_some())
+    }
+
+    #[test]
+    fn can_white_castle_long() {
+        let chess_board_as_string = concat!(
+            "♜ ♞ ♚ ♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "     ♛  \n",
+            "        \n",
+            "♙♙♙♙   ♙\n",
+            "♖   ♔♗♘♖"
+        );
+        let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let can_castle_long = can_castle_long(White, &game_board);
+
+        assert!(can_castle_long.is_some())
+    }
+
+    #[test]
+    fn cant_black_castle_short() {
+        let chess_board_as_string = concat!(
+            "♜  ♞♚  ♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "     ♙  \n",
+            "♙♙♙♙♙  ♙\n",
+            "♖♘♗♕♔♗♘♖\n"
+        );
+        let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let can_castle_short = can_castle_short(Black, &game_board);
+
+        assert!(can_castle_short.is_some())
+    }
+
+    #[test]
+    fn cant_white_castle_short() {
+        let chess_board_as_string = concat!(
+            "♜  ♞♚  ♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "      ♙♛\n",
+            "        \n",
+            "♙♙♙♙♙♙ ♙\n",
+            "♖♘♗♕♔  ♖\n"
+        );
+        let game_board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let can_castle_short = can_castle_short(White, &game_board);
+
+        assert!(can_castle_short.is_some())
+    }
+
+    #[test]
+    fn solve_this_bug() {
+        let board_as_string = concat!(
+        "♔ \n",
+        "  \n",
+        "♟♚\n",
+        "  "
+        );
+
+
+        let game_board = GameBoard::from_string(2, 4, board_as_string).unwrap();
+
+        is_color_in_check(&game_board, Color::White, None);
     }
 }
