@@ -56,15 +56,17 @@ fn main() {
         
         let next_move =  match game.current_turn {
             Color::White => print_and_get_next_move(moves),
-            Color::Black => {
-                let move_count = moves.len();
-                let random_move_index = rand::thread_rng().gen_range(0..move_count);
-                moves[random_move_index]
-            }
+            Color::Black => get_random_move(moves),
         };
         
         game.change_turn(&next_move);
     }
+}
+
+fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
+    let move_count = moves.len();
+    let random_move_index = rand::thread_rng().gen_range(0..move_count);
+    moves[random_move_index]
 }
 
 fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
