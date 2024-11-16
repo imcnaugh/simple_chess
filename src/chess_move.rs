@@ -50,13 +50,13 @@ impl ChessMoveType {
             ChessMoveType::EnPassant {
                 original_position,
                 new_position,
-                piece: _piece,
-                taken_piece,
+                piece,
                 taken_piece_position,
+                ..
             } => {
                 board.remove_piece(taken_piece_position.get_column(), taken_piece_position.get_row());
                 board.remove_piece(original_position.get_column(), original_position.get_row());
-                board.place_piece(*taken_piece, new_position.get_column(), new_position.get_row());
+                board.place_piece(*piece, new_position.get_column(), new_position.get_row());
             }
             ChessMoveType::Castle {
                 king,
@@ -81,11 +81,11 @@ impl fmt::Display for ChessMoveType {
             ChessMoveType::Move {
                 original_position, new_position, piece, taken_piece, promotion
             } => {
-                let promotion_message = match promotion { 
+                let promotion_message = match promotion {
                     Some(promotion_piece) => format!(" and promotes to {:?}", promotion_piece.piece_type),
                     None => String::new(),
                 };
-                
+
                 if let Some(taken_piece) = taken_piece {
                     write!(f, "{:?} {:?} takes {:?} at {} from {} {}", piece.color, piece.piece_type, taken_piece.piece_type ,new_position, original_position, promotion_message)
                 } else {

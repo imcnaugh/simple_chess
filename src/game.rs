@@ -1,7 +1,9 @@
+use std::thread::panicking;
 use crate::chess_move::{ChessMoveType};
 use crate::Color::{Black, White};
 use crate::{Color, GameBoard};
-use crate::PieceType::{Pawn, Queen};
+use crate::chess_move::ChessMoveType::Castle;
+use crate::PieceType::{King, Pawn, Queen, Rook};
 
 /// # Game
 ///
@@ -53,19 +55,37 @@ impl Game {
             self.turn_number += 1;
         }
 
-        match m {
-            ChessMoveType::EnPassant {..} => self.fifty_move_rule_counter = 0,
-            ChessMoveType::Move {taken_piece, piece, ..} => {
-                if taken_piece.is_some() || piece.piece_type == Pawn {
-                    self.fifty_move_rule_counter = 0
-                } else {
-                    self.fifty_move_rule_counter += 1
+        self.update_50_move_rule_counter(m);
+        
+        let castle_dir = match self.current_turn {
+            White => (&mut self.white_can_castle_short, &mut self.white_can_castle_long),
+            Black => (&mut self.black_can_castle_short, &mut self.black_can_castle_long),
+        };
+        
+        if let Castle {..} = m {
+            *castle_dir.0 = false;
+            *castle_dir.1 = false;
+        }
+        
+        if let ChessMoveType::Move {piece, original_position, ..} = m {
+            if piece.piece_type == King {
+                *castle_dir.0 = false;
+                *castle_dir.1 = false;
+            }
+            
+            if piece.piece_type == Rook {
+                if original_position.get_column() == 0 {
+                    *castle_dir.1 = false;
                 }
                 
-            },
-            ChessMoveType::Castle {..} => self.fifty_move_rule_counter += 1,
-        };
-
+                if original_position.get_column() == self.board.get_width() - 1{
+                    *castle_dir.0 = false;
+                }
+            }
+        }
+        
+        
+        
         self.current_turn = match self.current_turn {
             White => Black,
             Black => White,
@@ -74,6 +94,20 @@ impl Game {
         m.make_move(&mut self.board);
 
         self.moves.push(m);
+    }
+
+    fn update_50_move_rule_counter(&mut self, m: ChessMoveType) {
+        match m {
+            ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 0,
+            ChessMoveType::Move { taken_piece, piece, .. } => {
+                if taken_piece.is_some() || piece.piece_type == Pawn {
+                    self.fifty_move_rule_counter = 0
+                } else {
+                    self.fifty_move_rule_counter += 1
+                }
+            },
+            _ => self.fifty_move_rule_counter += 1,
+        };
     }
 
     pub fn get_board_mut(&mut self) -> &mut GameBoard {

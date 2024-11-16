@@ -7,6 +7,7 @@ use crate::game_state::GameState::{
 use crate::Color::{Black, White};
 use crate::PieceType::{Bishop, King, Knight, Rook};
 use crate::{ChessPiece, Color, Game};
+use crate::chess_board_square::SquareId;
 
 pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMoveType>) {
     let is_in_check = is_color_in_check(game.get_board(), game.current_turn, game.get_moves().last());
@@ -110,107 +111,149 @@ fn get_all_moves(game: &Game) -> Vec<ChessMoveType> {
         }
     }
 
-    // match current_turn {
-    //     White => {
-    //         if game.white_can_castle_long && can_castle_long(White, board) {
-    //             // TODO refactor chess move for castling
-    //         }
-    //         if game.white_can_castle_short && can_castle_short(White, board) {
-    //             // TODO refactor chess move for castling
-    //         }
-    //     }
-    //     Black => {
-    //         if game.black_can_castle_long && can_castle_long(Black, board) {
-    //             // TODO refactor chess move for castling
-    //         }
-    //         if game.black_can_castle_short && can_castle_short(Black, board) {
-    //             // TODO refactor chess move for castling
-    //         }
-    //     }
-    // }
+    match current_turn {
+        White => {
+            if game.white_can_castle_long {
+                if let Some(m) = can_castle_long(White, board){
+                    legal_moves.push(m);
+                }
+            }
+            if game.white_can_castle_short {
+                if let Some(m) = can_castle_short(White, board) {
+                    legal_moves.push(m);
+
+                }
+            }
+        }
+        Black => {
+            if game.black_can_castle_long {
+                if let Some(m) = can_castle_long(Black, board) {
+                    legal_moves.push(m);
+                }
+            }
+            if game.black_can_castle_short {
+                if let Some(m) = can_castle_short(Black, board){
+                    legal_moves.push(m);
+                }
+            }
+        }
+    }
 
     legal_moves
 }
 
-fn can_castle_long(color: Color, board: &GameBoard) -> bool {
+fn can_castle_long(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
     let row = match color {
         White => 0,
         Black => board.get_height() - 1,
     };
+
+    if is_color_in_check(board, color, None) {
+        return None;
+    }
 
     if let Some(piece) = board.check_space(0, row) {
         if piece.piece_type != Rook {
-            return false;
-        }
-
-        for col in 1..board.get_width() {
-            if let Some(piece) = board.check_space(col, row) {
-                if piece.piece_type != King {
-                    return false;
-                }
-                if is_color_in_check(board, color, None) {
-                    return false;
-                }
-                let mut board_clone = board.clone();
-                let king = board_clone.remove_piece(col, row).unwrap();
-                board_clone.place_piece(king, col - 1, row);
-                if is_color_in_check(&board_clone, color, None) {
-                    return false;
-                }
-                let mut board_clone = board.clone();
-                let king = board_clone.remove_piece(col, row).unwrap();
-                board_clone.place_piece(king, col - 2, row);
-                if is_color_in_check(&board_clone, color, None) {
-                    return false;
-                }
-
-                return true;
-            };
+            return None;
         }
     }
-    false
+
+    let mut king_col = None;
+    for col in 1..board.get_width() {
+        if let Some(piece) = board.check_space(col, row) {
+            if piece.piece_type != King {
+                return None;
+            } else {
+                king_col = Some(col);
+                break;
+            }
+        }
+    }
+
+    if king_col? < 2 {
+        return None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? - 1, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return  None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? - 2, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+
+    Some(ChessMoveType::Castle {
+        king: *board.check_space(king_col?, row).unwrap(),
+        original_king_position: SquareId::build(king_col?, row),
+        new_king_position: SquareId::build(king_col? - 2, row),
+        rook: *board.check_space(0, row).unwrap(),
+        original_rook_position: SquareId::build(0, row),
+        new_rook_position: SquareId::build(king_col? - 1 , row),
+    })
 }
 
-fn can_castle_short(color: Color, board: &GameBoard) -> bool {
+fn can_castle_short(color: Color, board: &GameBoard) -> Option<ChessMoveType> {
     let row = match color {
         White => 0,
         Black => board.get_height() - 1,
     };
 
+    if is_color_in_check(board, color, None) {
+        return None;
+    }
+
     if let Some(piece) = board.check_space(board.get_width() - 1, row) {
         if piece.piece_type != Rook {
-            return false;
-        }
-
-        let range = 0..board.get_width() - 1;
-        let range = range.rev();
-
-        for col in range {
-            if let Some(piece) = board.check_space(col, row) {
-                if piece.piece_type != King {
-                    return false;
-                }
-                if is_color_in_check(board, color, None) {
-                    return false;
-                }
-                let mut board_clone = board.clone();
-                let king = board_clone.remove_piece(col, row).unwrap();
-                board_clone.place_piece(king, col - 1, row);
-                if is_color_in_check(&board_clone, color, None) {
-                    return false;
-                }
-                let mut board_clone = board.clone();
-                let king = board_clone.remove_piece(col, row).unwrap();
-                board_clone.place_piece(king, col - 2, row);
-                if is_color_in_check(&board_clone, color, None) {
-                    return false;
-                }
-
-                return true;
-            };
+            return None;
         }
     }
-    false
+
+    let range = 0..board.get_width() - 1;
+    let range = range.rev();
+
+    let mut king_col = None;
+    for col in range {
+        if let Some(piece) = board.check_space(col, row) {
+            if piece.piece_type != King {
+                return None;
+            } else {
+                king_col = Some(col);
+                break;
+            }
+        };
+    }
+
+    if board.get_width() < 3 || king_col? > (board.get_width() - 3) {
+        return None;
+    }
+
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? + 1, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+    let mut board_clone = board.clone();
+    let king = board_clone.remove_piece(king_col?, row).unwrap();
+    board_clone.place_piece(king, king_col? + 2, row);
+    if is_color_in_check(&board_clone, color, None) {
+        return None;
+    }
+
+    Some(ChessMoveType::Castle {
+        king: *board.check_space(king_col?, row).unwrap(),
+        original_king_position: SquareId::build(king_col?, row),
+        new_king_position: SquareId::build(king_col? + 2, row),
+        rook: *board.check_space(board.get_width() - 1, row).unwrap(),
+        original_rook_position: SquareId::build(board.get_width() - 1, row),
+        new_rook_position: SquareId::build(king_col? + 1 , row),
+    })
 }
 
 fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMoveType>) -> bool {
@@ -450,7 +493,7 @@ mod tests {
 
         let can_castle_long = can_castle_long(Black, &game_board);
 
-        assert!(can_castle_long)
+        assert!(can_castle_long.is_some())
     }
 
     #[test]
@@ -469,7 +512,7 @@ mod tests {
 
         let can_castle_long = can_castle_long(White, &game_board);
 
-        assert!(can_castle_long)
+        assert!(can_castle_long.is_some())
     }
 
     #[test]
@@ -488,7 +531,7 @@ mod tests {
 
         let can_castle_short = can_castle_short(Black, &game_board);
 
-        assert!(can_castle_short)
+        assert!(can_castle_short.is_some())
     }
 
     #[test]
@@ -507,7 +550,7 @@ mod tests {
 
         let can_castle_short = can_castle_short(White, &game_board);
 
-        assert!(can_castle_short)
+        assert!(can_castle_short.is_some())
     }
 
     #[test]
