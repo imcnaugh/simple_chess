@@ -269,13 +269,15 @@ fn is_color_in_check(board: &GameBoard, color: Color, last_move: Option<&ChessMo
                 if piece.color == opposite_color {
                     let moves = piece.get_legal_moves(col, row, board, last_move);
                     for mov in moves {
-                        if let ChessMoveType::Move { taken_piece, .. } = mov {
-                            if let Some(taken_piece) = taken_piece {
-                                if taken_piece.get_piece_type() == &King
-                                    && taken_piece.get_color() == &color
-                                {
-                                    return true;
-                                }
+                        if let ChessMoveType::Move {
+                            taken_piece: Some(taken_piece),
+                            ..
+                        } = mov
+                        {
+                            if taken_piece.get_piece_type() == &King
+                                && taken_piece.get_color() == &color
+                            {
+                                return true;
                             }
                         }
                     }

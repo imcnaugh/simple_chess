@@ -146,34 +146,32 @@ impl ChessPiece {
                     }
 
                     // En Passant
-                    if let Some(last_move) = last_move {
-                        if let Move {
-                            original_position,
-                            new_position,
-                            piece,
-                            ..
-                        } = last_move
-                        {
-                            if piece.piece_type == PieceType::Pawn {
-                                let rows_moved =
-                                    if original_position.get_row() < new_position.get_row() {
-                                        new_position.get_row() - original_position.get_row()
-                                    } else {
-                                        original_position.get_row() - new_position.get_row()
-                                    };
+                    if let Some(Move {
+                        original_position,
+                        new_position,
+                        piece,
+                        ..
+                    }) = last_move
+                    {
+                        if piece.piece_type == PieceType::Pawn {
+                            let rows_moved = if original_position.get_row() < new_position.get_row()
+                            {
+                                new_position.get_row() - original_position.get_row()
+                            } else {
+                                original_position.get_row() - new_position.get_row()
+                            };
 
-                                if rows_moved == 2
-                                    && new_position.get_row() == row
-                                    && new_position.get_column() == col - 1
-                                {
-                                    legal_moves.push(EnPassant {
-                                        original_position: SquareId::build(col, row),
-                                        new_position: SquareId::build(col - 1, one_ahead),
-                                        piece: *self,
-                                        taken_piece: *piece,
-                                        taken_piece_position: SquareId::build(col - 1, row),
-                                    })
-                                }
+                            if rows_moved == 2
+                                && new_position.get_row() == row
+                                && new_position.get_column() == col - 1
+                            {
+                                legal_moves.push(EnPassant {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(col - 1, one_ahead),
+                                    piece: *self,
+                                    taken_piece: *piece,
+                                    taken_piece_position: SquareId::build(col - 1, row),
+                                })
                             }
                         }
                     }
@@ -193,34 +191,32 @@ impl ChessPiece {
                     }
 
                     // En Passant
-                    if let Some(last_move) = last_move {
-                        if let Move {
-                            original_position,
-                            new_position,
-                            piece,
-                            ..
-                        } = last_move
-                        {
-                            if piece.piece_type == PieceType::Pawn {
-                                let rows_moved =
-                                    if original_position.get_row() < new_position.get_row() {
-                                        new_position.get_row() - original_position.get_row()
-                                    } else {
-                                        original_position.get_row() - new_position.get_row()
-                                    };
+                    if let Some(Move {
+                        original_position,
+                        new_position,
+                        piece,
+                        ..
+                    }) = last_move
+                    {
+                        if piece.piece_type == PieceType::Pawn {
+                            let rows_moved = if original_position.get_row() < new_position.get_row()
+                            {
+                                new_position.get_row() - original_position.get_row()
+                            } else {
+                                original_position.get_row() - new_position.get_row()
+                            };
 
-                                if rows_moved == 2
-                                    && new_position.get_row() == row
-                                    && new_position.get_column() == col + 1
-                                {
-                                    legal_moves.push(EnPassant {
-                                        original_position: SquareId::build(col, row),
-                                        new_position: SquareId::build(col + 1, one_ahead),
-                                        piece: *self,
-                                        taken_piece: *piece,
-                                        taken_piece_position: SquareId::build(col + 1, row),
-                                    })
-                                }
+                            if rows_moved == 2
+                                && new_position.get_row() == row
+                                && new_position.get_column() == col + 1
+                            {
+                                legal_moves.push(EnPassant {
+                                    original_position: SquareId::build(col, row),
+                                    new_position: SquareId::build(col + 1, one_ahead),
+                                    piece: *self,
+                                    taken_piece: *piece,
+                                    taken_piece_position: SquareId::build(col + 1, row),
+                                })
                             }
                         }
                     }
