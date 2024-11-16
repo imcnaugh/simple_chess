@@ -1,8 +1,9 @@
 use chess::game_analyser::get_game_state;
 use chess::game_state::GameState::*;
-use chess::{Game};
+use chess::{Color, Game};
 use rand::Rng;
 use std::io::Write;
+use chess::chess_move::ChessMoveType;
 
 fn main() {
     let mut game = Game::new_chess_game();
@@ -52,30 +53,35 @@ fn main() {
                 break;
             }
         }
-
-        let move_count = moves.len();
-        let random_move_index = rand::thread_rng().gen_range(0..move_count);
-        let next_move = &moves[random_move_index];
-
-        game.change_turn(*next_move);
+        
+        let next_move =  match game.current_turn {
+            Color::White => print_and_get_next_move(moves),
+            Color::Black => {
+                let move_count = moves.len();
+                let random_move_index = rand::thread_rng().gen_range(0..move_count);
+                moves[random_move_index]
+            }
+        };
+        
+        game.change_turn(&next_move);
     }
 }
 
-// fn print_and_get_next_move(moves: Vec<ChessMove>) -> ChessMove {
-//     for (index, m) in moves.iter().enumerate() {
-//         println!("{index}: {m}");
-//     }
-//
-//     // wait for the user to press the enter key
-//     let mut i = String::new();
-//     std::io::stdin()
-//         .read_line(&mut i)
-//         .expect("TODO: panic message");
-//
-//     let i: usize = i.trim().parse().expect("Please enter a valid index.");
-//
-//     moves[i]
-// }
+fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
+    for (index, m) in moves.iter().enumerate() {
+        println!("{index}: {m}");
+    }
+
+    // wait for the user to press the enter key
+    let mut i = String::new();
+    std::io::stdin()
+        .read_line(&mut i)
+        .expect("TODO: panic message");
+
+    let i: usize = i.trim().parse().expect("Please enter a valid index.");
+
+    moves[i]
+}
 
 fn clear_console() {
     // Print the escape code to clear the console

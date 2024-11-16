@@ -50,7 +50,7 @@ impl Game {
         }
     }
 
-    pub fn change_turn(&mut self, m: ChessMoveType) {
+    pub fn change_turn(&mut self, m: &ChessMoveType) {
         if self.current_turn == Black {
             self.turn_number += 1;
         }
@@ -93,10 +93,10 @@ impl Game {
 
         m.make_move(&mut self.board);
 
-        self.moves.push(m);
+        self.moves.push(*m);
     }
 
-    fn update_50_move_rule_counter(&mut self, m: ChessMoveType) {
+    fn update_50_move_rule_counter(&mut self, m: &ChessMoveType) {
         match m {
             ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 0,
             ChessMoveType::Move { taken_piece, piece, .. } => {
