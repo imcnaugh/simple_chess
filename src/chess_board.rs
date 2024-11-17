@@ -169,6 +169,34 @@ impl GameBoard {
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].clear_piece()
     }
+
+    fn as_byte_arr(&self) -> Vec<u8> {
+        let mut capacity = self.squares.len() / 2;
+        if self.squares.len() % 2 == 1 {
+            capacity += 1;
+        }
+
+        let mut byte_arr = vec![0b00000000; capacity];
+
+        for col in 0..self.get_width() {
+            for row in 0..self.get_height() {
+                let square_index = self.get_square_index(col, row);
+                let square = self.squares[square_index];
+
+                let arr_index = square_index / 2;
+                let first = square_index % 2 == 0;
+
+                if first {
+                    let byte = square.encode() << 4;
+                    byte_arr[arr_index] |= byte;
+                } else {
+                    byte_arr[arr_index] |= square.encode();
+                }
+            }
+        }
+
+        byte_arr
+    }
 }
 
 impl Clone for GameBoard {
@@ -406,5 +434,87 @@ mod tests {
                 assert!(board.check_space(col_index, empty_row_index).is_none());
             }
         }
+    }
+
+    #[test]
+    fn as_byte_arr_simple_board() {
+        let chess_board_as_string = " ";
+        let board = GameBoard::from_string(1, 1, chess_board_as_string).unwrap();
+
+        let encoded = board.as_byte_arr();
+
+        assert_eq!(1, encoded.len());
+        assert_eq!(0b00000000, encoded[0]);
+    }
+
+    #[test]
+    fn as_byte_arr_single_pawn() {
+        let chess_board_as_string = "♙";
+        let board = GameBoard::from_string(1, 1, chess_board_as_string).unwrap();
+
+        let encoded = board.as_byte_arr();
+
+        assert_eq!(1, encoded.len());
+        assert_eq!(0b00100000, encoded[0]);
+    }
+
+    #[test]
+    fn as_byte_arr_two_pieces() {
+        let chess_board_as_string = "♙♟";
+        let board = GameBoard::from_string(2, 1, chess_board_as_string).unwrap();
+
+        let encoded = board.as_byte_arr();
+
+        assert_eq!(1, encoded.len());
+        assert_eq!(0b00100011, encoded[0]);
+    }
+
+    #[test]
+    fn as_byte_arr_odd_number_of_squares() {
+        let chess_board_as_string = "♛\n♚\n♜";
+        let board = GameBoard::from_string(1, 3, chess_board_as_string).unwrap();
+
+        let encoded = board.as_byte_arr();
+
+        assert_eq!(2, encoded.len());
+        assert_eq!(0b01011011, encoded[0]);
+        assert_eq!(0b11010000, encoded[1]);
+    }
+
+    #[test]
+    fn starting_position_as_byte_arr() {
+        let chess_board_as_string = concat!(
+            "♜♞♝♛♚♝♞♜\n",
+            "♟♟♟♟♟♟♟♟\n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "        \n",
+            "♙♙♙♙♙♙♙♙\n",
+            "♖♘♗♕♔♗♘♖\n"
+        );
+
+        let board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+
+        let encoded = board.as_byte_arr();
+
+        assert_eq!(32, encoded.len());
+        assert_eq!(0b01000110, encoded[0]);
+        assert_eq!(0b10001100, encoded[1]);
+        assert_eq!(0b10101000, encoded[2]);
+        assert_eq!(0b01100100, encoded[3]);
+        for white_pawns_index in 4..8 {
+            assert_eq!(0b00100010, encoded[white_pawns_index]);
+        }
+        for empty_index in 9..24 {
+            assert_eq!(0b00000000, encoded[empty_index]);
+        }
+        for black_pawn_index in 25..28 {
+            assert_eq!(0b00110011, encoded[black_pawn_index]);
+        }
+        assert_eq!(0b01010111, encoded[28]);
+        assert_eq!(0b10011101, encoded[29]);
+        assert_eq!(0b10111001, encoded[30]);
+        assert_eq!(0b01110101, encoded[31]);
     }
 }

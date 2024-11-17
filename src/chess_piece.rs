@@ -430,6 +430,22 @@ impl ChessPiece {
             King => "K",
         }
     }
+
+    pub fn get_as_4_bit(&self) -> u8 {
+        let mut bits = match self.piece_type {
+            Pawn => 0b0010,
+            Rook => 0b0100,
+            Knight => 0b0110,
+            Bishop => 0b1000,
+            King => 0b1010,
+            Queen => 0b1100,
+        };
+        bits |= match self.color {
+            Color::White => 0b0000,
+            Color::Black => 0b0001,
+        };
+        bits
+    }
 }
 
 fn create_moves(

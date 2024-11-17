@@ -15,10 +15,7 @@ impl Square {
         } else {
             Color::Black
         };
-        Square {
-            color,
-            piece: None,
-        }
+        Square { color, piece: None }
     }
 
     pub fn place_piece(&mut self, piece: ChessPiece) {
@@ -33,6 +30,13 @@ impl Square {
         let piece = self.piece;
         self.piece = None;
         piece
+    }
+
+    pub fn encode(&self) -> u8 {
+        match self.piece {
+            Some(piece) => piece.get_as_4_bit(),
+            None => 0b0000,
+        }
     }
 }
 
