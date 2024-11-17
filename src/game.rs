@@ -12,6 +12,8 @@ pub struct Game {
     pub current_turn: Color,
     pub turn_number: u32,
     moves: Vec<ChessMoveType>,
+    pub encoded_board_by_turn: Vec<Vec<u8>>,
+    pub last_take_index: usize,
     fifty_move_rule_counter: usize,
     pub white_can_castle_short: bool,
     pub white_can_castle_long: bool,
@@ -24,9 +26,11 @@ impl Game {
     pub fn new_chess_game() -> Game {
         Game {
             board: GameBoard::build_chess_board(),
-            current_turn: Color::White,
+            current_turn: White,
             turn_number: 1,
             moves: Vec::new(),
+            encoded_board_by_turn: Vec::new(),
+            last_take_index: 0,
             fifty_move_rule_counter: 0,
             white_can_castle_short: true,
             white_can_castle_long: true,
@@ -41,6 +45,8 @@ impl Game {
             current_turn,
             turn_number: 1,
             moves: Vec::new(),
+            encoded_board_by_turn: Vec::new(),
+            last_take_index: 0,
             fifty_move_rule_counter: 0,
             white_can_castle_short: true,
             white_can_castle_long: true,
@@ -100,6 +106,12 @@ impl Game {
         };
 
         m.make_move(&mut self.board);
+        
+        let new_board_as_encoded = self.board.as_byte_arr();
+        self.encoded_board_by_turn.push(new_board_as_encoded);
+        if let ChessMoveType::Move{taken_piece: Some(_), .. } = m {
+            self.last_take_index = self.encoded_board_by_turn.len() - 1;
+        };
 
         self.moves.push(*m);
     }
@@ -134,5 +146,28 @@ impl Game {
 
     pub fn can_trigger_fifty_move_rule(&self) -> bool {
         self.fifty_move_rule_counter >= 100
+    }
+    
+    pub fn can_trigger_draw_by_repetition(&self) -> bool {
+        let current_board_as_encoded = self.encoded_board_by_turn.last();
+        if current_board_as_encoded.is_none() {
+            return false;
+        }
+        
+        let mut repetition_count = 0;
+        
+        for index in self.last_take_index..self.encoded_board_by_turn.len() {
+            let previous_board_as_encoded = &self.encoded_board_by_turn[index];
+            
+            if current_board_as_encoded.unwrap() == previous_board_as_encoded {
+                repetition_count+=1;
+            }
+            
+            if repetition_count >= 3 {
+                return true;
+            }
+        }
+        
+        false
     }
 }

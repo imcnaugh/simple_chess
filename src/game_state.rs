@@ -6,4 +6,5 @@ pub enum GameState {
     Stalemate,
     InsufficientMaterial,
     FiftyMoveRule,
+    DrawByRepetition,
 }

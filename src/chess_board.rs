@@ -170,7 +170,7 @@ impl GameBoard {
         self.squares[square_index].clear_piece()
     }
 
-    fn as_byte_arr(&self) -> Vec<u8> {
+    pub fn as_byte_arr(&self) -> Vec<u8> {
         let mut capacity = self.squares.len() / 2;
         if self.squares.len() % 2 == 1 {
             capacity += 1;

@@ -51,6 +51,10 @@ fn main() {
                     game.turn_number
                 );
                 break;
+            },
+            DrawByRepetition => {
+                println!("Game ends in a draw by repetition at move {}", game.turn_number);
+                break;
             }
         }
 
