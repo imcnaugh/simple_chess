@@ -4,7 +4,6 @@ use std::fmt::Formatter;
 
 #[derive(Copy, Clone)]
 pub struct Square {
-    id: SquareId,
     color: Color,
     piece: Option<ChessPiece>,
 }
@@ -17,14 +16,9 @@ impl Square {
             Color::Black
         };
         Square {
-            id: SquareId::build(column, row),
             color,
             piece: None,
         }
-    }
-
-    pub fn get_id(&self) -> &SquareId {
-        &self.id
     }
 
     pub fn place_piece(&mut self, piece: ChessPiece) {
@@ -43,7 +37,7 @@ impl Square {
 }
 
 impl fmt::Display for Square {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match self.color {
             Color::White => "",
             Color::Black => "\x1b[100m",
