@@ -24,12 +24,14 @@ pub struct Game {
 impl Game {
     /// Creates a new chess game
     pub fn new_chess_game() -> Game {
+        let starting_board = GameBoard::build_chess_board();
+        let encoded_starting_position = starting_board.as_byte_arr();
         Game {
-            board: GameBoard::build_chess_board(),
+            board: starting_board,
             current_turn: White,
             turn_number: 1,
             moves: Vec::new(),
-            encoded_board_by_turn: Vec::new(),
+            encoded_board_by_turn: vec![encoded_starting_position],
             last_take_index: 0,
             fifty_move_rule_counter: 0,
             white_can_castle_short: true,
@@ -40,12 +42,13 @@ impl Game {
     }
 
     pub fn new_game(board: GameBoard, current_turn: Color) -> Self {
+        let encoded_starting_position = board.as_byte_arr();
         Self {
             board,
             current_turn,
             turn_number: 1,
             moves: Vec::new(),
-            encoded_board_by_turn: Vec::new(),
+            encoded_board_by_turn: vec![encoded_starting_position],
             last_take_index: 0,
             fifty_move_rule_counter: 0,
             white_can_castle_short: true,
