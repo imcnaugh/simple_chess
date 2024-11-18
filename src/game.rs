@@ -58,13 +58,31 @@ impl Game {
         }
     }
 
-    pub fn change_turn(&mut self, m: &ChessMoveType) {
+    pub fn make_move(&mut self, m: &ChessMoveType) {
         if self.current_turn == Black {
             self.turn_number += 1;
         }
 
         self.update_50_move_rule_counter(m);
+        self.update_can_can_castle(m);
 
+        self.current_turn = match self.current_turn {
+            White => Black,
+            Black => White,
+        };
+
+        m.make_move(&mut self.board);
+        
+        let new_board_as_encoded = self.board.as_byte_arr();
+        self.encoded_board_by_turn.push(new_board_as_encoded);
+        if let ChessMoveType::Move{taken_piece: Some(_), .. } = m {
+            self.last_take_index = self.encoded_board_by_turn.len() - 1;
+        };
+
+        self.moves.push(*m);
+    }
+
+    fn update_can_can_castle(&mut self, m: &ChessMoveType) {
         let castle_dir = match self.current_turn {
             White => (
                 &mut self.white_can_castle_short,
@@ -102,21 +120,6 @@ impl Game {
                 }
             }
         }
-
-        self.current_turn = match self.current_turn {
-            White => Black,
-            Black => White,
-        };
-
-        m.make_move(&mut self.board);
-        
-        let new_board_as_encoded = self.board.as_byte_arr();
-        self.encoded_board_by_turn.push(new_board_as_encoded);
-        if let ChessMoveType::Move{taken_piece: Some(_), .. } = m {
-            self.last_take_index = self.encoded_board_by_turn.len() - 1;
-        };
-
-        self.moves.push(*m);
     }
 
     fn update_50_move_rule_counter(&mut self, m: &ChessMoveType) {

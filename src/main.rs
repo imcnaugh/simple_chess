@@ -63,7 +63,7 @@ fn main() {
             Color::Black => get_random_move(moves),
         };
 
-        game.change_turn(&next_move);
+        game.make_move(&next_move);
     }
 }
 

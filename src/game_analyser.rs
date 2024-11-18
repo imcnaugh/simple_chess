@@ -424,7 +424,7 @@ mod tests {
                 false
             })
             .unwrap();
-        game.change_turn(move_pawn_to_b4);
+        game.make_move(move_pawn_to_b4);
 
         println!("{}", game.get_board());
         let (state, moves) = get_game_state(&game);
@@ -465,7 +465,7 @@ mod tests {
             })
             .unwrap();
 
-        game.change_turn(move_pawn_to_b4);
+        game.make_move(move_pawn_to_b4);
 
         println!("{}", game.get_board());
         let (state, moves) = get_game_state(&game);
