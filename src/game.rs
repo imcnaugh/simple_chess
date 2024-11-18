@@ -72,14 +72,18 @@ impl Game {
         };
 
         m.make_move(&mut self.board);
-        
-        let new_board_as_encoded = self.board.as_byte_arr();
-        self.encoded_board_by_turn.push(new_board_as_encoded);
-        if let ChessMoveType::Move{taken_piece: Some(_), .. } = m {
-            self.last_take_index = self.encoded_board_by_turn.len() - 1;
-        };
+
+        self.add_new_board_position_to_game_history(m);
 
         self.moves.push(*m);
+    }
+
+    fn add_new_board_position_to_game_history(&mut self, m: &ChessMoveType) {
+        let new_board_as_encoded = self.board.as_byte_arr();
+        self.encoded_board_by_turn.push(new_board_as_encoded);
+        if let ChessMoveType::Move { taken_piece: Some(_), .. } = m {
+            self.last_take_index = self.encoded_board_by_turn.len() - 1;
+        };
     }
 
     fn update_can_can_castle(&mut self, m: &ChessMoveType) {
