@@ -3,6 +3,7 @@ use crate::chess_move::ChessMoveType::Castle;
 use crate::Color::{Black, White};
 use crate::PieceType::{King, Pawn, Rook, Queen, Knight, Bishop};
 use crate::{Color, GameBoard};
+use crate::chess_board_square::SquareId;
 
 /// # Game
 ///
@@ -128,12 +129,12 @@ impl Game {
 
     fn update_50_move_rule_counter(&mut self, m: &ChessMoveType) {
         match m {
-            ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 0,
+            ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 1,
             ChessMoveType::Move {
                 taken_piece, piece, ..
             } => {
                 if taken_piece.is_some() || piece.piece_type == Pawn {
-                    self.fifty_move_rule_counter = 0
+                    self.fifty_move_rule_counter = 1
                 } else {
                     self.fifty_move_rule_counter += 1
                 }
@@ -182,32 +183,46 @@ impl Game {
     }
     
     pub fn get_representation_as_FEN(&self) -> String {
-        let ranks: Vec<String> = (0..self.board.get_height())
+        let ranks: Vec<String> = (0..self.board.get_height()).rev()
             .map(|rank| self.print_rank_as_FEN(rank))
             .collect();
 
         let joined_ranks = ranks.join("/");
-        
+
         let current_turn_char = match self.current_turn {
             White => 'w',
             Black => 'b',
         };
 
         let castle_string = self.castle_string_as_FEN();
-        
-        let en_passant_string = self.en_passant_as_FEN();
-        
+
+        let en_passant_string = self.en_passant_as_fen();
+
         let half_moves_clock = self.fifty_move_rule_counter;
         let turn_number = self.turn_number;
-        
+
         format!("{joined_ranks} {current_turn_char} {castle_string} {en_passant_string} {half_moves_clock} {turn_number}")
     }
-    
-    fn en_passant_as_FEN(&self) -> String {
-        match self.moves.last().unwrap() {
-            ChessMoveType::EnPassant { new_position, .. } => format!("{new_position}"),
-            _ => "".to_string(),
-        }.to_string()
+
+    fn en_passant_as_fen(&self) -> String {
+        let (starting_row, en_passant_row, target_row) = match self.current_turn.opposite_color() {
+            White => (1, 2, 3),
+            Black => {
+                let height = self.board.get_height();
+                (height - 2, height - 3, height - 4)
+            }
+        };
+
+        match self.moves.last() {
+            Some(ChessMoveType::Move {piece, original_position, new_position, .. }) if piece.piece_type == Pawn => {
+                if original_position.get_row() == starting_row && new_position .get_row() == target_row {
+                    format!("{}", SquareId::build(original_position.get_column(), en_passant_row))
+                } else {
+                    "-".to_string()
+                }
+            },
+            _ => "-".to_string()
+        }
     }
 
     fn castle_string_as_FEN(&self) -> String {
@@ -252,9 +267,13 @@ impl Game {
                     if piece.color == White {
                         piece_char = piece_char.to_uppercase().last().unwrap();
                     }
-                    resp.push(piece_char)
+                    resp.push(piece_char);
+                    empty_square_count = 0;
                 }
             }
+        }
+        if empty_square_count != 0 {
+            resp.push_str(format!("{empty_square_count}").as_str());
         }
         resp
     }
