@@ -153,8 +153,13 @@ impl fmt::Display for ChessMoveType {
                     new_position
                 )
             }
-            ChessMoveType::Castle { .. } => {
-                write!(f, "Castles")
+            ChessMoveType::Castle { original_rook_position, ..} => {
+                let castle_direction = if original_rook_position.get_column() == 0 {
+                    "Queen side"
+                } else {
+                    "King side"
+                };
+                write!(f, "Castles {}", castle_direction)
             }
         }
     }

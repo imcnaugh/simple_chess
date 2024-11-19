@@ -1,7 +1,7 @@
 use crate::chess_move::ChessMoveType;
 use crate::chess_move::ChessMoveType::Castle;
 use crate::Color::{Black, White};
-use crate::PieceType::{King, Pawn, Rook};
+use crate::PieceType::{King, Pawn, Rook, Queen, Knight, Bishop};
 use crate::{Color, GameBoard};
 
 /// # Game
@@ -179,5 +179,83 @@ impl Game {
         }
         
         false
+    }
+    
+    pub fn get_representation_as_FEN(&self) -> String {
+        let ranks: Vec<String> = (0..self.board.get_height())
+            .map(|rank| self.print_rank_as_FEN(rank))
+            .collect();
+
+        let joined_ranks = ranks.join("/");
+        
+        let current_turn_char = match self.current_turn {
+            White => 'w',
+            Black => 'b',
+        };
+
+        let castle_string = self.castle_string_as_FEN();
+        
+        let en_passant_string = self.en_passant_as_FEN();
+        
+        let half_moves_clock = self.fifty_move_rule_counter;
+        let turn_number = self.turn_number;
+        
+        format!("{joined_ranks} {current_turn_char} {castle_string} {en_passant_string} {half_moves_clock} {turn_number}")
+    }
+    
+    fn en_passant_as_FEN(&self) -> String {
+        match self.moves.last().unwrap() {
+            ChessMoveType::EnPassant { new_position, .. } => format!("{new_position}"),
+            _ => "".to_string(),
+        }.to_string()
+    }
+
+    fn castle_string_as_FEN(&self) -> String {
+        let mut castle_string = String::new();
+        if self.white_can_castle_long {
+            castle_string.push('Q');
+        }
+        if self.white_can_castle_short {
+            castle_string.push('K');
+        }
+        if self.black_can_castle_long {
+            castle_string.push('q');
+        }
+        if self.black_can_castle_short {
+            castle_string.push('k');
+        }
+
+        if castle_string.is_empty() {
+            castle_string.push('-');
+        }
+        castle_string
+    }
+
+    fn print_rank_as_FEN(&self, rank: usize) -> String {
+        let mut resp = String::new();
+        let mut empty_square_count = 0;
+        for col in 0..self.board.get_width() {
+            match self.board.check_space(col, rank) {
+                None => empty_square_count+=1,
+                Some(piece) => {
+                    if empty_square_count != 0 {
+                        resp.push_str(format!("{empty_square_count}").as_str());
+                    }
+                    let mut piece_char = match piece.piece_type {
+                        Pawn => 'p',
+                        Rook => 'r',
+                        Knight => 'n',
+                        Bishop => 'b',
+                        Queen => 'q',
+                        King => 'k'
+                    };
+                    if piece.color == White {
+                        piece_char = piece_char.to_uppercase().last().unwrap();
+                    }
+                    resp.push(piece_char)
+                }
+            }
+        }
+        resp
     }
 }
