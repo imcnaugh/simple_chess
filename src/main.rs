@@ -78,7 +78,7 @@ fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
 
 fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
     for (index, m) in moves.iter().enumerate() {
-        println!("{index}: {m}");
+        println!("{index}: {}", m.get_standard_algebraic_notation());
     }
 
     // wait for the user to press the enter key

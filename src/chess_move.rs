@@ -94,6 +94,28 @@ impl ChessMoveType {
             }
         };
     }
+    
+    pub fn get_standard_algebraic_notation(&self) -> String {
+        match self {
+            ChessMoveType::Move { original_position, new_position, piece, taken_piece, promotion } => {
+                let promotion_string = match promotion {
+                    None => String::new(),
+                    Some(piece) => format!("={}", piece.get_notation_char())
+                };
+                format!("{}{}{}{}", piece.get_notation_char(), if taken_piece.is_some() { "x" } else { "" }, new_position, promotion_string)
+            }
+            ChessMoveType::EnPassant { original_position, new_position, ..} => {
+                format!("{}x{} e.p.", (b'a' + original_position.get_column() as u8) as char, new_position)
+            }
+            ChessMoveType::Castle { original_rook_position, .. } => {
+                if original_rook_position.get_column() == 0 {
+                    String::from("O-O-O")
+                } else {
+                    String::from("O-O")
+                }
+            }
+        }
+    }
 }
 
 impl fmt::Display for ChessMoveType {

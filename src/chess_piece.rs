@@ -420,7 +420,7 @@ impl ChessPiece {
         legal_moves
     }
 
-    fn get_notation_char(&self) -> &str {
+    pub fn get_notation_char(&self) -> &str {
         match self.piece_type {
             Pawn => "",
             Rook => "R",
