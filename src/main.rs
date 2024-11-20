@@ -33,14 +33,6 @@ fn main() {
                 println!("Game ends in Stalemate in {} moves", game.turn_number);
                 break;
             }
-            Check => {
-                println!("{:?} is in check", game.current_turn);
-            }
-            InProgress => {
-                // for m in &moves {
-                //     println!("{m}");
-                // }
-            }
             InsufficientMaterial => {
                 println!(
                     "Game is over due to Insufficient Material in {} moves",
@@ -58,6 +50,14 @@ fn main() {
             DrawByRepetition => {
                 println!("Game ends in a draw by repetition at move {}", game.turn_number);
                 break;
+            }
+            Check => {
+                println!("{:?} is in check", game.current_turn);
+            }
+            InProgress => {
+                // for m in &moves {
+                //     println!("{m}");
+                // }
             }
         }
 
