@@ -16,9 +16,6 @@ fn main() {
             println!("{last_move}");
         }
         println!("{}", game.get_board());
-        let fen = game.get_representation_as_FEN();
-        println!("{fen}");
-
 
         match state {
             Checkmate => {
@@ -68,6 +65,8 @@ fn main() {
 
         game.make_move(&next_move);
     }
+
+    println!("{}", game.get_pgn());
 }
 
 fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
