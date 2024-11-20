@@ -77,19 +77,29 @@ fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
 }
 
 fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
-    for (index, m) in moves.iter().enumerate() {
-        println!("{index}: {}", m.get_standard_algebraic_notation());
+    loop {
+        println!("Enter next move");
+
+        let mut i = String::new();
+        std::io::stdin()
+            .read_line(&mut i)
+            .expect("TODO: panic message");
+
+        match i.trim() {
+            "exit" => std::process::exit(0),
+            _ => {
+                let i = i.trim().to_string();
+                let m = moves.iter().find(|p| p.get_standard_algebraic_notation() == i);
+
+                if let Some(m) = m {
+                    return *m;
+                }
+
+                println!("Invalid move. Please try again.");
+            }
+        }
+
     }
-
-    // wait for the user to press the enter key
-    let mut i = String::new();
-    std::io::stdin()
-        .read_line(&mut i)
-        .expect("TODO: panic message");
-
-    let i: usize = i.trim().parse().expect("Please enter a valid index.");
-
-    moves[i]
 }
 
 fn clear_console() {
