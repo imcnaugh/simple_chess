@@ -129,12 +129,12 @@ impl Game {
 
     fn update_50_move_rule_counter(&mut self, m: &ChessMoveType) {
         match m {
-            ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 1,
+            ChessMoveType::EnPassant { .. } => self.fifty_move_rule_counter = 0,
             ChessMoveType::Move {
                 taken_piece, piece, ..
             } => {
                 if taken_piece.is_some() || piece.piece_type == Pawn {
-                    self.fifty_move_rule_counter = 1
+                    self.fifty_move_rule_counter = 0
                 } else {
                     self.fifty_move_rule_counter += 1
                 }
@@ -153,6 +153,27 @@ impl Game {
 
     pub fn get_moves(&self) -> &Vec<ChessMoveType> {
         &self.moves
+    }
+
+    pub fn get_pgn(&self) -> String {
+        let mut pgn = String::new();
+
+        let mut switch = true;
+        let mut turn = 1;
+
+        for m in &self.moves {
+            if switch {
+               pgn.push_str(format!("{}. ", turn).as_str());
+            }
+            pgn.push_str(format!("{} ", m.get_standard_algebraic_notation()).as_str());
+            if !switch {
+                pgn.push_str("\n");
+                turn+=1;
+            }
+            switch= !switch;
+        }
+
+        pgn
     }
 
     pub fn can_trigger_fifty_move_rule(&self) -> bool {

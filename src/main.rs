@@ -16,9 +16,6 @@ fn main() {
             println!("{last_move}");
         }
         println!("{}", game.get_board());
-        let fen = game.get_representation_as_FEN();
-        println!("{fen}");
-
 
         match state {
             Checkmate => {
@@ -32,14 +29,6 @@ fn main() {
             Stalemate => {
                 println!("Game ends in Stalemate in {} moves", game.turn_number);
                 break;
-            }
-            Check => {
-                println!("{:?} is in check", game.current_turn);
-            }
-            InProgress => {
-                // for m in &moves {
-                //     println!("{m}");
-                // }
             }
             InsufficientMaterial => {
                 println!(
@@ -59,6 +48,14 @@ fn main() {
                 println!("Game ends in a draw by repetition at move {}", game.turn_number);
                 break;
             }
+            Check => {
+                println!("{:?} is in check", game.current_turn);
+            }
+            InProgress => {
+                // for m in &moves {
+                //     println!("{m}");
+                // }
+            }
         }
 
         let next_move = match game.current_turn {
@@ -68,6 +65,8 @@ fn main() {
 
         game.make_move(&next_move);
     }
+
+    println!("{}", game.get_pgn());
 }
 
 fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
@@ -77,19 +76,29 @@ fn get_random_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
 }
 
 fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
-    for (index, m) in moves.iter().enumerate() {
-        println!("{index}: {m}");
+    loop {
+        println!("Enter next move");
+
+        let mut i = String::new();
+        std::io::stdin()
+            .read_line(&mut i)
+            .expect("TODO: panic message");
+
+        match i.trim() {
+            "exit" => std::process::exit(0),
+            _ => {
+                let i = i.trim().to_string();
+                let m = moves.iter().find(|p| p.get_standard_algebraic_notation() == i);
+
+                if let Some(m) = m {
+                    return *m;
+                }
+
+                println!("Invalid move. Please try again.");
+            }
+        }
+
     }
-
-    // wait for the user to press the enter key
-    let mut i = String::new();
-    std::io::stdin()
-        .read_line(&mut i)
-        .expect("TODO: panic message");
-
-    let i: usize = i.trim().parse().expect("Please enter a valid index.");
-
-    moves[i]
 }
 
 fn clear_console() {
