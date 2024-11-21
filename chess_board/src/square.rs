@@ -3,8 +3,65 @@ use std::fmt::Formatter;
 use crate::color::Color;
 use crate::piece::Piece;
 
+pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
+    let mut col_id = String::new();
+    let mut remainder = column;
+
+    loop {
+        let r = remainder % 26;
+        let c = (r as u8 + b'a') as char;
+        col_id.push(c);
+        remainder /= 26;
+        if remainder == 0 {
+            break;
+        }
+        remainder -= 1;
+    }
+
+    format!("{}{}", col_id, row + 1)
+}
+
+pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> {
+    let mut col_as_string = String::new();
+    let mut row_as_string = String::new();
+    let mut finding_col = true;
+
+    for c in name.chars() {
+        if finding_col {
+            if c.is_ascii_alphabetic() {
+                col_as_string.push(c);
+            } else if c.is_ascii_digit() {
+                finding_col = false;
+                row_as_string.push(c);
+            } else {
+                return Err("Invalid input");
+            }
+        } else if c.is_ascii_digit() {
+            row_as_string.push(c);
+        } else {
+            return Err("Invalid input");
+        }
+    }
+    if col_as_string.is_empty() || row_as_string.is_empty() {
+        return Err("Invalid input");
+    }
+
+    let mut column: usize = 0;
+    for (index, c) in col_as_string.chars().enumerate() {
+        let base_26 = c as usize - 'a' as usize + 1;
+        let s = 26_usize.pow((col_as_string.len() - index - 1) as u32);
+
+        column += s * base_26;
+    }
+
+    let row: usize = row_as_string.parse().unwrap();
+    Ok((column - 1, row - 1))
+}
+
 #[derive(Copy, Clone)]
 pub struct Square<P: Piece> {
+    column: usize,
+    row: usize,
     color: Color,
     piece: Option<P>,
 }
@@ -16,7 +73,7 @@ impl<P: Piece> Square<P> {
         } else {
             Color::Black
         };
-        Square { color, piece: None }
+        Square { color, piece: None, column, row }
     }
 
     pub fn place_piece(&mut self, piece: P) {
@@ -29,6 +86,18 @@ impl<P: Piece> Square<P> {
 
     pub fn clear_piece(&mut self) -> Option<P> {
         self.piece.take()
+    }
+
+    pub fn get_column(&self) -> usize {
+        self.column
+    }
+
+    pub fn get_row(&self) -> usize {
+        self.row
+    }
+
+    pub fn get_name(&self) -> String {
+        get_name_from_row_and_col(self.column, self.row)
     }
 }
 
@@ -43,92 +112,6 @@ impl<P: Piece> fmt::Display for Square<P> {
             None => ' ',
         };
         write!(f, "{} {} \x1b[0m", square_color, inner_char)
-    }
-}
-
-/// # Square Id
-#[derive(PartialEq, Eq, Hash, Copy, Clone)]
-pub struct SquareId {
-    column: usize,
-    row: usize,
-}
-
-impl SquareId {
-    /// # Build
-    ///
-    /// Creates a new square id from a row and a column
-    ///
-    /// Column and row are usize, and can scale beyond the typical size of a chess board.
-    pub fn build(column: usize, row: usize) -> Self {
-        Self { column, row }
-    }
-
-    /// # From string
-    ///
-    /// Create a square id from a string
-    pub fn from_string(s: &str) -> Result<Self, &str> {
-        let mut col_as_string = String::new();
-        let mut row_as_string = String::new();
-        let mut finding_col = true;
-
-        for c in s.chars() {
-            if finding_col {
-                if c.is_ascii_alphabetic() {
-                    col_as_string.push(c);
-                } else if c.is_ascii_digit() {
-                    finding_col = false;
-                    row_as_string.push(c);
-                } else {
-                    return Err("Invalid input");
-                }
-            } else if c.is_ascii_digit() {
-                row_as_string.push(c);
-            } else {
-                return Err("Invalid input");
-            }
-        }
-
-        let mut column: usize = 0;
-        for (index, c) in col_as_string.chars().enumerate() {
-            let base_26 = c as usize - 'a' as usize + 1;
-            let s = 26_usize.pow((col_as_string.len() - index - 1) as u32);
-
-            column += s * base_26;
-        }
-
-        let row: usize = row_as_string.parse().unwrap();
-        Ok(Self {
-            column: column - 1,
-            row: row - 1,
-        })
-    }
-
-    pub fn get_column(&self) -> usize {
-        self.column
-    }
-
-    pub fn get_row(&self) -> usize {
-        self.row
-    }
-}
-
-impl fmt::Display for SquareId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let mut col_id = String::new();
-        let mut remainder = self.column;
-
-        loop {
-            let r = remainder % 26;
-            let c = (r as u8 + b'a') as char;
-            col_id = format!("{}{}", c, col_id);
-            remainder /= 26;
-            if remainder == 0 {
-                break;
-            }
-            remainder -= 1;
-        }
-
-        write!(f, "{}{}", col_id, self.row + 1)
     }
 }
 
