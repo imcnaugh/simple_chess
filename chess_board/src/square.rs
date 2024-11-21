@@ -30,24 +30,17 @@ impl<P: Piece> Square<P> {
     pub fn clear_piece(&mut self) -> Option<P> {
         self.piece.take()
     }
-
-    pub fn encode(&self) -> u8 {
-        match self.piece {
-            Some(piece) => piece.get_as_4_bit(),
-            None => 0b0000,
-        }
-    }
 }
 
 impl<P: Piece> fmt::Display for Square<P> {
     fn fmt(self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match self.color {
-            Color::White => "",
-            Color::Black => "\x1b[100m",
+            Color::White => "\x1b[100m",
+            Color::Black => "",
         };
         let inner_char = match self.piece {
-            Some(piece) => format!("{piece}"),
-            None => " ".to_string(),
+            Some(piece) => piece.get_char_representation(),
+            None => ' ',
         };
         write!(f, "{} {} \x1b[0m", square_color, inner_char)
     }
