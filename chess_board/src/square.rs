@@ -17,6 +17,8 @@ pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
         }
         remainder -= 1;
     }
+    
+    col_id = col_id.chars().rev().collect();
 
     format!("{}{}", col_id, row + 1)
 }
