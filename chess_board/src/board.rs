@@ -1,12 +1,10 @@
 use crate::square::Square;
-use crate::chess_piece::ChessPiece;
-use crate::{Color, PieceType};
 use std::fmt;
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
 pub struct Board {
-    squares: Vec<Square>,
+    squares: Vec<Square<P>>,
     width: usize,
     height: usize,
 }
@@ -22,87 +20,6 @@ impl Board {
             width,
             height,
         }
-    }
-
-    /// Builds a chess board that is 8 x 8 spaces big
-    pub fn build_chess_board() -> Board {
-        let board_width = 8;
-        let board_height = 8;
-
-        let mut board = Board {
-            squares: Board::generate_board(board_width, board_height),
-            width: board_width,
-            height: board_height,
-        };
-
-        for i in 0..8 {
-            board.place_piece(ChessPiece::new(Color::White, PieceType::Pawn), i, 1);
-            board.place_piece(ChessPiece::new(Color::Black, PieceType::Pawn), i, 6);
-        }
-
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Rook), 0, 0);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Rook), 7, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Rook), 0, 7);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Rook), 7, 7);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Knight), 1, 0);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Knight), 6, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Knight), 1, 7);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Knight), 6, 7);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Bishop), 2, 0);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Bishop), 5, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Bishop), 2, 7);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Bishop), 5, 7);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::Queen), 3, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::Queen), 3, 7);
-        board.place_piece(ChessPiece::new(Color::White, PieceType::King), 4, 0);
-        board.place_piece(ChessPiece::new(Color::Black, PieceType::King), 4, 7);
-
-        board
-    }
-
-    pub fn from_string(width: usize, height: usize, s: &str) -> Result<Board, String> {
-        let s = s.replace('\n', "");
-
-        if s.chars().count() != width * height {
-            return Err(format!("expected a string of length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()));
-        }
-
-        let mut board = Board::build(width, height);
-
-        for (index, char) in s.chars().enumerate() {
-            let piece = match char {
-                '♙' => Some(ChessPiece::new(Color::White, PieceType::Pawn)),
-                '♖' => Some(ChessPiece::new(Color::White, PieceType::Rook)),
-                '♘' => Some(ChessPiece::new(Color::White, PieceType::Knight)),
-                '♗' => Some(ChessPiece::new(Color::White, PieceType::Bishop)),
-                '♕' => Some(ChessPiece::new(Color::White, PieceType::Queen)),
-                '♔' => Some(ChessPiece::new(Color::White, PieceType::King)),
-                '♟' => Some(ChessPiece::new(Color::Black, PieceType::Pawn)),
-                '♜' => Some(ChessPiece::new(Color::Black, PieceType::Rook)),
-                '♞' => Some(ChessPiece::new(Color::Black, PieceType::Knight)),
-                '♝' => Some(ChessPiece::new(Color::Black, PieceType::Bishop)),
-                '♛' => Some(ChessPiece::new(Color::Black, PieceType::Queen)),
-                '♚' => Some(ChessPiece::new(Color::Black, PieceType::King)),
-                _ => None,
-            };
-
-            if let Some(piece) = piece {
-                let column = index % width;
-                let row = index / width;
-
-                let row = row as isize - (height - 1) as isize;
-                let row = row.unsigned_abs();
-
-                let index = column + row * width;
-                board.squares[index].place_piece(piece);
-            }
-        }
-
-        Ok(board)
-    }
-
-    pub fn chess_board_from_string(s: &str) -> Result<Board, String> {
-        Self::from_string(8, 8, s)
     }
 
     fn get_square_index(&self, col: usize, row: usize) -> usize {

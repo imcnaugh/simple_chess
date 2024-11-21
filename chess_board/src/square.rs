@@ -157,15 +157,14 @@ pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> 
 /// * `color` - The color of the square, which can be either white or black.
 /// * `piece` - An optional field that holds a piece of type `P` if present on the square.
 /// ```
-#[derive(Copy, Clone)]
-pub struct Square<P: Piece> {
+pub struct Square<> {
     column: usize,
     row: usize,
     color: Color,
-    piece: Option<P>,
+    piece: Option<Box<dyn Piece>>,
 }
 
-impl<P: Piece> Square<P> {
+impl Square {
     pub fn build(column: usize, row: usize) -> Self {
         let color = if (column + row) % 2 == 1 {
             Color::White
@@ -180,15 +179,15 @@ impl<P: Piece> Square<P> {
         }
     }
 
-    pub fn place_piece(&mut self, piece: P) {
+    pub fn place_piece(&mut self, piece: Box<dyn Piece>) {
         self.piece = Some(piece);
     }
 
-    pub fn get_piece(&self) -> Option<&P> {
+    pub fn get_piece(&self) -> Option<&Box<dyn Piece>> {
         self.piece.as_ref()
     }
 
-    pub fn clear_piece(&mut self) -> Option<P> {
+    pub fn clear_piece(&mut self) -> Option<Box<dyn Piece>> {
         self.piece.take()
     }
 
@@ -209,7 +208,7 @@ impl<P: Piece> Square<P> {
     }
 }
 
-impl<P: Piece> fmt::Display for Square<P> {
+impl fmt::Display for Square {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match &self.color {
             Color::White => "\x1b[100m",
