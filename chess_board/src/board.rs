@@ -15,32 +15,33 @@ impl Board {
     ///
     /// # Panics
     /// The function will panic if either height or width is 0
-    pub fn build(width: usize, height: usize) -> Board {
-        Board {
-            squares: Board::generate_board(width, height),
+    pub fn build(width: usize, height: usize) -> Result<Board, String> {
+        Ok(Board {
+            squares: Board::generate_board(width, height).unwrap(),
             width,
             height,
-        }
+        })
     }
 
     fn get_square_index(&self, col: usize, row: usize) -> usize {
         col + row * self.width
     }
 
-    fn generate_board(width: usize, height: usize) -> Vec<Square> {
-        assert!(width > 0 && height > 0);
+    fn generate_board(width: usize, height: usize) -> Result<Vec<Square>, String> {
+        if width == 0 || height == 0 {
+            return Err(String::from("Height and Width must be positive integers greater then 0"));
+        }
 
         let mut spaces = Vec::with_capacity(width * height);
 
-        for col in 0..width {
-            for row in 0..height {
+        for row in 0..height {
+            for col in 0..width {
                 let square = Square::build(col, row);
-                let index = col + row * width;
-                spaces[index] = square;
+                spaces.push(square);
             }
         }
 
-        spaces
+        Ok(spaces)
     }
 
     /// the width of the board

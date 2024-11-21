@@ -22,7 +22,7 @@ use std::fmt::Formatter;
 /// # Examples
 ///
 /// ```
-/// use chess_board::square::get_name_from_row_and_col;
+/// use chess_board::get_name_from_row_and_col;
 /// let coordinate = get_name_from_row_and_col(0, 0);
 /// assert_eq!(coordinate, "a1");
 ///
@@ -81,7 +81,7 @@ pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// use chess_board::square::get_column_and_row_from_name;
+/// use chess_board::get_column_and_row_from_name;
 ///
 /// let (column, row) = get_column_and_row_from_name("a1").unwrap();
 /// assert_eq!(column, 0);
