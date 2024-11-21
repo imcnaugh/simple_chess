@@ -1,2 +1,4 @@
-pub mod chess_board;
-pub mod chess_board_square;
+pub mod board;
+pub mod square;
+pub mod piece;
+mod color;

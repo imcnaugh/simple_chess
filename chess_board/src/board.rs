@@ -1,36 +1,36 @@
-use crate::chess_board_square::Square;
+use crate::square::Square;
 use crate::chess_piece::ChessPiece;
 use crate::{Color, PieceType};
 use std::fmt;
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
-pub struct GameBoard {
+pub struct Board {
     squares: Vec<Square>,
     width: usize,
     height: usize,
 }
 
-impl GameBoard {
+impl Board {
     /// Create a new board of any size,
     ///
     /// # Panics
     /// The function will panic if either height or width is 0
-    pub fn build(width: usize, height: usize) -> GameBoard {
-        GameBoard {
-            squares: GameBoard::generate_board(width, height),
+    pub fn build(width: usize, height: usize) -> Board {
+        Board {
+            squares: Board::generate_board(width, height),
             width,
             height,
         }
     }
 
     /// Builds a chess board that is 8 x 8 spaces big
-    pub fn build_chess_board() -> GameBoard {
+    pub fn build_chess_board() -> Board {
         let board_width = 8;
         let board_height = 8;
 
-        let mut board = GameBoard {
-            squares: GameBoard::generate_board(board_width, board_height),
+        let mut board = Board {
+            squares: Board::generate_board(board_width, board_height),
             width: board_width,
             height: board_height,
         };
@@ -60,14 +60,14 @@ impl GameBoard {
         board
     }
 
-    pub fn from_string(width: usize, height: usize, s: &str) -> Result<GameBoard, String> {
+    pub fn from_string(width: usize, height: usize, s: &str) -> Result<Board, String> {
         let s = s.replace('\n', "");
 
         if s.chars().count() != width * height {
             return Err(format!("expected a string of length: {} for a board with width: {}, and height: {}, received a string of {}", width * height, width, height, s.len()));
         }
 
-        let mut board = GameBoard::build(width, height);
+        let mut board = Board::build(width, height);
 
         for (index, char) in s.chars().enumerate() {
             let piece = match char {
@@ -101,7 +101,7 @@ impl GameBoard {
         Ok(board)
     }
 
-    pub fn chess_board_from_string(s: &str) -> Result<GameBoard, String> {
+    pub fn chess_board_from_string(s: &str) -> Result<Board, String> {
         Self::from_string(8, 8, s)
     }
 
@@ -199,7 +199,7 @@ impl GameBoard {
     }
 }
 
-impl Clone for GameBoard {
+impl Clone for Board {
     fn clone(&self) -> Self {
         Self {
             squares: self.squares.clone(),
@@ -215,7 +215,7 @@ impl Clone for GameBoard {
     }
 }
 
-impl fmt::Display for GameBoard {
+impl fmt::Display for Board {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();
 
@@ -246,7 +246,7 @@ mod tests {
 
     #[test]
     fn test_build_game_board() {
-        let board = GameBoard::build(10, 10);
+        let board = Board::build(10, 10);
         assert_eq!(board.get_width(), 10);
         assert_eq!(board.get_height(), 10);
         for x in 0..10 {
@@ -259,14 +259,14 @@ mod tests {
 
     #[test]
     fn test_build_chess_board() {
-        let board = GameBoard::build_chess_board();
+        let board = Board::build_chess_board();
         assert_eq!(board.get_width(), 8);
         assert_eq!(board.get_height(), 8);
     }
 
     #[test]
     fn test_place_and_remove_piece() {
-        let mut board = GameBoard::build_chess_board();
+        let mut board = Board::build_chess_board();
         let piece = ChessPiece::new(Color::White, Knight);
 
         board.place_piece(piece, 0, 0);
@@ -290,7 +290,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_place_piece_out_of_bounds() {
-        let mut board = GameBoard::build_chess_board();
+        let mut board = Board::build_chess_board();
         let piece = ChessPiece::new(Color::White, PieceType::Knight);
 
         board.place_piece(piece, 8, 0);
@@ -299,7 +299,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn test_remove_piece_out_of_bounds() {
-        let mut board = GameBoard::build_chess_board();
+        let mut board = Board::build_chess_board();
         board.remove_piece(8, 0).unwrap();
     }
 
@@ -316,7 +316,7 @@ mod tests {
             "        \n"
         );
 
-        let board = GameBoard::from_string(8, 8, board_as_string);
+        let board = Board::from_string(8, 8, board_as_string);
 
         assert!(board.is_ok());
         let game_board = board.unwrap();
@@ -333,7 +333,7 @@ mod tests {
 
     #[test]
     fn should_fail() {
-        let board = GameBoard::from_string(8, 8, "");
+        let board = Board::from_string(8, 8, "");
         assert!(board.is_err());
     }
 
@@ -341,7 +341,7 @@ mod tests {
     fn should_be_able_to_detect_any_piece() {
         let board_string = concat!("♜♞♝♛♚♟ \n", "♖♘♗♕♔♙ ");
 
-        let board = GameBoard::from_string(7, 2, board_string).unwrap();
+        let board = Board::from_string(7, 2, board_string).unwrap();
         println!("{board}");
 
         let pieces = [Rook, Knight, Bishop, Queen, King, Pawn];
@@ -363,7 +363,7 @@ mod tests {
 
     #[test]
     fn builds_starting_position_in_chess() {
-        let board = GameBoard::build_chess_board();
+        let board = Board::build_chess_board();
 
         assert_eq!(8, board.height);
         assert_eq!(8, board.width);
@@ -406,7 +406,7 @@ mod tests {
             "♖♘♗♕♔♗♘♖\n"
         );
 
-        let board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+        let board = Board::from_string(8, 8, chess_board_as_string).unwrap();
 
         assert_eq!(8, board.height);
         assert_eq!(8, board.width);
@@ -439,7 +439,7 @@ mod tests {
     #[test]
     fn as_byte_arr_simple_board() {
         let chess_board_as_string = " ";
-        let board = GameBoard::from_string(1, 1, chess_board_as_string).unwrap();
+        let board = Board::from_string(1, 1, chess_board_as_string).unwrap();
 
         let encoded = board.as_byte_arr();
 
@@ -450,7 +450,7 @@ mod tests {
     #[test]
     fn as_byte_arr_single_pawn() {
         let chess_board_as_string = "♙";
-        let board = GameBoard::from_string(1, 1, chess_board_as_string).unwrap();
+        let board = Board::from_string(1, 1, chess_board_as_string).unwrap();
 
         let encoded = board.as_byte_arr();
 
@@ -461,7 +461,7 @@ mod tests {
     #[test]
     fn as_byte_arr_two_pieces() {
         let chess_board_as_string = "♙♟";
-        let board = GameBoard::from_string(2, 1, chess_board_as_string).unwrap();
+        let board = Board::from_string(2, 1, chess_board_as_string).unwrap();
 
         let encoded = board.as_byte_arr();
 
@@ -472,7 +472,7 @@ mod tests {
     #[test]
     fn as_byte_arr_odd_number_of_squares() {
         let chess_board_as_string = "♛\n♚\n♜";
-        let board = GameBoard::from_string(1, 3, chess_board_as_string).unwrap();
+        let board = Board::from_string(1, 3, chess_board_as_string).unwrap();
 
         let encoded = board.as_byte_arr();
 
@@ -494,7 +494,7 @@ mod tests {
             "♖♘♗♕♔♗♘♖\n"
         );
 
-        let board = GameBoard::from_string(8, 8, chess_board_as_string).unwrap();
+        let board = Board::from_string(8, 8, chess_board_as_string).unwrap();
 
         let encoded = board.as_byte_arr();
 

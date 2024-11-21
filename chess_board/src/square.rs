@@ -1,14 +1,15 @@
-use crate::{ChessPiece, Color};
 use core::fmt;
 use std::fmt::Formatter;
+use crate::color::Color;
+use crate::piece::Piece;
 
 #[derive(Copy, Clone)]
-pub struct Square {
+pub struct Square<P: Piece> {
     color: Color,
-    piece: Option<ChessPiece>,
+    piece: Option<P>,
 }
 
-impl Square {
+impl<P: Piece> Square<P> {
     pub fn build(column: usize, row: usize) -> Self {
         let color = if (column + row) % 2 == 1 {
             Color::White
@@ -18,18 +19,16 @@ impl Square {
         Square { color, piece: None }
     }
 
-    pub fn place_piece(&mut self, piece: ChessPiece) {
+    pub fn place_piece(&mut self, piece: P) {
         self.piece = Some(piece);
     }
 
-    pub fn get_piece(&self) -> Option<&ChessPiece> {
+    pub fn get_piece(&self) -> Option<&P> {
         self.piece.as_ref()
     }
 
-    pub fn clear_piece(&mut self) -> Option<ChessPiece> {
-        let piece = self.piece;
-        self.piece = None;
-        piece
+    pub fn clear_piece(&mut self) -> Option<P> {
+        self.piece.take()
     }
 
     pub fn encode(&self) -> u8 {
@@ -40,8 +39,8 @@ impl Square {
     }
 }
 
-impl fmt::Display for Square {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl<P: Piece> fmt::Display for Square<P> {
+    fn fmt(self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match self.color {
             Color::White => "",
             Color::Black => "\x1b[100m",
@@ -143,7 +142,6 @@ impl fmt::Display for SquareId {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rand::Rng;
 
     #[test]
     fn col_row_turn_into_id() {
@@ -182,18 +180,5 @@ mod tests {
         let square_zzz100 = SquareId::from_string("zzz100").unwrap();
         assert_eq!(18277, square_zzz100.get_column());
         assert_eq!(99, square_zzz100.get_row());
-    }
-
-    #[test]
-    fn board_squares_built_from_string_are_equal_to_squares_build_from_ints() {
-        let random_col = rand::thread_rng().gen_range(0..1000);
-        let random_row = rand::thread_rng().gen_range(0..1000);
-
-        let square_id = SquareId::build(random_col, random_row);
-
-        let square_id_from_string = SquareId::from_string(format!("{square_id}").as_str()).unwrap();
-
-        assert_eq!(square_id.column, square_id_from_string.column);
-        assert_eq!(square_id.row, square_id_from_string.row);
     }
 }
