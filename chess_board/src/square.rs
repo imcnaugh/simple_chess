@@ -1,8 +1,37 @@
-use core::fmt;
-use std::fmt::Formatter;
 use crate::color::Color;
 use crate::piece::Piece;
+use core::fmt;
+use std::fmt::Formatter;
 
+/// Converts a given column and row to a chess-style coordinate string.
+///
+/// The function works by repeatedly dividing the column index by 26 to
+/// convert it to a base-26 representation, with 'a' representing 1, 'b'
+/// representing 2, and so on. This representation is reversed and
+/// combined with the row (incremented by 1) to produce the final coordinate.
+///
+/// # Arguments
+///
+/// * `column` - A `usize` representing the column index, where 0 corresponds to 'a'.
+/// * `row` - A `usize` representing the row index, which is zero-based.
+///
+/// # Returns
+///
+/// A `String` containing the coordinate in chess notation.
+///
+/// # Examples
+///
+/// ```
+/// use chess_board::square::get_name_from_row_and_col;
+/// let coordinate = get_name_from_row_and_col(0, 0);
+/// assert_eq!(coordinate, "a1");
+///
+/// let coordinate = get_name_from_row_and_col(25, 1);
+/// assert_eq!(coordinate, "z2");
+///
+/// let coordinate = get_name_from_row_and_col(26, 0);
+/// assert_eq!(coordinate, "aa1");
+/// ```
 pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
     let mut col_id = String::new();
     let mut remainder = column;
@@ -17,12 +46,63 @@ pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
         }
         remainder -= 1;
     }
-    
+
     col_id = col_id.chars().rev().collect();
 
     format!("{}{}", col_id, row + 1)
 }
 
+/// Converts a chess-style coordinate string to a given column and row.
+///
+/// The function works by separating the alphabetic characters (columns)
+/// from the numeric characters (rows) in the input string. Once split,
+/// it converts the alphabetic column to a base-26 number and adjusts it
+/// to be zero-based. It also converts the numeric row to be zero-based.
+///
+/// # Arguments
+///
+/// * `name` - A `&str` representing the coordinate in chess notation,
+///            with alphabetic characters for the column and numeric
+///            characters for the row. Examples include "a1", "b2", "z2", etc.
+///
+/// # Returns
+///
+/// A `Result<(usize, usize), &str>` containing a tuple with the column
+/// and row indices as `usize` if the input is valid, or an error string
+/// if the input is invalid.
+///
+/// # Errors
+///
+/// This function returns an error if the input contains any invalid
+/// characters (non-alphabetic characters in the column part or
+/// non-numeric characters in the row part), or if the column or
+/// row parts are empty.
+///
+/// # Examples
+///
+/// ```
+/// use chess_board::square::get_column_and_row_from_name;
+///
+/// let (column, row) = get_column_and_row_from_name("a1").unwrap();
+/// assert_eq!(column, 0);
+/// assert_eq!(row, 0);
+///
+/// let (column, row) = get_column_and_row_from_name("b2").unwrap();
+/// assert_eq!(column, 1);
+/// assert_eq!(row, 1);
+///
+/// let (column, row) = get_column_and_row_from_name("ab1").unwrap();
+/// assert_eq!(column, 27);
+/// assert_eq!(row, 0);
+///
+/// let (column, row) = get_column_and_row_from_name("zzz100").unwrap();
+/// assert_eq!(column, 18277);
+/// assert_eq!(row, 99);
+/// ```
+///
+/// # Panics
+///
+/// The function will panic if it fails to parse the row part into a `usize`.
 pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> {
     let mut col_as_string = String::new();
     let mut row_as_string = String::new();
@@ -60,6 +140,23 @@ pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> 
     Ok((column - 1, row - 1))
 }
 
+/// Represents a square on a chess board.
+///
+/// The `Square` struct holds the column and row indices, the color of the square,
+/// and an optional piece that might occupy the square. The color is determined based
+/// on the column and row indices.
+///
+/// # Type Parameters
+///
+/// * `P` - A type that implements the `Piece` trait, representing the type piece that can be placed on the square.
+///
+/// # Fields
+///
+/// * `column` - The zero-based column index of the square.
+/// * `row` - The zero-based row index of the square.
+/// * `color` - The color of the square, which can be either white or black.
+/// * `piece` - An optional field that holds a piece of type `P` if present on the square.
+/// ```
 #[derive(Copy, Clone)]
 pub struct Square<P: Piece> {
     column: usize,
@@ -75,7 +172,12 @@ impl<P: Piece> Square<P> {
         } else {
             Color::Black
         };
-        Square { color, piece: None, column, row }
+        Square {
+            color,
+            piece: None,
+            column,
+            row,
+        }
     }
 
     pub fn place_piece(&mut self, piece: P) {
@@ -96,6 +198,10 @@ impl<P: Piece> Square<P> {
 
     pub fn get_row(&self) -> usize {
         self.row
+    }
+
+    pub fn get_color(&self) -> Color {
+        self.color
     }
 
     pub fn get_name(&self) -> String {
