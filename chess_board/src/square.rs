@@ -102,12 +102,12 @@ impl<P: Piece> Square<P> {
 }
 
 impl<P: Piece> fmt::Display for Square<P> {
-    fn fmt(self, f: &mut Formatter<'_>) -> fmt::Result {
-        let square_color = match self.color {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        let square_color = match &self.color {
             Color::White => "\x1b[100m",
             Color::Black => "",
         };
-        let inner_char = match self.piece {
+        let inner_char = match &self.piece {
             Some(piece) => piece.get_char_representation(),
             None => ' ',
         };
@@ -121,40 +121,38 @@ mod tests {
 
     #[test]
     fn col_row_turn_into_id() {
-        let square_a1 = SquareId::build(0, 0);
-        assert_eq!(square_a1.get_column(), 0);
-        assert_eq!(square_a1.get_row(), 0);
+        let square_a1 = get_name_from_row_and_col(0, 0);
         assert_eq!("a1", format!("{square_a1}"));
 
-        let square_z2 = SquareId::build(25, 1);
+        let square_z2 = get_name_from_row_and_col(25, 1);
         assert_eq!("z2", format!("{square_z2}"));
 
-        let square_aa1 = SquareId::build(26, 0);
+        let square_aa1 = get_name_from_row_and_col(26, 0);
         assert_eq!("aa1", format!("{square_aa1}"));
 
-        let square_ab1 = SquareId::build(27, 0);
+        let square_ab1 = get_name_from_row_and_col(27, 0);
         assert_eq!("ab1", format!("{square_ab1}"));
 
-        let square_zzz100 = SquareId::build(18277, 99);
+        let square_zzz100 = get_name_from_row_and_col(18277, 99);
         assert_eq!("zzz100", format!("{square_zzz100}"));
     }
 
     #[test]
     fn string_to_id() {
-        let square_a1 = SquareId::from_string("a1").unwrap();
-        assert_eq!(0, square_a1.get_column());
-        assert_eq!(0, square_a1.get_row());
+        let (a1_column, a1_row) = get_column_and_row_from_name("a1").unwrap();
+        assert_eq!(0, a1_column);
+        assert_eq!(0, a1_row);
 
-        let square_b2 = SquareId::from_string("b2").unwrap();
-        assert_eq!(1, square_b2.get_column());
-        assert_eq!(1, square_b2.get_row());
+        let (b2_column, b2_row) = get_column_and_row_from_name("b2").unwrap();
+        assert_eq!(1, b2_column);
+        assert_eq!(1, b2_row);
 
-        let square_ab1 = SquareId::from_string("ab1").unwrap();
-        assert_eq!(27, square_ab1.get_column());
-        assert_eq!(0, square_ab1.get_row());
+        let (ab1_column, ab1_row) = get_column_and_row_from_name("ab1").unwrap();
+        assert_eq!(27, ab1_column);
+        assert_eq!(0, ab1_row);
 
-        let square_zzz100 = SquareId::from_string("zzz100").unwrap();
-        assert_eq!(18277, square_zzz100.get_column());
-        assert_eq!(99, square_zzz100.get_row());
+        let (zzz100_column, zzz100_row) = get_column_and_row_from_name("zzz100").unwrap();
+        assert_eq!(18277, zzz100_column);
+        assert_eq!(99, zzz100_row);
     }
 }
