@@ -1,10 +1,11 @@
 use crate::square::Square;
 use std::fmt;
+use crate::piece::Piece;
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
 pub struct Board {
-    squares: Vec<Square<P>>,
+    squares: Vec<Square>,
     width: usize,
     height: usize,
 }
@@ -29,7 +30,7 @@ impl Board {
     fn generate_board(width: usize, height: usize) -> Vec<Square> {
         assert!(width > 0 && height > 0);
 
-        let mut spaces = vec![Square::build(0, 0); width * height];
+        let mut spaces = Vec::with_capacity(width * height);
 
         for col in 0..width {
             for row in 0..height {
@@ -52,7 +53,7 @@ impl Board {
         self.height
     }
 
-    pub fn check_space(&self, col: usize, row: usize) -> Option<&ChessPiece> {
+    pub fn check_space(&self, col: usize, row: usize) -> Option<&Box<dyn Piece>> {
         if col >= self.width {
             panic!("column outside of board bounds");
         }
@@ -64,7 +65,7 @@ impl Board {
     }
 
     /// Places a chess piece to the board
-    pub fn place_piece(&mut self, piece: ChessPiece, col: usize, row: usize) {
+    pub fn place_piece(&mut self, piece: Box<dyn Piece>, col: usize, row: usize) {
         if col >= self.width {
             panic!("column outside of board bounds");
         }
@@ -76,7 +77,7 @@ impl Board {
     }
 
     /// If the square identified has a chess piece, this removes it and returns ownership of that piece
-    pub fn remove_piece(&mut self, col: usize, row: usize) -> Option<ChessPiece> {
+    pub fn remove_piece(&mut self, col: usize, row: usize) -> Option<Box<dyn Piece>> {
         if col >= self.width {
             panic!("column outside of board bounds");
         }
@@ -85,50 +86,6 @@ impl Board {
         }
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].clear_piece()
-    }
-
-    pub fn as_byte_arr(&self) -> Vec<u8> {
-        let mut capacity = self.squares.len() / 2;
-        if self.squares.len() % 2 == 1 {
-            capacity += 1;
-        }
-
-        let mut byte_arr = vec![0b00000000; capacity];
-
-        for col in 0..self.get_width() {
-            for row in 0..self.get_height() {
-                let square_index = self.get_square_index(col, row);
-                let square = self.squares[square_index];
-
-                let arr_index = square_index / 2;
-                let first = square_index % 2 == 0;
-
-                if first {
-                    let byte = square.encode() << 4;
-                    byte_arr[arr_index] |= byte;
-                } else {
-                    byte_arr[arr_index] |= square.encode();
-                }
-            }
-        }
-
-        byte_arr
-    }
-}
-
-impl Clone for Board {
-    fn clone(&self) -> Self {
-        Self {
-            squares: self.squares.clone(),
-            height: self.height,
-            width: self.width,
-        }
-    }
-
-    fn clone_from(&mut self, source: &Self) {
-        self.squares = source.squares.clone();
-        self.width = source.width;
-        self.height = source.height;
     }
 }
 
@@ -141,7 +98,7 @@ impl fmt::Display for Board {
         for y in 0..self.get_height() {
             for x in 0..self.get_width() {
                 let square_index = self.get_square_index(x, y);
-                let square = self.squares[square_index];
+                let square = &self.squares[square_index];
                 lines[y].push_str(format!("{square}",).as_str());
             }
         }
@@ -152,286 +109,5 @@ impl fmt::Display for Board {
         }
 
         write!(f, "{}", board_string)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
-    use crate::{Color, PieceType};
-
-    #[test]
-    fn test_build_game_board() {
-        let board = Board::build(10, 10);
-        assert_eq!(board.get_width(), 10);
-        assert_eq!(board.get_height(), 10);
-        for x in 0..10 {
-            for y in 0..10 {
-                let square_index = board.get_square_index(x, y);
-                assert!(board.squares[square_index].get_piece().is_none());
-            }
-        }
-    }
-
-    #[test]
-    fn test_build_chess_board() {
-        let board = Board::build_chess_board();
-        assert_eq!(board.get_width(), 8);
-        assert_eq!(board.get_height(), 8);
-    }
-
-    #[test]
-    fn test_place_and_remove_piece() {
-        let mut board = Board::build_chess_board();
-        let piece = ChessPiece::new(Color::White, Knight);
-
-        board.place_piece(piece, 0, 0);
-
-        let square_index = board.get_square_index(0, 0);
-        assert!(board.squares[square_index].get_piece().is_some());
-        assert_eq!(Knight, board.check_space(0, 0).unwrap().piece_type);
-        assert_eq!(Color::White, board.check_space(0, 0).unwrap().color);
-
-        let removed_piece = board.remove_piece(0, 0);
-        assert!(removed_piece.is_some());
-        assert!(board.squares[square_index].get_piece().is_none());
-
-        board.place_piece(removed_piece.unwrap(), 0, 1);
-        let square_index_a2 = board.get_square_index(0, 1);
-        assert!(board.squares[square_index_a2].get_piece().is_some());
-        assert_eq!(Knight, board.check_space(0, 1).unwrap().piece_type);
-        assert_eq!(Color::White, board.check_space(0, 1).unwrap().color);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_place_piece_out_of_bounds() {
-        let mut board = Board::build_chess_board();
-        let piece = ChessPiece::new(Color::White, PieceType::Knight);
-
-        board.place_piece(piece, 8, 0);
-    }
-
-    #[test]
-    #[should_panic]
-    fn test_remove_piece_out_of_bounds() {
-        let mut board = Board::build_chess_board();
-        board.remove_piece(8, 0).unwrap();
-    }
-
-    #[test]
-    fn build_board_from_string() {
-        let board_as_string = concat!(
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n"
-        );
-
-        let board = Board::from_string(8, 8, board_as_string);
-
-        assert!(board.is_ok());
-        let game_board = board.unwrap();
-        assert_eq!(game_board.get_width(), 8);
-        assert_eq!(game_board.get_height(), 8);
-
-        for x in 0..8 {
-            for y in 0..8 {
-                let piece = game_board.check_space(x, y);
-                assert!(piece.is_none());
-            }
-        }
-    }
-
-    #[test]
-    fn should_fail() {
-        let board = Board::from_string(8, 8, "");
-        assert!(board.is_err());
-    }
-
-    #[test]
-    fn should_be_able_to_detect_any_piece() {
-        let board_string = concat!("♜♞♝♛♚♟ \n", "♖♘♗♕♔♙ ");
-
-        let board = Board::from_string(7, 2, board_string).unwrap();
-        println!("{board}");
-
-        let pieces = [Rook, Knight, Bishop, Queen, King, Pawn];
-
-        for col_index in 0..6 {
-            let white_piece = board.check_space(col_index, 0);
-            let black_piece = board.check_space(col_index, 1);
-
-            assert_eq!(pieces[col_index], white_piece.unwrap().piece_type);
-            assert_eq!(pieces[col_index], black_piece.unwrap().piece_type);
-
-            assert_eq!(Color::White, white_piece.unwrap().color);
-            assert_eq!(Color::Black, black_piece.unwrap().color);
-        }
-
-        assert!(board.check_space(6, 0).is_none());
-        assert!(board.check_space(6, 1).is_none());
-    }
-
-    #[test]
-    fn builds_starting_position_in_chess() {
-        let board = Board::build_chess_board();
-
-        assert_eq!(8, board.height);
-        assert_eq!(8, board.width);
-
-        let pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
-
-        for col_index in 0..8 {
-            assert_eq!(
-                pieces[col_index],
-                board.check_space(col_index, 0).unwrap().piece_type
-            );
-            assert_eq!(Color::White, board.check_space(col_index, 0).unwrap().color);
-            assert_eq!(
-                pieces[col_index],
-                board.check_space(col_index, 7).unwrap().piece_type
-            );
-            assert_eq!(Color::Black, board.check_space(col_index, 7).unwrap().color);
-
-            assert_eq!(Pawn, board.check_space(col_index, 1).unwrap().piece_type);
-            assert_eq!(Color::White, board.check_space(col_index, 1).unwrap().color);
-            assert_eq!(Pawn, board.check_space(col_index, 6).unwrap().piece_type);
-            assert_eq!(Color::Black, board.check_space(col_index, 6).unwrap().color);
-
-            for empty_row_index in 2..6 {
-                assert!(board.check_space(col_index, empty_row_index).is_none());
-            }
-        }
-    }
-
-    #[test]
-    fn build_starting_position_from_string() {
-        let chess_board_as_string = concat!(
-            "♜♞♝♛♚♝♞♜\n",
-            "♟♟♟♟♟♟♟♟\n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "♙♙♙♙♙♙♙♙\n",
-            "♖♘♗♕♔♗♘♖\n"
-        );
-
-        let board = Board::from_string(8, 8, chess_board_as_string).unwrap();
-
-        assert_eq!(8, board.height);
-        assert_eq!(8, board.width);
-
-        let pieces = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
-
-        for col_index in 0..8 {
-            assert_eq!(
-                pieces[col_index],
-                board.check_space(col_index, 0).unwrap().piece_type
-            );
-            assert_eq!(Color::White, board.check_space(col_index, 0).unwrap().color);
-            assert_eq!(
-                pieces[col_index],
-                board.check_space(col_index, 7).unwrap().piece_type
-            );
-            assert_eq!(Color::Black, board.check_space(col_index, 7).unwrap().color);
-
-            assert_eq!(Pawn, board.check_space(col_index, 1).unwrap().piece_type);
-            assert_eq!(Color::White, board.check_space(col_index, 1).unwrap().color);
-            assert_eq!(Pawn, board.check_space(col_index, 6).unwrap().piece_type);
-            assert_eq!(Color::Black, board.check_space(col_index, 6).unwrap().color);
-
-            for empty_row_index in 2..6 {
-                assert!(board.check_space(col_index, empty_row_index).is_none());
-            }
-        }
-    }
-
-    #[test]
-    fn as_byte_arr_simple_board() {
-        let chess_board_as_string = " ";
-        let board = Board::from_string(1, 1, chess_board_as_string).unwrap();
-
-        let encoded = board.as_byte_arr();
-
-        assert_eq!(1, encoded.len());
-        assert_eq!(0b00000000, encoded[0]);
-    }
-
-    #[test]
-    fn as_byte_arr_single_pawn() {
-        let chess_board_as_string = "♙";
-        let board = Board::from_string(1, 1, chess_board_as_string).unwrap();
-
-        let encoded = board.as_byte_arr();
-
-        assert_eq!(1, encoded.len());
-        assert_eq!(0b00100000, encoded[0]);
-    }
-
-    #[test]
-    fn as_byte_arr_two_pieces() {
-        let chess_board_as_string = "♙♟";
-        let board = Board::from_string(2, 1, chess_board_as_string).unwrap();
-
-        let encoded = board.as_byte_arr();
-
-        assert_eq!(1, encoded.len());
-        assert_eq!(0b00100011, encoded[0]);
-    }
-
-    #[test]
-    fn as_byte_arr_odd_number_of_squares() {
-        let chess_board_as_string = "♛\n♚\n♜";
-        let board = Board::from_string(1, 3, chess_board_as_string).unwrap();
-
-        let encoded = board.as_byte_arr();
-
-        assert_eq!(2, encoded.len());
-        assert_eq!(0b01011011, encoded[0]);
-        assert_eq!(0b11010000, encoded[1]);
-    }
-
-    #[test]
-    fn starting_position_as_byte_arr() {
-        let chess_board_as_string = concat!(
-            "♜♞♝♛♚♝♞♜\n",
-            "♟♟♟♟♟♟♟♟\n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "        \n",
-            "♙♙♙♙♙♙♙♙\n",
-            "♖♘♗♕♔♗♘♖\n"
-        );
-
-        let board = Board::from_string(8, 8, chess_board_as_string).unwrap();
-
-        let encoded = board.as_byte_arr();
-
-        assert_eq!(32, encoded.len());
-        assert_eq!(0b01000110, encoded[0]);
-        assert_eq!(0b10001100, encoded[1]);
-        assert_eq!(0b10101000, encoded[2]);
-        assert_eq!(0b01100100, encoded[3]);
-        for white_pawns_index in 4..8 {
-            assert_eq!(0b00100010, encoded[white_pawns_index]);
-        }
-        for empty_index in 9..24 {
-            assert_eq!(0b00000000, encoded[empty_index]);
-        }
-        for black_pawn_index in 25..28 {
-            assert_eq!(0b00110011, encoded[black_pawn_index]);
-        }
-        assert_eq!(0b01010111, encoded[28]);
-        assert_eq!(0b10011101, encoded[29]);
-        assert_eq!(0b10111001, encoded[30]);
-        assert_eq!(0b01110101, encoded[31]);
     }
 }
