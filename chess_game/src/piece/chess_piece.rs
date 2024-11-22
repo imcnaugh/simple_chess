@@ -14,7 +14,8 @@ use crate::color::Color;
 ///
 /// ```
 /// // Assuming there is a struct `Pawn` that implements `ChessPiece`
-/// use chess_pieces::{Color, Pawn, ChessPiece};
+/// use chess_game::Color;
+/// use chess_game::piece::{Pawn, ChessPiece};
 /// let pawn = Pawn::new(Color::White);
 /// assert_eq!(pawn.get_color(), Color::White);
 /// assert_eq!(pawn.get_as_char(), '♙');

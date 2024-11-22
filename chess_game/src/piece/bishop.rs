@@ -1,23 +1,24 @@
-use crate::{ChessPiece, Color};
+use crate::piece::ChessPiece;
+use crate::Color;
 
-pub struct King {
+pub struct Bishop {
     color: Color,
 }
 
-impl ChessPiece for King {
+impl ChessPiece for Bishop {
     fn get_color(&self) -> Color {
         self.color
     }
 
     fn get_as_char(&self) -> char {
         match self.color {
-            Color::White => '♔',
-            Color::Black => '♚',
+            Color::White => '♗',
+            Color::Black => '♝',
         }
     }
 }
 
-impl King {
+impl Bishop {
     pub fn new(color: Color) -> Self {
         Self { color }
     }

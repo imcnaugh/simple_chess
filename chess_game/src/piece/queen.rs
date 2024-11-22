@@ -1,4 +1,5 @@
-use crate::{ChessPiece, Color};
+use crate::piece::ChessPiece;
+use crate::Color;
 
 pub struct Queen {
     color: Color,

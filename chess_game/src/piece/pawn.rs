@@ -1,23 +1,25 @@
-use crate::{ChessPiece, Color};
+use crate::piece::ChessPiece;
+use crate::Color;
 
-pub struct Bishop {
+/// Represents a pawn chess piece
+pub struct Pawn {
     color: Color,
 }
 
-impl ChessPiece for Bishop {
+impl ChessPiece for Pawn {
     fn get_color(&self) -> Color {
         self.color
     }
 
     fn get_as_char(&self) -> char {
         match self.color {
-            Color::White => '♗',
-            Color::Black => '♝',
+            Color::White => '♙',
+            Color::Black => '♟',
         }
     }
 }
 
-impl Bishop {
+impl Pawn {
     pub fn new(color: Color) -> Self {
         Self { color }
     }

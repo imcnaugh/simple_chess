@@ -1,25 +1,24 @@
-use crate::chess_piece::ChessPiece;
-use crate::color::Color;
+use crate::piece::ChessPiece;
+use crate::Color;
 
-/// Represents a pawn chess piece
-pub struct Pawn {
+pub struct King {
     color: Color,
 }
 
-impl ChessPiece for Pawn {
+impl ChessPiece for King {
     fn get_color(&self) -> Color {
         self.color
     }
 
     fn get_as_char(&self) -> char {
         match self.color {
-            Color::White => '♙',
-            Color::Black => '♟',
+            Color::White => '♔',
+            Color::Black => '♚',
         }
     }
 }
 
-impl Pawn {
+impl King {
     pub fn new(color: Color) -> Self {
         Self { color }
     }

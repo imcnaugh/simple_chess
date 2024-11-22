@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [workspace]
-members = [ "chess_pieces",
+members = [
     "game_board",
-    "chess_pieces"
+    "chess_game",
 ]
 
 [dependencies]

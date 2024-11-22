@@ -22,8 +22,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "chess_pieces"
+name = "chess_game"
 version = "0.1.0"
+dependencies = [
+ "game_board",
+]
 
 [[package]]
 name = "game_board"

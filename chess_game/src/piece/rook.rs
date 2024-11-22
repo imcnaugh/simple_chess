@@ -1,4 +1,5 @@
-use crate::{ChessPiece, Color};
+use crate::piece::ChessPiece;
+use crate::Color;
 
 /// represents a rook chess piece
 pub struct Rook {
