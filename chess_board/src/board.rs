@@ -248,6 +248,7 @@ impl fmt::Display for Board {
 
 #[cfg(test)]
 mod tests {
+    use std::any::Any;
     use super::*;
 
     #[test]
@@ -291,13 +292,57 @@ mod tests {
             _ => panic!("expected Err")
         };
     }
-    
+
     #[test]
-    fn 
+    fn can_place_retrieve_and_remove_piece() {
+        struct ChessPawn {}
+        impl Piece for ChessPawn {
+            fn get_char_representation(&self) -> char {
+                'p'
+            }
+
+            fn as_any(&self) -> &dyn Any {
+                self
+            }
+        }
+
+        let pawn = Box::new(ChessPawn {});
+        let mut board = Board::build(8, 8).unwrap();
+        assert!(board.get_piece_at_space(1,1).is_none());
+        board.place_piece(pawn, 1, 1);
+        let piece = board.get_piece_at_space(1, 1).unwrap();
+        assert_eq!(piece.get_char_representation(), 'p');
+        assert_eq!(board.remove_piece(1, 1).unwrap().get_char_representation(), 'p');
+        assert!(board.get_piece_at_space(1,1).is_none());
+    }
 
     #[test]
     #[should_panic]
-    fn can_not_access_square_out_of_bounds() {
+    fn can_not_access_square_out_of_bounds_place_piece() {
+        struct ChessPawn {}
+        impl Piece for ChessPawn {
+            fn get_char_representation(&self) -> char {
+                'p'
+            }
+
+            fn as_any(&self) -> &dyn Any {
+                self
+            }
+        }
+
+        let pawn = Box::new(ChessPawn {});
+        Board::build(1, 1).unwrap().place_piece(pawn, 0,1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn can_not_access_square_out_of_bounds_get_piece() {
+        Board::build(1, 1).unwrap().get_piece_at_space(g0,1);
+    }
+
+    #[test]
+    #[should_panic]
+    fn can_not_access_square_out_of_bounds_remove_piece() {
         Board::build(1, 1).unwrap().remove_piece(0,1);
     }
 }
