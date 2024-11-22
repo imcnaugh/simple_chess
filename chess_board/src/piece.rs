@@ -1,3 +1,5 @@
+use std::any::Any;
+
 /// A trait that represents a generic piece in a game or system.
 ///
 /// Any type that implements this trait will be able to provide
@@ -11,4 +13,6 @@ pub trait Piece {
     ///
     /// * `char` - A character that symbolically represents the piece.
     fn get_char_representation(&self) -> char;
+
+    fn as_any(&self) -> &dyn Any;
 }
