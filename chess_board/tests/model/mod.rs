@@ -1,5 +1,5 @@
-use std::any::Any;
 use chess_board::Piece;
+use std::any::Any;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct CheckersPiece {}
@@ -16,10 +16,9 @@ impl Piece for CheckersPiece {
 
 impl CheckersPiece {
     pub fn new() -> Self {
-        Self{}
+        Self {}
     }
 }
-
 
 pub enum ChessPiece {
     Pawn,

@@ -1,6 +1,6 @@
+use crate::piece::Piece;
 use crate::square::Square;
 use std::fmt;
-use crate::piece::Piece;
 
 /// # Game Board struct
 /// A struct used to keep track of the spaces of a rectangular game board made up of spaces
@@ -29,7 +29,9 @@ impl Board {
 
     fn generate_board(width: usize, height: usize) -> Result<Vec<Square>, String> {
         if width == 0 || height == 0 {
-            return Err(String::from("Height and Width must be positive integers greater then 0"));
+            return Err(String::from(
+                "Height and Width must be positive integers greater then 0",
+            ));
         }
 
         let mut spaces = Vec::with_capacity(width * height);

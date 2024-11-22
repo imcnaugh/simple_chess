@@ -3,8 +3,8 @@ mod model;
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Deref;
     use crate::model::CheckersPiece;
+    use std::ops::Deref;
 
     #[test]
     fn simple_board_with_piece_test() {
@@ -18,16 +18,26 @@ mod tests {
         board.place_piece(piece, 0, 0);
 
         let piece_from_board = board.check_space(0, 0).unwrap();
-        if piece_from_board.deref().as_any().downcast_ref::<CheckersPiece>().is_none() {
+        if piece_from_board
+            .deref()
+            .as_any()
+            .downcast_ref::<CheckersPiece>()
+            .is_none()
+        {
             panic!("Expected Checkers Piece")
         }
-        
+
         let removed_piece = board.remove_piece(0, 0);
         assert!(removed_piece.is_some());
-        if removed_piece.unwrap().as_any().downcast_ref::<CheckersPiece>().is_none() {
+        if removed_piece
+            .unwrap()
+            .as_any()
+            .downcast_ref::<CheckersPiece>()
+            .is_none()
+        {
             panic!("Expected Checkers Piece")
         }
-        
+
         assert!(board.check_space(0, 0).is_none());
     }
 }

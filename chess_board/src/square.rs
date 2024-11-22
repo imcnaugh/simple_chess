@@ -157,7 +157,7 @@ pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> 
 /// * `color` - The color of the square, which can be either white or black.
 /// * `piece` - An optional field that holds a piece of type `P` if present on the square.
 /// ```
-pub struct Square<> {
+pub struct Square {
     column: usize,
     row: usize,
     color: Color,
