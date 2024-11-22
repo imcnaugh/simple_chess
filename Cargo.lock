@@ -22,6 +22,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "chess_pieces"
+version = "0.1.0"
+
+[[package]]
 name = "game_board"
 version = "0.1.0"
 
