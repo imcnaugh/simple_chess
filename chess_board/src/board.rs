@@ -337,7 +337,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn can_not_access_square_out_of_bounds_get_piece() {
-        Board::build(1, 1).unwrap().get_piece_at_space(g0,1);
+        Board::build(1, 1).unwrap().get_piece_at_space(0,1);
     }
 
     #[test]

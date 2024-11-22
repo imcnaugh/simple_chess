@@ -14,5 +14,12 @@ pub trait Piece {
     /// * `char` - A character that symbolically represents the piece.
     fn get_char_representation(&self) -> char;
 
+    
+    /// Provides the ability to cast the piece to a trait object of `Any`.
+    ///
+    /// # Returns
+    ///
+    /// * `&dyn Any` - A reference to the piece as a trait object of `Any`. This is useful
+    /// for downcasting the piece to its concrete type.
     fn as_any(&self) -> &dyn Any;
 }

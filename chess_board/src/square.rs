@@ -1,4 +1,4 @@
-use crate::color::Color;
+use crate::color::SquareColor;
 use crate::piece::Piece;
 use core::fmt;
 use std::fmt::Formatter;
@@ -160,16 +160,39 @@ pub fn get_column_and_row_from_square_name(name: &str) -> Result<(usize, usize),
 pub struct Square {
     column: usize,
     row: usize,
-    color: Color,
+    color: SquareColor,
     piece: Option<Box<dyn Piece>>,
 }
 
 impl Square {
+    /// Constructs a new `Square` with the specified column and row indices.
+    /// The color of the square is determined by the parity of the sum of
+    /// the column and row indices.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The zero-based column index of the square.
+    /// * `row` - The zero-based row index of the square.
+    ///
+    /// # Returns
+    ///
+    /// A `Square` instance with the specified column and row, and the calculated color.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_board::{Square, SquareColor};
+    /// let square = Square::build(0, 0);
+    /// assert_eq!(square.get_color(), SquareColor::Black);
+    /// let square = Square::build(1, 0);
+    /// assert_eq!(square.get_color(), SquareColor::White);
+    /// ```
+    ///
     pub fn build(column: usize, row: usize) -> Self {
         let color = if (column + row) % 2 == 1 {
-            Color::White
+            SquareColor::White
         } else {
-            Color::Black
+            SquareColor::Black
         };
         Square {
             color,
@@ -179,14 +202,105 @@ impl Square {
         }
     }
 
+    
+    /// Places a piece on the square.
+    ///
+    /// # Arguments
+    ///
+    /// * `piece` - A boxed piece that implements the `Piece` trait.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::any::Any;
+    /// use chess_board::{Square, Piece};
+    ///
+    /// struct Pawn;
+    ///
+    /// impl Piece for Pawn {
+    ///     fn get_char_representation(&self) -> char {
+    ///         'P'
+    ///     }
+    ///
+    /// fn as_any(&self) -> &dyn Any {
+    ///         self
+    ///     }
+    /// }
+    ///
+    /// let mut square = Square::build(0, 0);
+    /// square.place_piece(Box::new(Pawn));
+    /// assert!(square.get_piece().is_some());
+    /// ```
     pub fn place_piece(&mut self, piece: Box<dyn Piece>) {
         self.piece = Some(piece);
     }
 
+    
+    /// Returns a reference to the piece placed on the square, if any.
+    ///
+    /// # Returns
+    ///
+    /// An `Option` containing a reference to the piece of type `Box<dyn Piece>` 
+    /// if a piece is placed on the square, or `None` if the square is empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::any::Any;
+    /// use chess_board::{Square, Piece};
+    ///
+    /// struct Pawn;
+    ///
+    /// impl Piece for Pawn {
+    ///     fn get_char_representation(&self) -> char {
+    ///         'P'
+    ///     }
+    ///
+    ///     fn as_any(&self) -> &dyn Any {
+    ///         self
+    ///     }
+    /// }
+    ///
+    /// let mut square = Square::build(0, 0);
+    /// square.place_piece(Box::new(Pawn));
+    /// assert!(square.get_piece().is_some());
+    /// ```
     pub fn get_piece(&self) -> Option<&Box<dyn Piece>> {
         self.piece.as_ref()
     }
 
+    
+    /// Clears the piece from the square.
+    ///
+    /// # Returns
+    ///
+    /// An `Option` containing the piece of type `Box<dyn Piece>` if a piece was present on the square,
+    /// or `None` if the square was already empty.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use std::any::Any;
+    /// use chess_board::{Square, Piece};
+    ///
+    /// struct Pawn;
+    ///
+    /// impl Piece for Pawn {
+    ///     fn get_char_representation(&self) -> char {
+    ///         'P'
+    ///     }
+    ///
+    ///     fn as_any(&self) -> &dyn Any {
+    ///         self
+    ///     }
+    /// }
+    ///
+    /// let mut square = Square::build(0, 0);
+    /// square.place_piece(Box::new(Pawn));
+    /// let piece = square.clear_piece();
+    /// assert!(piece.is_some());
+    /// assert!(square.get_piece().is_none());
+    /// ```
     pub fn clear_piece(&mut self) -> Option<Box<dyn Piece>> {
         self.piece.take()
     }
@@ -199,10 +313,24 @@ impl Square {
         self.row
     }
 
-    pub fn get_color(&self) -> Color {
+    pub fn get_color(&self) -> SquareColor {
         self.color
     }
 
+
+    /// Gets the name of the square in standard chess notation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_board::Square;
+    ///
+    /// let square = Square::build(0, 0);
+    /// assert_eq!(square.get_name(), "a1".to_string());
+    ///
+    /// let square = Square::build(25, 1);
+    /// assert_eq!(square.get_name(), "z2".to_string());
+    /// ```
     pub fn get_name(&self) -> String {
         get_square_name_from_row_and_col(self.column, self.row)
     }
@@ -211,8 +339,8 @@ impl Square {
 impl fmt::Display for Square {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match &self.color {
-            Color::White => "\x1b[100m",
-            Color::Black => "",
+            SquareColor::White => "\x1b[100m",
+            SquareColor::Black => "",
         };
         let inner_char = match &self.piece {
             Some(piece) => piece.get_char_representation(),
@@ -261,5 +389,104 @@ mod tests {
         let (zzz100_column, zzz100_row) = get_column_and_row_from_square_name("zzz100").unwrap();
         assert_eq!(18277, zzz100_column);
         assert_eq!(99, zzz100_row);
+    }
+
+
+    #[test]
+    fn test_square_build() {
+        let square = Square::build(0, 0);
+        assert_eq!(square.get_column(), 0);
+        assert_eq!(square.get_row(), 0);
+        assert_eq!(square.get_color(), SquareColor::Black); // a8
+        assert!(square.get_piece().is_none());
+
+        let square = Square::build(1, 0);
+        assert_eq!(square.get_column(), 1);
+        assert_eq!(square.get_row(), 0);
+        assert_eq!(square.get_color(), SquareColor::White); // b8
+    }
+
+    #[test]
+    fn test_place_piece() {
+        struct Pawn;
+        impl Piece for Pawn {
+            fn get_char_representation(&self) -> char {
+                'P'
+            }
+
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+        }
+
+        let mut square = Square::build(0, 0);
+        square.place_piece(Box::new(Pawn));
+        assert!(square.get_piece().is_some());
+    }
+
+    #[test]
+    fn test_get_piece() {
+        struct Pawn;
+        impl Piece for Pawn {
+            fn get_char_representation(&self) -> char {
+                'P'
+            }
+
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+        }
+
+        let mut square = Square::build(0, 0);
+        square.place_piece(Box::new(Pawn));
+        let piece = square.get_piece();
+        assert!(piece.is_some());
+    }
+
+    #[test]
+    fn test_clear_piece() {
+        struct Pawn;
+        impl Piece for Pawn {
+            fn get_char_representation(&self) -> char {
+                'P'
+            }
+
+            fn as_any(&self) -> &dyn std::any::Any {
+                self
+            }
+        }
+
+        let mut square = Square::build(0, 0);
+        square.place_piece(Box::new(Pawn));
+        let piece = square.clear_piece();
+        assert!(piece.is_some());
+        assert!(square.get_piece().is_none());
+    }
+
+    #[test]
+    fn test_get_column() {
+        let square = Square::build(5, 3);
+        assert_eq!(square.get_column(), 5);
+    }
+
+    #[test]
+    fn test_get_row() {
+        let square = Square::build(5, 3);
+        assert_eq!(square.get_row(), 3);
+    }
+
+    #[test]
+    fn test_get_color() {
+        let square = Square::build(0, 0);
+        assert_eq!(square.get_color(), SquareColor::Black);
+    }
+
+    #[test]
+    fn test_get_name() {
+        let square = Square::build(0, 0);
+        assert_eq!(square.get_name(), "a1".to_string());
+
+        let square = Square::build(25, 1);
+        assert_eq!(square.get_name(), "z2".to_string());
     }
 }
