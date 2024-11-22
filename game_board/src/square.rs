@@ -157,14 +157,14 @@ pub fn get_column_and_row_from_square_name(name: &str) -> Result<(usize, usize),
 /// * `color` - The color of the square, which can be either white or black.
 /// * `piece` - An optional field that holds a piece of type `P` if present on the square.
 /// ```
-pub struct Square {
+pub struct Square<P> {
     column: usize,
     row: usize,
     color: SquareColor,
-    piece: Option<Box<dyn Piece>>,
+    piece: Option<P>,
 }
 
-impl Square {
+impl<P> Square<P> {
     /// Constructs a new `Square` with the specified column and row indices.
     /// The color of the square is determined by the parity of the sum of
     /// the column and row indices.
@@ -231,7 +231,7 @@ impl Square {
     /// square.place_piece(Box::new(Pawn));
     /// assert!(square.get_piece().is_some());
     /// ```
-    pub fn place_piece(&mut self, piece: Box<dyn Piece>) {
+    pub fn place_piece(&mut self, piece: P) {
         self.piece = Some(piece);
     }
 
@@ -265,7 +265,7 @@ impl Square {
     /// square.place_piece(Box::new(Pawn));
     /// assert!(square.get_piece().is_some());
     /// ```
-    pub fn get_piece(&self) -> Option<&Box<dyn Piece>> {
+    pub fn get_piece(&self) -> Option<&P> {
         self.piece.as_ref()
     }
 
@@ -301,7 +301,7 @@ impl Square {
     /// assert!(piece.is_some());
     /// assert!(square.get_piece().is_none());
     /// ```
-    pub fn clear_piece(&mut self) -> Option<Box<dyn Piece>> {
+    pub fn clear_piece(&mut self) -> Option<P> {
         self.piece.take()
     }
 
@@ -336,7 +336,7 @@ impl Square {
     }
 }
 
-impl fmt::Display for Square {
+impl<P> fmt::Display for Square<P> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match &self.color {
             SquareColor::White => "\x1b[100m",

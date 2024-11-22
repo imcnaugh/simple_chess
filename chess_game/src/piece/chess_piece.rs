@@ -18,10 +18,13 @@ use crate::color::Color;
 /// use chess_game::piece::{Pawn, ChessPiece};
 /// let pawn = Pawn::new(Color::White);
 /// assert_eq!(pawn.get_color(), Color::White);
-/// assert_eq!(pawn.get_as_char(), '♙');
+/// assert_eq!(pawn.get_utf_char(), '♙');
 /// ```
 pub trait ChessPiece {
     fn get_color(&self) -> Color;
 
-    fn get_as_char(&self) -> char;
+    fn get_utf_char(&self) -> char;
+
+    // fn get_possible_moves(&self, current_location: (usize, usize), board: Board);
+    fn get_fen_char(&self) -> char;
 }

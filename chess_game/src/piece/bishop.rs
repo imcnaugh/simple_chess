@@ -1,3 +1,4 @@
+use std::any::Any;
 use crate::piece::ChessPiece;
 use crate::Color;
 
@@ -10,10 +11,17 @@ impl ChessPiece for Bishop {
         self.color
     }
 
-    fn get_as_char(&self) -> char {
+    fn get_utf_char(&self) -> char {
         match self.color {
             Color::White => '♗',
             Color::Black => '♝',
+        }
+    }
+
+    fn get_fen_char(&self) -> char {
+        match self.color {
+            Color::White => 'B',
+            Color::Black => 'b',
         }
     }
 }
