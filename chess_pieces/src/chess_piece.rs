@@ -21,6 +21,6 @@ use crate::color::Color;
 /// ```
 pub trait ChessPiece {
     fn get_color(&self) -> Color;
-    
+
     fn get_as_char(&self) -> char;
 }
