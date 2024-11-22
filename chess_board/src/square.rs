@@ -22,17 +22,17 @@ use std::fmt::Formatter;
 /// # Examples
 ///
 /// ```
-/// use chess_board::get_name_from_row_and_col;
-/// let coordinate = get_name_from_row_and_col(0, 0);
+/// use chess_board::get_square_name_from_row_and_col;
+/// let coordinate = get_square_name_from_row_and_col(0, 0);
 /// assert_eq!(coordinate, "a1");
 ///
-/// let coordinate = get_name_from_row_and_col(25, 1);
+/// let coordinate = get_square_name_from_row_and_col(25, 1);
 /// assert_eq!(coordinate, "z2");
 ///
-/// let coordinate = get_name_from_row_and_col(26, 0);
+/// let coordinate = get_square_name_from_row_and_col(26, 0);
 /// assert_eq!(coordinate, "aa1");
 /// ```
-pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
+pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
     let mut col_id = String::new();
     let mut remainder = column;
 
@@ -81,21 +81,21 @@ pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// use chess_board::get_column_and_row_from_name;
+/// use chess_board::get_column_and_row_from_square_name;
 ///
-/// let (column, row) = get_column_and_row_from_name("a1").unwrap();
+/// let (column, row) = get_column_and_row_from_square_name("a1").unwrap();
 /// assert_eq!(column, 0);
 /// assert_eq!(row, 0);
 ///
-/// let (column, row) = get_column_and_row_from_name("b2").unwrap();
+/// let (column, row) = get_column_and_row_from_square_name("b2").unwrap();
 /// assert_eq!(column, 1);
 /// assert_eq!(row, 1);
 ///
-/// let (column, row) = get_column_and_row_from_name("ab1").unwrap();
+/// let (column, row) = get_column_and_row_from_square_name("ab1").unwrap();
 /// assert_eq!(column, 27);
 /// assert_eq!(row, 0);
 ///
-/// let (column, row) = get_column_and_row_from_name("zzz100").unwrap();
+/// let (column, row) = get_column_and_row_from_square_name("zzz100").unwrap();
 /// assert_eq!(column, 18277);
 /// assert_eq!(row, 99);
 /// ```
@@ -103,7 +103,7 @@ pub fn get_name_from_row_and_col(column: usize, row: usize) -> String {
 /// # Panics
 ///
 /// The function will panic if it fails to parse the row part into a `usize`.
-pub fn get_column_and_row_from_name(name: &str) -> Result<(usize, usize), &str> {
+pub fn get_column_and_row_from_square_name(name: &str) -> Result<(usize, usize), &str> {
     let mut col_as_string = String::new();
     let mut row_as_string = String::new();
     let mut finding_col = true;
@@ -204,7 +204,7 @@ impl Square {
     }
 
     pub fn get_name(&self) -> String {
-        get_name_from_row_and_col(self.column, self.row)
+        get_square_name_from_row_and_col(self.column, self.row)
     }
 }
 
@@ -228,37 +228,37 @@ mod tests {
 
     #[test]
     fn col_row_turn_into_id() {
-        let square_a1 = get_name_from_row_and_col(0, 0);
+        let square_a1 = get_square_name_from_row_and_col(0, 0);
         assert_eq!("a1", format!("{square_a1}"));
 
-        let square_z2 = get_name_from_row_and_col(25, 1);
+        let square_z2 = get_square_name_from_row_and_col(25, 1);
         assert_eq!("z2", format!("{square_z2}"));
 
-        let square_aa1 = get_name_from_row_and_col(26, 0);
+        let square_aa1 = get_square_name_from_row_and_col(26, 0);
         assert_eq!("aa1", format!("{square_aa1}"));
 
-        let square_ab1 = get_name_from_row_and_col(27, 0);
+        let square_ab1 = get_square_name_from_row_and_col(27, 0);
         assert_eq!("ab1", format!("{square_ab1}"));
 
-        let square_zzz100 = get_name_from_row_and_col(18277, 99);
+        let square_zzz100 = get_square_name_from_row_and_col(18277, 99);
         assert_eq!("zzz100", format!("{square_zzz100}"));
     }
 
     #[test]
     fn string_to_id() {
-        let (a1_column, a1_row) = get_column_and_row_from_name("a1").unwrap();
+        let (a1_column, a1_row) = get_column_and_row_from_square_name("a1").unwrap();
         assert_eq!(0, a1_column);
         assert_eq!(0, a1_row);
 
-        let (b2_column, b2_row) = get_column_and_row_from_name("b2").unwrap();
+        let (b2_column, b2_row) = get_column_and_row_from_square_name("b2").unwrap();
         assert_eq!(1, b2_column);
         assert_eq!(1, b2_row);
 
-        let (ab1_column, ab1_row) = get_column_and_row_from_name("ab1").unwrap();
+        let (ab1_column, ab1_row) = get_column_and_row_from_square_name("ab1").unwrap();
         assert_eq!(27, ab1_column);
         assert_eq!(0, ab1_row);
 
-        let (zzz100_column, zzz100_row) = get_column_and_row_from_name("zzz100").unwrap();
+        let (zzz100_column, zzz100_row) = get_column_and_row_from_square_name("zzz100").unwrap();
         assert_eq!(18277, zzz100_column);
         assert_eq!(99, zzz100_row);
     }

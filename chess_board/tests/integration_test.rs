@@ -12,12 +12,12 @@ mod tests {
         assert_eq!(1, board.get_width());
         assert_eq!(1, board.get_height());
 
-        assert!(board.check_space(0, 0).is_none());
+        assert!(board.get_piece_at_space(0, 0).is_none());
 
         let piece = Box::new(CheckersPiece::new());
         board.place_piece(piece, 0, 0);
 
-        let piece_from_board = board.check_space(0, 0).unwrap();
+        let piece_from_board = board.get_piece_at_space(0, 0).unwrap();
         if piece_from_board
             .deref()
             .as_any()
@@ -38,6 +38,6 @@ mod tests {
             panic!("Expected Checkers Piece")
         }
 
-        assert!(board.check_space(0, 0).is_none());
+        assert!(board.get_piece_at_space(0, 0).is_none());
     }
 }
