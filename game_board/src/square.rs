@@ -22,7 +22,7 @@ use std::fmt::Formatter;
 /// # Examples
 ///
 /// ```
-/// use chess_board::get_square_name_from_row_and_col;
+/// use game_board::get_square_name_from_row_and_col;
 /// let coordinate = get_square_name_from_row_and_col(0, 0);
 /// assert_eq!(coordinate, "a1");
 ///
@@ -81,7 +81,7 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
 /// # Examples
 ///
 /// ```
-/// use chess_board::get_column_and_row_from_square_name;
+/// use game_board::get_column_and_row_from_square_name;
 ///
 /// let (column, row) = get_column_and_row_from_square_name("a1").unwrap();
 /// assert_eq!(column, 0);
@@ -181,7 +181,7 @@ impl Square {
     /// # Examples
     ///
     /// ```
-    /// use chess_board::{Square, SquareColor};
+    /// use game_board::{Square, SquareColor};
     /// let square = Square::build(0, 0);
     /// assert_eq!(square.get_color(), SquareColor::Black);
     /// let square = Square::build(1, 0);
@@ -213,7 +213,7 @@ impl Square {
     ///
     /// ```
     /// use std::any::Any;
-    /// use chess_board::{Square, Piece};
+    /// use game_board::{Square, Piece};
     ///
     /// struct Pawn;
     ///
@@ -247,7 +247,7 @@ impl Square {
     ///
     /// ```
     /// use std::any::Any;
-    /// use chess_board::{Square, Piece};
+    /// use game_board::{Square, Piece};
     ///
     /// struct Pawn;
     ///
@@ -281,7 +281,7 @@ impl Square {
     ///
     /// ```
     /// use std::any::Any;
-    /// use chess_board::{Square, Piece};
+    /// use game_board::{Square, Piece};
     ///
     /// struct Pawn;
     ///
@@ -323,7 +323,7 @@ impl Square {
     /// # Examples
     ///
     /// ```
-    /// use chess_board::Square;
+    /// use game_board::Square;
     ///
     /// let square = Square::build(0, 0);
     /// assert_eq!(square.get_name(), "a1".to_string());

@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "chess_board"
+name = "game_board"
 version = "0.1.0"
 
 [[package]]

@@ -1,4 +1,4 @@
-use chess_board::Piece;
+use game_board::Piece;
 use std::any::Any;
 
 #[derive(Debug, PartialEq, Eq)]

@@ -18,7 +18,7 @@ impl Board {
     ///
     /// # Example
     /// ```
-    ///use chess_board::Board;
+    ///use game_board::Board;
     ///
     ///let board = Board::build(8, 8);
     ///
@@ -62,7 +62,7 @@ impl Board {
     /// # Example
     /// ```
     /// use std::any::Any;
-    /// use chess_board::{Board, Piece};
+    /// use game_board::{Board, Piece};
     ///
     /// enum Checker {
     ///     Red,
@@ -110,7 +110,7 @@ impl Board {
     ///
     /// # Example
     /// ```
-    /// use chess_board::{Board, Piece};
+    /// use game_board::{Board, Piece};
     ///
     /// enum Checker {
     ///     Red,
@@ -160,7 +160,7 @@ impl Board {
     ///
     /// # Example
     /// ```
-    /// use chess_board::{Board, Piece};
+    /// use game_board::{Board, Piece};
     ///
     /// enum Checker {
     ///     Red,

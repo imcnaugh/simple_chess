@@ -1,4 +1,4 @@
-extern crate chess_board;
+extern crate game_board;
 mod model;
 
 #[cfg(test)]
@@ -8,7 +8,7 @@ mod tests {
 
     #[test]
     fn simple_board_with_piece_test() {
-        let mut board = chess_board::Board::build(1, 1).unwrap();
+        let mut board = game_board::Board::build(1, 1).unwrap();
         assert_eq!(1, board.get_width());
         assert_eq!(1, board.get_height());
 
