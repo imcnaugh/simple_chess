@@ -1,7 +1,7 @@
 use crate::color::SquareColor;
 use crate::piece::Piece;
 use core::fmt;
-use std::fmt::Formatter;
+use std::fmt::{Display, Formatter};
 
 /// Converts a given column and row to a chess-style coordinate string.
 ///
@@ -336,15 +336,15 @@ impl<P> Square<P> {
     }
 }
 
-impl<P> fmt::Display for Square<P> {
+impl<P: Display> Display for Square<P> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         let square_color = match &self.color {
             SquareColor::White => "\x1b[100m",
             SquareColor::Black => "",
         };
         let inner_char = match &self.piece {
-            Some(piece) => piece.get_char_representation(),
-            None => ' ',
+            Some(piece) => piece.to_string(),
+            None => " ".to_string(),
         };
         write!(f, "{} {} \x1b[0m", square_color, inner_char)
     }
@@ -352,7 +352,11 @@ impl<P> fmt::Display for Square<P> {
 
 #[cfg(test)]
 mod tests {
+    use std::fmt::{format, write};
     use super::*;
+
+
+    struct MockPiece {}
 
     #[test]
     fn col_row_turn_into_id() {
@@ -394,13 +398,13 @@ mod tests {
 
     #[test]
     fn test_square_build() {
-        let square = Square::build(0, 0);
+        let square = Square::<MockPiece>::build(0, 0);
         assert_eq!(square.get_column(), 0);
         assert_eq!(square.get_row(), 0);
         assert_eq!(square.get_color(), SquareColor::Black); // a8
         assert!(square.get_piece().is_none());
 
-        let square = Square::build(1, 0);
+        let square = Square::<MockPiece>::build(1, 0);
         assert_eq!(square.get_column(), 1);
         assert_eq!(square.get_row(), 0);
         assert_eq!(square.get_color(), SquareColor::White); // b8
@@ -465,28 +469,41 @@ mod tests {
 
     #[test]
     fn test_get_column() {
-        let square = Square::build(5, 3);
+        let square = Square::<MockPiece>::build(5, 3);
         assert_eq!(square.get_column(), 5);
     }
 
     #[test]
     fn test_get_row() {
-        let square = Square::build(5, 3);
+        let square = Square::<MockPiece>::build(5, 3);
         assert_eq!(square.get_row(), 3);
     }
 
     #[test]
     fn test_get_color() {
-        let square = Square::build(0, 0);
+        let square = Square::<MockPiece>::build(0, 0);
         assert_eq!(square.get_color(), SquareColor::Black);
     }
 
     #[test]
     fn test_get_name() {
-        let square = Square::build(0, 0);
+        let square = Square::<MockPiece>::build(0, 0);
         assert_eq!(square.get_name(), "a1".to_string());
 
-        let square = Square::build(25, 1);
+        let square = Square::<MockPiece>::build(25, 1);
         assert_eq!(square.get_name(), "z2".to_string());
+    }
+
+    #[test]
+    fn can_print_square() {
+        struct Printable {}
+        impl Display for Printable {
+            fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+                write!(f, "Hello world")
+            }
+        }
+
+        let mut square = Square::<Printable>::build(0, 0);
+        println!("{}", square);
     }
 }

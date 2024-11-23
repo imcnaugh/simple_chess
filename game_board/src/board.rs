@@ -1,16 +1,17 @@
 use crate::piece::Piece;
 use crate::square::Square;
 use std::fmt;
+use std::fmt::Display;
 
 /// # Board
 /// A struct used to keep track of a rectangular game board made up of spaces.
-pub struct Board {
-    squares: Vec<Square>,
+pub struct Board<P> {
+    squares: Vec<Square<P>>,
     width: usize,
     height: usize,
 }
 
-impl Board {
+impl<P> Board<P> {
     /// Create a new board of any size,
     ///
     /// # Panics
@@ -24,7 +25,7 @@ impl Board {
     ///
     ///assert!(board.is_ok());
     /// ```
-    pub fn build(width: usize, height: usize) -> Result<Board, String> {
+    pub fn build(width: usize, height: usize) -> Result<Board<P>, String> {
         Ok(Board {
             squares: Board::generate_board(width, height)?,
             width,
@@ -88,7 +89,7 @@ impl Board {
     /// let piece = board.get_piece_at_space(3, 4);
     /// assert!(piece.is_some())
     /// ```
-    pub fn get_piece_at_space(&self, col: usize, row: usize) -> Option<&Box<dyn Piece>> {
+    pub fn get_piece_at_space(&self, col: usize, row: usize) -> Option<&P> {
         self.validate_col_and_row(col, row);
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].get_piece()
@@ -134,7 +135,7 @@ impl Board {
     /// let piece = board.get_piece_at_space(3, 4);
     /// assert!(piece.is_some());
     /// ```
-    pub fn place_piece(&mut self, piece: Box<dyn Piece>, col: usize, row: usize) {
+    pub fn place_piece(&mut self, piece: P, col: usize, row: usize) {
         self.validate_col_and_row(col, row);
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].place_piece(piece);
@@ -184,13 +185,13 @@ impl Board {
     /// let piece = board.remove_piece(3, 4);
     /// assert!(piece.is_some());
     /// ```
-    pub fn remove_piece(&mut self, col: usize, row: usize) -> Option<Box<dyn Piece>> {
+    pub fn remove_piece(&mut self, col: usize, row: usize) -> Option<P> {
         self.validate_col_and_row(col, row);
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].clear_piece()
     }
 
-    fn generate_board(width: usize, height: usize) -> Result<Vec<Square>, String> {
+    fn generate_board(width: usize, height: usize) -> Result<Vec<Square<P>>, String> {
         if width == 0 || height == 0 {
             return Err(String::from(
                 "Height and Width must be positive integers greater then 0",
@@ -223,7 +224,7 @@ impl Board {
     }
 }
 
-impl fmt::Display for Board {
+impl<P: Display> Display for Board<P> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut board_string = String::new();
 
@@ -250,10 +251,12 @@ impl fmt::Display for Board {
 mod tests {
     use std::any::Any;
     use super::*;
+    
+    struct MockPiece {}
 
     #[test]
     fn generate_8_by_8_board(){
-        let board = Board::build(8,8);
+        let board = Board::<MockPiece>::build(8,8);
 
         assert!(board.is_ok());
 
@@ -274,7 +277,7 @@ mod tests {
 
     #[test]
     fn can_not_make_board_with_width_of_0() {
-        match Board::build(0, 8){
+        match Board::<MockPiece>::build(0, 8){
             Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
             _ => panic!("expected Err")
         };
@@ -282,12 +285,12 @@ mod tests {
 
     #[test]
     fn can_not_make_board_with_height_or_width_of_0() {
-        match Board::build(8, 0){
+        match Board::<MockPiece>::build(8, 0){
             Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
             _ => panic!("expected Err")
         };
 
-        match Board::build(0, 8){
+        match Board::<MockPiece>::build(0, 8){
             Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
             _ => panic!("expected Err")
         };
@@ -337,12 +340,12 @@ mod tests {
     #[test]
     #[should_panic]
     fn can_not_access_square_out_of_bounds_get_piece() {
-        Board::build(1, 1).unwrap().get_piece_at_space(0,1);
+        Board::<MockPiece>::build(1, 1).unwrap().get_piece_at_space(0,1);
     }
 
     #[test]
     #[should_panic]
     fn can_not_access_square_out_of_bounds_remove_piece() {
-        Board::build(1, 1).unwrap().remove_piece(0,1);
+        Board::<MockPiece>::build(1, 1).unwrap().remove_piece(0,1);
     }
 }
