@@ -44,12 +44,12 @@ fn get_board_as_fen_string(game: &ChessGame) -> String {
     let board_as_fen_string: String = (0..board.get_height())
         .rev()
         .map(|rank| encode_row(board, rank))
-        .collect()
+        .collect::<Vec<String>>()
         .join("/");
     board_as_fen_string
 }
 
-fn encode_row(board: &Board<dyn ChessPiece>, row: usize) -> String {
+fn encode_row(board: &Board<Box<dyn ChessPiece>>, row: usize) -> String {
     let mut result = String::new();
 
     let mut empty_space_counter: usize = 0;

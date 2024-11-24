@@ -3,7 +3,7 @@ use crate::Color;
 use game_board::Board;
 
 pub struct ChessGame {
-    board: Board<dyn ChessPiece>,
+    board: Board<Box<dyn ChessPiece>>,
     current_players_turn: Color,
     turn_number: usize,
     fifty_move_rule_counter: usize,
@@ -33,7 +33,7 @@ impl ChessGame {
     pub fn new() -> ChessGame {
         ChessGame {
             // TODO setup the board in starting position
-            board: Board::<dyn ChessPiece>::build(8, 8).unwrap(),
+            board: Board::<Box<dyn ChessPiece>>::build(8, 8).unwrap(),
             current_players_turn: Color::White,
             turn_number: 1,
             fifty_move_rule_counter: 0,
@@ -48,7 +48,7 @@ impl ChessGame {
     ///
     /// # Returns
     /// `Board<dyn ChessPiece>`: The board in its current state
-    pub fn get_board(&self) -> &Board<dyn ChessPiece> {
+    pub fn get_board(&self) -> &Board<Box<dyn ChessPiece>> {
         &self.board
     }
 
