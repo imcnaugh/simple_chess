@@ -87,4 +87,44 @@ impl ChessGame {
         self.can_black_castle_long,
         self.can_black_castle_short)
     }
+    
+
+    /// Get the fifty-move rule counter
+    ///
+    /// # Returns
+    ///
+    /// `usize`: The current count of half-moves since the last capture or pawn move.
+    /// This counter is used to determine if the fifty-move rule has been reached,
+    /// which allows a player to claim a draw if fifty consecutive moves have been
+    /// made without any pawn movement or piece capture.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessGame;
+    /// let chess_game = ChessGame::new();
+    /// assert_eq!(chess_game.get_50_move_rule_counter(), 0);
+    /// ```
+    pub fn get_50_move_rule_counter(&self) -> usize {
+        self.fifty_move_rule_counter
+    }
+
+
+    /// Returns the current turn number.
+    ///
+    /// # Returns
+    ///
+    /// `usize`: The current turn number in the game.
+    /// This method returns the total number of turns that have been taken in the game so far.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessGame;
+    /// let chess_game = ChessGame::new();
+    /// assert_eq!(chess_game.get_turn_number(), 1);
+    /// ```
+    pub fn get_turn_number(&self) -> usize {
+        self.turn_number
+    }
 }
