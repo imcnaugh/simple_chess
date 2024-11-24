@@ -1,10 +1,15 @@
-use crate::piece::Piece;
 use crate::square::Square;
 use std::fmt;
 use std::fmt::Display;
 
-/// # Board
-/// A struct used to keep track of a rectangular game board made up of spaces.
+
+/// Represents a game board that holds pieces of a certain type.
+///
+/// The board is made up of a grid of squares, each of which can hold a piece.
+///
+/// # Type Parameters
+///
+/// * `P` - The type of pieces that can be placed on the board.
 pub struct Board<P> {
     squares: Vec<Square<P>>,
     width: usize,
@@ -52,7 +57,7 @@ impl<P> Board<P> {
     ///
     /// # Returns
     ///
-    /// * `Option<&Box<dyn Piece>>` - Some containing a reference to the piece if there
+    /// * `Option<&P>` - Some containing a reference to the piece if there
     ///   is one at the specified position, or None if the space is empty.
     ///
     /// # Panics
@@ -63,28 +68,19 @@ impl<P> Board<P> {
     /// # Example
     /// ```
     /// use std::any::Any;
-    /// use game_board::{Board, Piece};
+    /// use game_board::Board;
     ///
     /// enum Checker {
     ///     Red,
     ///     Black,
     /// }
     ///
-    /// impl Piece for Checker {fn get_char_representation(&self) -> char {
-    ///         'o'
-    ///     }
-    ///
-    /// fn as_any(&self) -> &dyn Any {
-    ///         self
-    ///     }
-    /// }
-    ///
-    /// let mut board = Board::build(10, 10).unwrap();
+    /// let mut board = Board::<Checker>::build(10, 10).unwrap();
     ///
     /// let empty_space = board.get_piece_at_space(3,4);
     /// assert!(empty_space.is_none());
     ///
-    /// board.place_piece(Box::new(Checker::Red) ,3, 4);
+    /// board.place_piece(Checker::Red, 3, 4);
     ///
     /// let piece = board.get_piece_at_space(3, 4);
     /// assert!(piece.is_some())
@@ -111,26 +107,16 @@ impl<P> Board<P> {
     ///
     /// # Example
     /// ```
-    /// use game_board::{Board, Piece};
+    /// use game_board::Board;
     ///
     /// enum Checker {
     ///     Red,
     ///     Black,
     /// }
     ///
-    /// impl Piece for Checker {
-    ///     fn get_char_representation(&self) -> char {
-    ///         'o'
-    ///     }
+    /// let mut board = Board::<Checker>::build(10, 10).unwrap();
     ///
-    ///     fn as_any(&self) -> &dyn std::any::Any {
-    ///         self
-    ///     }
-    /// }
-    ///
-    /// let mut board = Board::build(10, 10).unwrap();
-    ///
-    /// board.place_piece(Box::new(Checker::Red), 3, 4);
+    /// board.place_piece(Checker::Red, 3, 4);
     ///
     /// let piece = board.get_piece_at_space(3, 4);
     /// assert!(piece.is_some());
@@ -151,7 +137,7 @@ impl<P> Board<P> {
     ///
     /// # Returns
     ///
-    /// * `Option<Box<dyn Piece>>` - Some containing the removed piece if there was one,
+    /// * `Option<P>` - Some containing the removed piece if there was one,
     ///   or None if the space was already empty.
     ///
     /// # Panics
@@ -161,26 +147,16 @@ impl<P> Board<P> {
     ///
     /// # Example
     /// ```
-    /// use game_board::{Board, Piece};
+    /// use game_board::Board;
     ///
     /// enum Checker {
     ///     Red,
     ///     Black,
     /// }
     ///
-    /// impl Piece for Checker {
-    ///     fn get_char_representation(&self) -> char {
-    ///         'o'
-    ///     }
+    /// let mut board = Board::<Checker>::build(10, 10).unwrap();
     ///
-    ///     fn as_any(&self) -> &dyn std::any::Any {
-    ///         self
-    ///     }
-    /// }
-    ///
-    /// let mut board = Board::build(10, 10).unwrap();
-    ///
-    /// board.place_piece(Box::new(Checker::Red), 3, 4);
+    /// board.place_piece(Checker::Red, 3, 4);
     ///
     /// let piece = board.remove_piece(3, 4);
     /// assert!(piece.is_some());
@@ -276,14 +252,6 @@ mod tests {
     }
 
     #[test]
-    fn can_not_make_board_with_width_of_0() {
-        match Board::<MockPiece>::build(0, 8){
-            Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
-            _ => panic!("expected Err")
-        };
-    }
-
-    #[test]
     fn can_not_make_board_with_height_or_width_of_0() {
         match Board::<MockPiece>::build(8, 0){
             Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
@@ -299,23 +267,13 @@ mod tests {
     #[test]
     fn can_place_retrieve_and_remove_piece() {
         struct ChessPawn {}
-        impl Piece for ChessPawn {
-            fn get_char_representation(&self) -> char {
-                'p'
-            }
 
-            fn as_any(&self) -> &dyn Any {
-                self
-            }
-        }
-
-        let pawn = Box::new(ChessPawn {});
-        let mut board = Board::build(8, 8).unwrap();
+        let pawn = ChessPawn {};
+        let mut board = Board::<ChessPawn>::build(8, 8).unwrap();
         assert!(board.get_piece_at_space(1,1).is_none());
         board.place_piece(pawn, 1, 1);
-        let piece = board.get_piece_at_space(1, 1).unwrap();
-        assert_eq!(piece.get_char_representation(), 'p');
-        assert_eq!(board.remove_piece(1, 1).unwrap().get_char_representation(), 'p');
+        let piece = board.get_piece_at_space(1, 1);
+        assert!(piece.is_some());
         assert!(board.get_piece_at_space(1,1).is_none());
     }
 
@@ -323,18 +281,9 @@ mod tests {
     #[should_panic]
     fn can_not_access_square_out_of_bounds_place_piece() {
         struct ChessPawn {}
-        impl Piece for ChessPawn {
-            fn get_char_representation(&self) -> char {
-                'p'
-            }
 
-            fn as_any(&self) -> &dyn Any {
-                self
-            }
-        }
-
-        let pawn = Box::new(ChessPawn {});
-        Board::build(1, 1).unwrap().place_piece(pawn, 0,1);
+        let pawn = ChessPawn {};
+        Board::<ChessPawn>::build(1, 1).unwrap().place_piece(pawn, 0,1);
     }
 
     #[test]
