@@ -1,5 +1,4 @@
 use crate::color::SquareColor;
-use crate::piece::Piece;
 use core::fmt;
 use std::fmt::{Display, Formatter};
 
@@ -182,9 +181,9 @@ impl<P> Square<P> {
     ///
     /// ```
     /// use game_board::{Square, SquareColor};
-    /// let square = Square::build(0, 0);
+    /// let square = Square::<String>::build(0, 0);
     /// assert_eq!(square.get_color(), SquareColor::Black);
-    /// let square = Square::build(1, 0);
+    /// let square = Square::<i32>::build(1, 0);
     /// assert_eq!(square.get_color(), SquareColor::White);
     /// ```
     ///
@@ -202,30 +201,19 @@ impl<P> Square<P> {
         }
     }
 
-    
     /// Places a piece on the square.
     ///
     /// # Arguments
     ///
-    /// * `piece` - A boxed piece that implements the `Piece` trait.
+    /// * `piece` - A piece of type P
     ///
     /// # Examples
     ///
     /// ```
     /// use std::any::Any;
-    /// use game_board::{Square, Piece};
+    /// use game_board::Square;
     ///
     /// struct Pawn;
-    ///
-    /// impl Piece for Pawn {
-    ///     fn get_char_representation(&self) -> char {
-    ///         'P'
-    ///     }
-    ///
-    /// fn as_any(&self) -> &dyn Any {
-    ///         self
-    ///     }
-    /// }
     ///
     /// let mut square = Square::build(0, 0);
     /// square.place_piece(Box::new(Pawn));
@@ -235,68 +223,46 @@ impl<P> Square<P> {
         self.piece = Some(piece);
     }
 
-    
     /// Returns a reference to the piece placed on the square, if any.
     ///
     /// # Returns
     ///
-    /// An `Option` containing a reference to the piece of type `Box<dyn Piece>` 
+    /// An `Option` containing a reference to the piece of type `P`
     /// if a piece is placed on the square, or `None` if the square is empty.
     ///
     /// # Examples
     ///
     /// ```
     /// use std::any::Any;
-    /// use game_board::{Square, Piece};
+    /// use game_board::Square;
     ///
     /// struct Pawn;
     ///
-    /// impl Piece for Pawn {
-    ///     fn get_char_representation(&self) -> char {
-    ///         'P'
-    ///     }
-    ///
-    ///     fn as_any(&self) -> &dyn Any {
-    ///         self
-    ///     }
-    /// }
-    ///
     /// let mut square = Square::build(0, 0);
-    /// square.place_piece(Box::new(Pawn));
+    /// square.place_piece(Pawn {});
     /// assert!(square.get_piece().is_some());
     /// ```
     pub fn get_piece(&self) -> Option<&P> {
         self.piece.as_ref()
     }
 
-    
     /// Clears the piece from the square.
     ///
     /// # Returns
     ///
-    /// An `Option` containing the piece of type `Box<dyn Piece>` if a piece was present on the square,
+    /// An `Option` containing the piece of type `P` if a piece was present on the square,
     /// or `None` if the square was already empty.
     ///
     /// # Examples
     ///
     /// ```
     /// use std::any::Any;
-    /// use game_board::{Square, Piece};
+    /// use game_board::Square;
     ///
     /// struct Pawn;
     ///
-    /// impl Piece for Pawn {
-    ///     fn get_char_representation(&self) -> char {
-    ///         'P'
-    ///     }
-    ///
-    ///     fn as_any(&self) -> &dyn Any {
-    ///         self
-    ///     }
-    /// }
-    ///
     /// let mut square = Square::build(0, 0);
-    /// square.place_piece(Box::new(Pawn));
+    /// square.place_piece(Pawn {});
     /// let piece = square.clear_piece();
     /// assert!(piece.is_some());
     /// assert!(square.get_piece().is_none());
@@ -317,7 +283,6 @@ impl<P> Square<P> {
         self.color
     }
 
-
     /// Gets the name of the square in standard chess notation.
     ///
     /// # Examples
@@ -325,10 +290,10 @@ impl<P> Square<P> {
     /// ```
     /// use game_board::Square;
     ///
-    /// let square = Square::build(0, 0);
+    /// let square = Square::<u32>::build(0, 0);
     /// assert_eq!(square.get_name(), "a1".to_string());
     ///
-    /// let square = Square::build(25, 1);
+    /// let square = Square::<String>::build(25, 1);
     /// assert_eq!(square.get_name(), "z2".to_string());
     /// ```
     pub fn get_name(&self) -> String {
@@ -352,9 +317,7 @@ impl<P: Display> Display for Square<P> {
 
 #[cfg(test)]
 mod tests {
-    use std::fmt::{format, write};
     use super::*;
-
 
     struct MockPiece {}
 
@@ -395,7 +358,6 @@ mod tests {
         assert_eq!(99, zzz100_row);
     }
 
-
     #[test]
     fn test_square_build() {
         let square = Square::<MockPiece>::build(0, 0);
@@ -413,36 +375,18 @@ mod tests {
     #[test]
     fn test_place_piece() {
         struct Pawn;
-        impl Piece for Pawn {
-            fn get_char_representation(&self) -> char {
-                'P'
-            }
-
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-        }
 
         let mut square = Square::build(0, 0);
-        square.place_piece(Box::new(Pawn));
+        square.place_piece(Pawn);
         assert!(square.get_piece().is_some());
     }
 
     #[test]
     fn test_get_piece() {
         struct Pawn;
-        impl Piece for Pawn {
-            fn get_char_representation(&self) -> char {
-                'P'
-            }
-
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-        }
 
         let mut square = Square::build(0, 0);
-        square.place_piece(Box::new(Pawn));
+        square.place_piece(Pawn);
         let piece = square.get_piece();
         assert!(piece.is_some());
     }
@@ -450,18 +394,9 @@ mod tests {
     #[test]
     fn test_clear_piece() {
         struct Pawn;
-        impl Piece for Pawn {
-            fn get_char_representation(&self) -> char {
-                'P'
-            }
-
-            fn as_any(&self) -> &dyn std::any::Any {
-                self
-            }
-        }
 
         let mut square = Square::build(0, 0);
-        square.place_piece(Box::new(Pawn));
+        square.place_piece(Pawn);
         let piece = square.clear_piece();
         assert!(piece.is_some());
         assert!(square.get_piece().is_none());
@@ -503,7 +438,7 @@ mod tests {
             }
         }
 
-        let mut square = Square::<Printable>::build(0, 0);
+        let square = Square::<Printable>::build(0, 0);
         println!("{}", square);
     }
 }

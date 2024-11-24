@@ -2,7 +2,6 @@ use crate::square::Square;
 use std::fmt;
 use std::fmt::Display;
 
-
 /// Represents a game board that holds pieces of a certain type.
 ///
 /// The board is made up of a grid of squares, each of which can hold a piece.
@@ -26,7 +25,7 @@ impl<P> Board<P> {
     /// ```
     ///use game_board::Board;
     ///
-    ///let board = Board::build(8, 8);
+    ///let board = Board::<u8>::build(8, 8);
     ///
     ///assert!(board.is_ok());
     /// ```
@@ -47,7 +46,7 @@ impl<P> Board<P> {
     pub fn get_height(&self) -> usize {
         self.height
     }
-    
+
     /// get piece at square
     ///
     /// # Arguments
@@ -91,7 +90,6 @@ impl<P> Board<P> {
         self.squares[square_index].get_piece()
     }
 
-    
     /// Places a piece at the given square
     ///
     /// # Arguments
@@ -126,7 +124,6 @@ impl<P> Board<P> {
         let square_index = self.get_square_index(col, row);
         self.squares[square_index].place_piece(piece);
     }
-
 
     /// Removes a piece from the given square
     ///
@@ -225,14 +222,13 @@ impl<P: Display> Display for Board<P> {
 
 #[cfg(test)]
 mod tests {
-    use std::any::Any;
     use super::*;
-    
+
     struct MockPiece {}
 
     #[test]
-    fn generate_8_by_8_board(){
-        let board = Board::<MockPiece>::build(8,8);
+    fn generate_8_by_8_board() {
+        let board = Board::<MockPiece>::build(8, 8);
 
         assert!(board.is_ok());
 
@@ -253,14 +249,20 @@ mod tests {
 
     #[test]
     fn can_not_make_board_with_height_or_width_of_0() {
-        match Board::<MockPiece>::build(8, 0){
-            Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
-            _ => panic!("expected Err")
+        match Board::<MockPiece>::build(8, 0) {
+            Err(e) => assert_eq!(
+                "Height and Width must be positive integers greater then 0",
+                e
+            ),
+            _ => panic!("expected Err"),
         };
 
-        match Board::<MockPiece>::build(0, 8){
-            Err(e) => assert_eq!("Height and Width must be positive integers greater then 0", e),
-            _ => panic!("expected Err")
+        match Board::<MockPiece>::build(0, 8) {
+            Err(e) => assert_eq!(
+                "Height and Width must be positive integers greater then 0",
+                e
+            ),
+            _ => panic!("expected Err"),
         };
     }
 
@@ -270,11 +272,13 @@ mod tests {
 
         let pawn = ChessPawn {};
         let mut board = Board::<ChessPawn>::build(8, 8).unwrap();
-        assert!(board.get_piece_at_space(1,1).is_none());
+        assert!(board.get_piece_at_space(1, 1).is_none());
         board.place_piece(pawn, 1, 1);
         let piece = board.get_piece_at_space(1, 1);
         assert!(piece.is_some());
-        assert!(board.get_piece_at_space(1,1).is_none());
+        let piece = board.remove_piece(1, 1);
+        assert!(piece.is_some());
+        assert!(board.get_piece_at_space(1, 1).is_none());
     }
 
     #[test]
@@ -283,18 +287,22 @@ mod tests {
         struct ChessPawn {}
 
         let pawn = ChessPawn {};
-        Board::<ChessPawn>::build(1, 1).unwrap().place_piece(pawn, 0,1);
+        Board::<ChessPawn>::build(1, 1)
+            .unwrap()
+            .place_piece(pawn, 0, 1);
     }
 
     #[test]
     #[should_panic]
     fn can_not_access_square_out_of_bounds_get_piece() {
-        Board::<MockPiece>::build(1, 1).unwrap().get_piece_at_space(0,1);
+        Board::<MockPiece>::build(1, 1)
+            .unwrap()
+            .get_piece_at_space(0, 1);
     }
 
     #[test]
     #[should_panic]
     fn can_not_access_square_out_of_bounds_remove_piece() {
-        Board::<MockPiece>::build(1, 1).unwrap().remove_piece(0,1);
+        Board::<MockPiece>::build(1, 1).unwrap().remove_piece(0, 1);
     }
 }
