@@ -1,6 +1,5 @@
 use crate::piece::ChessPiece;
 use crate::Color;
-use std::any::Any;
 
 /// Represents a pawn chess piece
 pub struct Pawn {
