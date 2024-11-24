@@ -43,9 +43,12 @@ fn main() {
                     game.turn_number
                 );
                 break;
-            },
+            }
             DrawByRepetition => {
-                println!("Game ends in a draw by repetition at move {}", game.turn_number);
+                println!(
+                    "Game ends in a draw by repetition at move {}",
+                    game.turn_number
+                );
                 break;
             }
             Check => {
@@ -88,7 +91,9 @@ fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
             "exit" => std::process::exit(0),
             _ => {
                 let i = i.trim().to_string();
-                let m = moves.iter().find(|p| p.get_standard_algebraic_notation() == i);
+                let m = moves
+                    .iter()
+                    .find(|p| p.get_standard_algebraic_notation() == i);
 
                 if let Some(m) = m {
                     return *m;
@@ -97,7 +102,6 @@ fn print_and_get_next_move(moves: Vec<ChessMoveType>) -> ChessMoveType {
                 println!("Invalid move. Please try again.");
             }
         }
-
     }
 }
 

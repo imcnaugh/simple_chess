@@ -1,9 +1,9 @@
+use crate::chess_board_square::SquareId;
 use crate::chess_move::ChessMoveType;
 use crate::chess_move::ChessMoveType::Castle;
 use crate::Color::{Black, White};
-use crate::PieceType::{King, Pawn, Rook, Queen, Knight, Bishop};
+use crate::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::{Color, GameBoard};
-use crate::chess_board_square::SquareId;
 
 /// # Game
 ///
@@ -82,7 +82,11 @@ impl Game {
     fn add_new_board_position_to_game_history(&mut self, m: &ChessMoveType) {
         let new_board_as_encoded = self.board.as_byte_arr();
         self.encoded_board_by_turn.push(new_board_as_encoded);
-        if let ChessMoveType::Move { taken_piece: Some(_), .. } = m {
+        if let ChessMoveType::Move {
+            taken_piece: Some(_),
+            ..
+        } = m
+        {
             self.last_take_index = self.encoded_board_by_turn.len() - 1;
         };
     }
@@ -163,14 +167,14 @@ impl Game {
 
         for m in &self.moves {
             if switch {
-               pgn.push_str(format!("{}. ", turn).as_str());
+                pgn.push_str(format!("{}. ", turn).as_str());
             }
             pgn.push_str(format!("{} ", m.get_standard_algebraic_notation()).as_str());
             if !switch {
                 pgn.push_str("\n");
-                turn+=1;
+                turn += 1;
             }
-            switch= !switch;
+            switch = !switch;
         }
 
         pgn
@@ -179,32 +183,33 @@ impl Game {
     pub fn can_trigger_fifty_move_rule(&self) -> bool {
         self.fifty_move_rule_counter >= 100
     }
-    
+
     pub fn can_trigger_draw_by_repetition(&self) -> bool {
         let current_board_as_encoded = self.encoded_board_by_turn.last();
         if current_board_as_encoded.is_none() {
             return false;
         }
-        
+
         let mut repetition_count = 0;
-        
+
         for index in self.last_take_index..self.encoded_board_by_turn.len() {
             let previous_board_as_encoded = &self.encoded_board_by_turn[index];
-            
+
             if current_board_as_encoded.unwrap() == previous_board_as_encoded {
-                repetition_count+=1;
+                repetition_count += 1;
             }
-            
+
             if repetition_count >= 3 {
                 return true;
             }
         }
-        
+
         false
     }
-    
+
     pub fn get_representation_as_FEN(&self) -> String {
-        let ranks: Vec<String> = (0..self.board.get_height()).rev()
+        let ranks: Vec<String> = (0..self.board.get_height())
+            .rev()
             .map(|rank| self.print_rank_as_FEN(rank))
             .collect();
 
@@ -235,14 +240,24 @@ impl Game {
         };
 
         match self.moves.last() {
-            Some(ChessMoveType::Move {piece, original_position, new_position, .. }) if piece.piece_type == Pawn => {
-                if original_position.get_row() == starting_row && new_position .get_row() == target_row {
-                    format!("{}", SquareId::build(original_position.get_column(), en_passant_row))
+            Some(ChessMoveType::Move {
+                piece,
+                original_position,
+                new_position,
+                ..
+            }) if piece.piece_type == Pawn => {
+                if original_position.get_row() == starting_row
+                    && new_position.get_row() == target_row
+                {
+                    format!(
+                        "{}",
+                        SquareId::build(original_position.get_column(), en_passant_row)
+                    )
                 } else {
                     "-".to_string()
                 }
-            },
-            _ => "-".to_string()
+            }
+            _ => "-".to_string(),
         }
     }
 
@@ -272,7 +287,7 @@ impl Game {
         let mut empty_square_count = 0;
         for col in 0..self.board.get_width() {
             match self.board.check_space(col, rank) {
-                None => empty_square_count+=1,
+                None => empty_square_count += 1,
                 Some(piece) => {
                     if empty_square_count != 0 {
                         resp.push_str(format!("{empty_square_count}").as_str());
@@ -283,7 +298,7 @@ impl Game {
                         Knight => 'n',
                         Bishop => 'b',
                         Queen => 'q',
-                        King => 'k'
+                        King => 'k',
                     };
                     if piece.color == White {
                         piece_char = piece_char.to_uppercase().last().unwrap();

@@ -97,20 +97,40 @@ impl ChessMoveType {
 
     pub fn get_standard_algebraic_notation(&self) -> String {
         match self {
-            ChessMoveType::Move { original_position, new_position, piece, taken_piece, promotion } => {
+            ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                promotion,
+            } => {
                 let promotion_string = match promotion {
                     None => String::new(),
-                    Some(piece) => format!("={}", piece.get_notation_char())
+                    Some(piece) => format!("={}", piece.get_notation_char()),
                 };
 
                 let piece_moving = piece.get_notation_char();
 
-                format!("{}{}{}{}{}", piece_moving, original_position, if taken_piece.is_some() { "x" } else { "" }, new_position, promotion_string)
+                format!(
+                    "{}{}{}{}{}",
+                    piece_moving,
+                    original_position,
+                    if taken_piece.is_some() { "x" } else { "" },
+                    new_position,
+                    promotion_string
+                )
             }
-            ChessMoveType::EnPassant { original_position, new_position, ..} => {
+            ChessMoveType::EnPassant {
+                original_position,
+                new_position,
+                ..
+            } => {
                 format!("{}x{}", original_position, new_position)
             }
-            ChessMoveType::Castle { original_rook_position, .. } => {
+            ChessMoveType::Castle {
+                original_rook_position,
+                ..
+            } => {
                 if original_rook_position.get_column() == 0 {
                     String::from("O-O-O")
                 } else {
@@ -178,7 +198,10 @@ impl fmt::Display for ChessMoveType {
                     new_position
                 )
             }
-            ChessMoveType::Castle { original_rook_position, ..} => {
+            ChessMoveType::Castle {
+                original_rook_position,
+                ..
+            } => {
                 let castle_direction = if original_rook_position.get_column() == 0 {
                     "Queen side"
                 } else {

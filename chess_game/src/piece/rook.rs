@@ -1,6 +1,6 @@
-use std::any::Any;
 use crate::piece::ChessPiece;
 use crate::Color;
+use std::any::Any;
 
 /// represents a rook chess piece
 pub struct Rook {

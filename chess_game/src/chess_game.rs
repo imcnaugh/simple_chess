@@ -1,6 +1,6 @@
-use game_board::Board;
-use crate::Color;
 use crate::piece::ChessPiece;
+use crate::Color;
+use game_board::Board;
 
 pub struct ChessGame {
     board: Board<dyn ChessPiece>,
@@ -52,7 +52,6 @@ impl ChessGame {
         &self.board
     }
 
-    
     /// Returns the color of the player whose turn it is.
     ///
     /// # Returns
@@ -71,7 +70,6 @@ impl ChessGame {
         self.current_players_turn
     }
 
-
     /// Get castling rights
     ///
     /// Returns a tuple containing four booleans that indicate the castling rights.
@@ -82,12 +80,13 @@ impl ChessGame {
     ///
     /// (bool, bool, bool, bool): A tuple representing the castling rights for white and black players.
     pub fn get_castling_rights(&self) -> (bool, bool, bool, bool) {
-        (self.can_white_castle_long,
-        self.can_white_castle_short,
-        self.can_black_castle_long,
-        self.can_black_castle_short)
+        (
+            self.can_white_castle_long,
+            self.can_white_castle_short,
+            self.can_black_castle_long,
+            self.can_black_castle_short,
+        )
     }
-    
 
     /// Get the fifty-move rule counter
     ///
@@ -108,7 +107,6 @@ impl ChessGame {
     pub fn get_50_move_rule_counter(&self) -> usize {
         self.fifty_move_rule_counter
     }
-
 
     /// Returns the current turn number.
     ///

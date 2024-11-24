@@ -2,7 +2,9 @@ use crate::chess_board::GameBoard;
 use crate::chess_board_square::SquareId;
 use crate::chess_move::ChessMoveType;
 use crate::game_state::GameState;
-use crate::game_state::GameState::{Check, Checkmate, DrawByRepetition, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate};
+use crate::game_state::GameState::{
+    Check, Checkmate, DrawByRepetition, FiftyMoveRule, InProgress, InsufficientMaterial, Stalemate,
+};
 use crate::Color::{Black, White};
 use crate::PieceType::{Bishop, King, Knight, Rook};
 use crate::{ChessPiece, Color, Game};
@@ -53,7 +55,6 @@ pub fn get_game_state(game: &Game) -> (GameState, Vec<ChessMoveType>) {
     if game.can_trigger_draw_by_repetition() {
         return (DrawByRepetition, possible_next_moves);
     }
-
 
     (InProgress, possible_next_moves)
 }
