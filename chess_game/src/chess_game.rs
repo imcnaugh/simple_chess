@@ -14,7 +14,22 @@ pub struct ChessGame {
 }
 
 impl ChessGame {
-
+    /// Initialize a new chess game.
+    ///
+    /// This function sets up a `ChessGame` with a starting board configuration,
+    /// sets the current player's turn to white, initializes the turn number and
+    /// fifty-move rule counter, and indicates that both sides may castle.
+    ///
+    /// # Returns
+    ///
+    /// `ChessGame`: A new instance of the `ChessGame` struct.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessGame;
+    /// let game = ChessGame::new();
+    /// ```
     pub fn new() -> ChessGame {
         ChessGame {
             // TODO setup the board in starting position
@@ -47,6 +62,7 @@ impl ChessGame {
     ///
     /// # Examples
     /// ```
+    /// use chess_game::{ChessGame, Color};
     /// let chess_game = ChessGame::new();
     /// // Assuming the game starts with White's turn
     /// assert_eq!(chess_game.get_current_players_turn(), Color::White);
