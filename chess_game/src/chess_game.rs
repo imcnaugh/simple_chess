@@ -69,7 +69,7 @@ impl ChessGame {
     /// Get board
     ///
     /// # Returns
-    /// `Board<dyn ChessPiece>`: The board in its current state
+    /// `Board<ChessPiece>`: The board in its current state
     pub fn get_board(&self) -> &Board<ChessPiece> {
         &self.board
     }
