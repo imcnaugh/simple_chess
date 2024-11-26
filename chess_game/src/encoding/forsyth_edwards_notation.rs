@@ -49,7 +49,7 @@ fn get_board_as_fen_string(game: &ChessGame) -> String {
     board_as_fen_string
 }
 
-fn encode_row(board: &Board<Box<dyn ChessPiece>>, row: usize) -> String {
+fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
     let mut result = String::new();
 
     let mut empty_space_counter: usize = 0;
@@ -60,7 +60,7 @@ fn encode_row(board: &Board<Box<dyn ChessPiece>>, row: usize) -> String {
                 result.push_str(&empty_space_counter.to_string());
                 empty_space_counter = 0;
             }
-            result.push(piece.get_fen_char());
+            result.push(piece.as_fen_char());
         } else {
             empty_space_counter += 1;
         }
