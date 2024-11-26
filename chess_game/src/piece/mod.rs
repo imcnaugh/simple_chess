@@ -150,7 +150,7 @@ impl ChessPiece {
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// let board = todo!();
-    /// let moves = white_king.possible_moves((0, 4), board);
+    /// let moves = white_king.possible_moves((0, 4), board, None);
     /// // `moves` now contains all possible moves for the white king from position (0, 4)
     /// ```
     pub fn possible_moves(
