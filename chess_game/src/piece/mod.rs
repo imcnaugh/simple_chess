@@ -120,6 +120,40 @@ impl ChessPiece {
         }
     }
 
+
+    /// Returns a vector of possible moves for the chess piece from a given position on the board.
+    ///
+    /// This function computes the possible moves for the chess piece, based on its type, current 
+    /// position on the board, and the state of the board. The rules for valid moves for each 
+    /// type of chess piece are applied.
+    ///
+    /// Pins are not taken into account in this function, you will need to filter the returned
+    /// vector of moves based off if they leave the king in check or not.
+    ///
+    /// # Arguments
+    ///
+    /// * `position` - A tuple `(usize, usize)` representing the current position of the chess piece 
+    ///                on the board (row, column).
+    /// * `board` - A reference to the `Board<ChessPiece>` which represents the current state of the 
+    ///             chess board, including all pieces and their positions.
+    ///
+    /// # Returns
+    ///
+    /// A `Vec<ChessMoveType>` containing all possible moves for the chess piece from its current 
+    /// position, based on the rules for the specific type of chess piece.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
+    /// use game_board::Board;
+    ///
+    /// let white_king = ChessPiece::new(PieceType::King, Color::White);
+    /// let board = todo!();
+    /// let moves = white_king.possible_moves((0, 4), board);
+    /// // `moves` now contains all possible moves for the white king from position (0, 4)
+    /// ```
     pub fn possible_moves(
         &self,
         position: (usize, usize),
