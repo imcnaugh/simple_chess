@@ -1,4 +1,7 @@
+use crate::chess_move::ChessMoveType;
 use crate::Color;
+use game_board::Board;
+use std::thread::current;
 
 mod bishop;
 mod king;
@@ -113,6 +116,21 @@ impl ChessPiece {
             PieceType::Bishop => bishop::as_fen_char(self.color),
             PieceType::Knight => knight::as_fen_char(self.color),
             PieceType::Pawn => pawn::as_fen_char(self.color),
+        }
+    }
+
+    pub fn possible_moves(
+        &self,
+        position: (usize, usize),
+        board: Board<ChessPiece>,
+    ) -> Vec<ChessMoveType> {
+        match self.piece_type {
+            PieceType::King => king::possible_moves(self.color, position, board),
+            PieceType::Queen => queen::possible_moves(self.color, position, board),
+            PieceType::Rook => rook::possible_moves(self.color, position, board),
+            PieceType::Bishop => bishop::possible_moves(self.color, position, board),
+            PieceType::Knight => knight::possible_moves(self.color, position, board),
+            PieceType::Pawn => pawn::possible_moves(self.color, position, board),
         }
     }
 }
