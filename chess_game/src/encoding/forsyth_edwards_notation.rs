@@ -38,6 +38,37 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
     )
 }
 
+pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
+    let fen_string = fen_string.trim();
+    if fen_string.is_empty() {
+        return Err("argument must be a string in Forsyth–Edwards Notation");
+    }
+    
+    // TODO, ugh I should use the builder pattern, and create a game builder that i can pass for these functions
+    let steps = [parse_board_from_string, parse_current_turn_from_string];
+
+    let parts= fen_string.split(" ");
+    // if parts.count() != 6 {
+    //     return Err("argument must be a string in Forsyth–Edwards Notation");
+    // }
+
+    for p in parts {
+        println!("{p}");
+    }
+
+
+
+    todo!()
+}
+
+fn parse_board_from_string(board_as_fen_string: &str) -> Board<ChessPiece> {
+    todo!()
+}
+
+fn parse_current_turn_from_string(current_turn_string: &str) -> Color {
+    todo!()
+}
+
 fn get_board_as_fen_string(game: &ChessGame) -> String {
     let board = game.get_board();
 
@@ -101,4 +132,27 @@ fn get_castling_rights(game: &ChessGame) -> String {
     };
 
     result
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn building_game_from_empty_string() {
+        let res = build_game_from_string("");
+        match res {
+            Ok(_) => {panic!("expected error")}
+            Err(e) => {assert_eq!("argument must be a string in Forsyth–Edwards Notation", e)}
+        }
+    }
+
+    #[test]
+    fn building_game_in_starting_position() {
+        let starting_position_as_fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        let game = build_game_from_string(starting_position_as_fen_string);
+        assert_eq!(game.is_ok(), true);
+        todo!("check the game is in the correct state")
+    }
 }

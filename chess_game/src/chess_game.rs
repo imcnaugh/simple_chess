@@ -43,6 +43,28 @@ impl ChessGame {
             can_black_castle_long: true,
         }
     }
+    
+    pub fn build(
+        board: Board<ChessPiece>,
+        current_players_turn: Color,
+        turn_number: usize,
+        fifty_move_rule_counter: usize,
+        can_white_castle_short: bool,
+        can_white_castle_long: bool,
+        can_black_castle_short: bool,
+        can_black_castle_long: bool,
+    ) -> ChessGame {
+        ChessGame {
+            board,
+            current_players_turn,
+            turn_number,
+            fifty_move_rule_counter,
+            can_white_castle_short,
+            can_white_castle_long,
+            can_black_castle_short,
+            can_black_castle_long
+        }
+    }
 
     /// Get board
     ///
