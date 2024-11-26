@@ -7,5 +7,5 @@ pub enum ChessMoveType {
         piece: ChessPiece,
         taken_piece: Option<ChessPiece>,
         promotion: Option<ChessPiece>,
-    }
+    },
 }
