@@ -1,12 +1,11 @@
+use crate::Color;
+
 mod bishop;
 mod king;
 mod knight;
 mod pawn;
 mod queen;
 mod rook;
-
-use crate::color::Color;
-
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum PieceType {
@@ -39,7 +38,8 @@ impl ChessPiece {
     /// # Examples
     ///
     /// ```
-    /// use crate::chess_game::piece::{ChessPiece, PieceType, Color};
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// let black_pawn = ChessPiece::new(PieceType::Pawn, Color::Black);
@@ -54,7 +54,8 @@ impl ChessPiece {
     /// # Examples
     ///
     /// ```
-    /// use crate::chess_game::piece::{ChessPiece, PieceType, Color};
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
     ///
     /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
     /// assert_eq!(white_pawn.get_color(), Color::White);
@@ -72,7 +73,8 @@ impl ChessPiece {
     /// # Examples
     ///
     /// ```
-    /// use crate::chess_game::piece::{ChessPiece, PieceType, Color};
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// assert_eq!(white_king.as_utf_str(), "♔");
@@ -98,7 +100,8 @@ impl ChessPiece {
     /// # Examples
     ///
     /// ```
-    /// use crate::chess_game::piece::{ChessPiece, PieceType, Color};
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// assert_eq!(white_king.as_fen_char(), 'K');
