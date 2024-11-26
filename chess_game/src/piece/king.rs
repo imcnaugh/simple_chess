@@ -1,5 +1,6 @@
 use crate::chess_move::ChessMoveType;
 use crate::piece::ChessPiece;
+use crate::piece::PieceType::King;
 use crate::Color;
 use game_board::Board;
 
@@ -51,12 +52,22 @@ pub fn possible_moves(
         match board.get_piece_at_space(new_col, new_row) {
             Some(p) => {
                 if p.get_color() != color {
-                    todo!()
+                    possible_moves.push(ChessMoveType::Move {
+                        original_position: position,
+                        new_position: (new_col, new_row),
+                        piece: ChessPiece::new(King, color),
+                        taken_piece: Some(*p),
+                        promotion: None,
+                    });
                 }
             }
-            None => {
-                todo!()
-            }
+            None => possible_moves.push(ChessMoveType::Move {
+                original_position: position,
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(King, color),
+                taken_piece: None,
+                promotion: None,
+            }),
         }
     }
 

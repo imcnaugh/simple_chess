@@ -10,7 +10,7 @@ mod pawn;
 mod queen;
 mod rook;
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Eq)]
 pub enum PieceType {
     Pawn,
     Rook,
@@ -24,6 +24,7 @@ pub enum PieceType {
 ///
 /// Each ChessPiece has a specific type (Pawn, Rook, Knight, Bishop, Queen, King)
 /// and a color (White or Black).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct ChessPiece {
     piece_type: PieceType,
     color: Color,
