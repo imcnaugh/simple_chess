@@ -43,7 +43,7 @@ impl ChessGame {
             can_black_castle_long: true,
         }
     }
-    
+
     pub fn build(
         board: Board<ChessPiece>,
         current_players_turn: Color,
@@ -62,7 +62,7 @@ impl ChessGame {
             can_white_castle_short,
             can_white_castle_long,
             can_black_castle_short,
-            can_black_castle_long
+            can_black_castle_long,
         }
     }
 

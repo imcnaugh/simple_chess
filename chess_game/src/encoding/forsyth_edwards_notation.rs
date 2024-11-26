@@ -1,4 +1,5 @@
 use crate::chess_game::ChessGame;
+use crate::chess_game_builder::ChessGameBuilder;
 use crate::piece::ChessPiece;
 use crate::Color;
 use game_board::Board;
@@ -43,29 +44,69 @@ pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
     if fen_string.is_empty() {
         return Err("argument must be a string in Forsyth–Edwards Notation");
     }
-    
-    // TODO, ugh I should use the builder pattern, and create a game builder that i can pass for these functions
-    let steps = [parse_board_from_string, parse_current_turn_from_string];
 
-    let parts= fen_string.split(" ");
-    // if parts.count() != 6 {
-    //     return Err("argument must be a string in Forsyth–Edwards Notation");
-    // }
+    let steps = [
+        parse_board_from_string,
+        parse_current_turn_from_string,
+        parse_castling_rights_from_string,
+        parse_en_passant_option_from_string,
+        parse_half_turn_counter_from_string,
+        parse_turn_number_from_string,
+    ];
 
-    for p in parts {
-        println!("{p}");
+    let mut parts = fen_string.split(" ");
+    let mut builder = ChessGameBuilder::new();
+
+    for step in steps {
+        if let Some(next) = parts.next() {
+            builder = step(builder, next);
+        } else {
+            return Err("Missing some parts of the string");
+        }
     }
 
+    builder.build()
+}
 
-
+fn parse_board_from_string(
+    builder: ChessGameBuilder,
+    board_as_fen_string: &str,
+) -> ChessGameBuilder {
     todo!()
 }
 
-fn parse_board_from_string(board_as_fen_string: &str) -> Board<ChessPiece> {
+fn parse_current_turn_from_string(
+    builder: ChessGameBuilder,
+    current_turn_string: &str,
+) -> ChessGameBuilder {
     todo!()
 }
 
-fn parse_current_turn_from_string(current_turn_string: &str) -> Color {
+fn parse_castling_rights_from_string(
+    builder: ChessGameBuilder,
+    castling_rights_string: &str,
+) -> ChessGameBuilder {
+    todo!()
+}
+
+fn parse_en_passant_option_from_string(
+    builder: ChessGameBuilder,
+    en_passent_option_string: &str,
+) -> ChessGameBuilder {
+    todo!()
+}
+
+fn parse_half_turn_counter_from_string(
+    builder: ChessGameBuilder,
+    half_turn_counter_string: &str,
+) -> ChessGameBuilder {
+    todo!()
+}
+
+fn parse_turn_number_from_string(
+    builder: ChessGameBuilder,
+    turn_number_string: &str,
+) -> ChessGameBuilder {
     todo!()
 }
 
@@ -134,7 +175,6 @@ fn get_castling_rights(game: &ChessGame) -> String {
     result
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -143,14 +183,19 @@ mod tests {
     fn building_game_from_empty_string() {
         let res = build_game_from_string("");
         match res {
-            Ok(_) => {panic!("expected error")}
-            Err(e) => {assert_eq!("argument must be a string in Forsyth–Edwards Notation", e)}
+            Ok(_) => {
+                panic!("expected error")
+            }
+            Err(e) => {
+                assert_eq!("argument must be a string in Forsyth–Edwards Notation", e)
+            }
         }
     }
 
     #[test]
     fn building_game_in_starting_position() {
-        let starting_position_as_fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        let starting_position_as_fen_string =
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         let game = build_game_from_string(starting_position_as_fen_string);
         assert_eq!(game.is_ok(), true);
         todo!("check the game is in the correct state")

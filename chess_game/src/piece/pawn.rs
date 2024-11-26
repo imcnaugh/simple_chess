@@ -1,9 +1,14 @@
-use game_board::Board;
 use crate::chess_move::ChessMoveType;
-use crate::Color;
 use crate::piece::{ChessPiece, PieceType};
+use crate::Color;
+use game_board::Board;
 
-const PROMOTION_OPTIONS: [PieceType; 4] = [PieceType::Queen, PieceType::Rook, PieceType::Bishop, PieceType::Knight];
+const PROMOTION_OPTIONS: [PieceType; 4] = [
+    PieceType::Queen,
+    PieceType::Rook,
+    PieceType::Bishop,
+    PieceType::Knight,
+];
 
 pub fn as_utf_str(color: Color) -> &'static str {
     match color {
@@ -33,7 +38,7 @@ pub fn possible_moves(
     };
 
     let promotion_row = match color {
-        Color::White => board.get_height() -1,
+        Color::White => board.get_height() - 1,
         Color::Black => 0,
     };
 
@@ -43,24 +48,30 @@ pub fn possible_moves(
     }
 
     // Simple move forward
-    if board.get_piece_at_space(position.0, next_row as usize).is_none() {
+    if board
+        .get_piece_at_space(position.0, next_row as usize)
+        .is_none()
+    {
         possible_moves.append(&mut create_possible_moves(
             position,
             (position.0, next_row as usize),
             color,
             None,
-            next_row as usize == promotion_row
+            next_row as usize == promotion_row,
         ));
 
         // moving 2 spaces from starting row
         let starting_row = match color {
             Color::White => 1,
-            Color::Black => board.get_height() - 2
+            Color::Black => board.get_height() - 2,
         };
         if position.1 == starting_row {
             let double_next_row = position.1 as i32 + 2 * forward_direction;
             if double_next_row >= 0 && double_next_row < board.get_height() as i32 {
-                if board.get_piece_at_space(position.0, double_next_row as usize).is_none() {
+                if board
+                    .get_piece_at_space(position.0, double_next_row as usize)
+                    .is_none()
+                {
                     possible_moves.append(&mut create_possible_moves(
                         position,
                         (position.0, double_next_row as usize),
@@ -86,7 +97,13 @@ pub fn possible_moves(
         }
 
         // En Passant
-        if let Some(ChessMoveType::Move { piece, new_position, original_position, .. }) = last_move_type {
+        if let Some(ChessMoveType::Move {
+            piece,
+            new_position,
+            original_position,
+            ..
+        }) = last_move_type
+        {
             if piece.piece_type == PieceType::Pawn {
                 let rows_moved = if original_position.1 < new_position.1 {
                     new_position.1 - original_position.1
@@ -94,14 +111,17 @@ pub fn possible_moves(
                     original_position.1 - new_position.1
                 };
 
-                if rows_moved == 2 && new_position.0 == position.0 - 1 && new_position.1 == position.1 {
+                if rows_moved == 2
+                    && new_position.0 == position.0 - 1
+                    && new_position.1 == position.1
+                {
                     possible_moves.append(&mut create_possible_en_passant(
                         position,
                         (position.0 - 1, next_row as usize),
                         color,
                         piece,
                         new_position,
-                        next_row as usize == promotion_row
+                        next_row as usize == promotion_row,
                     ));
                 }
             }
@@ -121,7 +141,13 @@ pub fn possible_moves(
         }
 
         // En Passant
-        if let Some(ChessMoveType::Move { piece, new_position, original_position, .. }) = last_move_type {
+        if let Some(ChessMoveType::Move {
+            piece,
+            new_position,
+            original_position,
+            ..
+        }) = last_move_type
+        {
             if piece.piece_type == PieceType::Pawn {
                 let rows_moved = if original_position.1 < new_position.1 {
                     new_position.1 - original_position.1
@@ -129,14 +155,17 @@ pub fn possible_moves(
                     original_position.1 - new_position.1
                 };
 
-                if rows_moved == 2 && new_position.0 == position.0 + 1 && new_position.1 == position.1 {
+                if rows_moved == 2
+                    && new_position.0 == position.0 + 1
+                    && new_position.1 == position.1
+                {
                     possible_moves.append(&mut create_possible_en_passant(
                         position,
                         (position.0 + 1, next_row as usize),
                         color,
                         piece,
                         new_position,
-                        next_row as usize == promotion_row
+                        next_row as usize == promotion_row,
                     ));
                 }
             }
@@ -146,7 +175,13 @@ pub fn possible_moves(
     possible_moves
 }
 
-fn create_possible_moves(original_position: (usize, usize), new_position: (usize, usize), color: Color, taken_piece: Option<ChessPiece>, can_promote: bool) -> Vec<ChessMoveType> {
+fn create_possible_moves(
+    original_position: (usize, usize),
+    new_position: (usize, usize),
+    color: Color,
+    taken_piece: Option<ChessPiece>,
+    can_promote: bool,
+) -> Vec<ChessMoveType> {
     let mut possible_moves: Vec<ChessMoveType> = Vec::new();
     if can_promote {
         for option in PROMOTION_OPTIONS.iter() {
@@ -171,7 +206,14 @@ fn create_possible_moves(original_position: (usize, usize), new_position: (usize
     possible_moves
 }
 
-fn create_possible_en_passant(original_position: (usize, usize), new_position: (usize, usize), color: Color, taken_piece: ChessPiece, taken_piece_position: (usize, usize), can_promote: bool) -> Vec<ChessMoveType> {
+fn create_possible_en_passant(
+    original_position: (usize, usize),
+    new_position: (usize, usize),
+    color: Color,
+    taken_piece: ChessPiece,
+    taken_piece_position: (usize, usize),
+    can_promote: bool,
+) -> Vec<ChessMoveType> {
     let mut possible_en_passants: Vec<ChessMoveType> = Vec::new();
 
     if can_promote {
