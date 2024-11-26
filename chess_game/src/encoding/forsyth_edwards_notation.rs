@@ -32,7 +32,7 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
         get_board_as_fen_string(game),
         get_current_turn_char(game),
         get_castling_rights(game),
-        '-', // TODO add En Passant string once i add move history to the game
+        todo!(),
         game.get_50_move_rule_counter(),
         game.get_turn_number()
     )
