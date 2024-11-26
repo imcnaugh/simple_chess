@@ -27,7 +27,6 @@ pub struct ChessPiece {
 }
 
 impl ChessPiece {
-    
     /// Creates a new `ChessPiece` with the specified type and color.
     ///
     /// # Arguments
@@ -48,7 +47,6 @@ impl ChessPiece {
         Self { piece_type, color }
     }
 
-    
     /// Returns the color of the chess piece.
     ///
     /// # Examples
@@ -67,7 +65,6 @@ impl ChessPiece {
         self.color
     }
 
-    
     /// Returns the UTF-8 string representation of the chess piece based on its type and color.
     ///
     /// # Examples
@@ -93,8 +90,7 @@ impl ChessPiece {
         }
     }
 
-
-    /// Returns the FEN (Forsyth-Edwards Notation) character representation of the chess piece 
+    /// Returns the FEN (Forsyth-Edwards Notation) character representation of the chess piece
     /// based on its type and color.
     ///
     /// # Examples

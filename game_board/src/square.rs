@@ -155,7 +155,6 @@ pub fn get_column_and_row_from_square_name(name: &str) -> Result<(usize, usize),
 /// * `row` - The zero-based row index of the square.
 /// * `color` - The color of the square, which can be either white or black.
 /// * `piece` - An optional field that holds a piece of type `P` if present on the square.
-/// ```
 pub struct Square<P> {
     column: usize,
     row: usize,
