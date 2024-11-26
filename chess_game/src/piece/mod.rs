@@ -120,11 +120,10 @@ impl ChessPiece {
         }
     }
 
-
     /// Returns a vector of possible moves for the chess piece from a given position on the board.
     ///
-    /// This function computes the possible moves for the chess piece, based on its type, current 
-    /// position on the board, and the state of the board. The rules for valid moves for each 
+    /// This function computes the possible moves for the chess piece, based on its type, current
+    /// position on the board, and the state of the board. The rules for valid moves for each
     /// type of chess piece are applied.
     ///
     /// Pins are not taken into account in this function, you will need to filter the returned
@@ -132,14 +131,14 @@ impl ChessPiece {
     ///
     /// # Arguments
     ///
-    /// * `position` - A tuple `(usize, usize)` representing the current position of the chess piece 
+    /// * `position` - A tuple `(usize, usize)` representing the current position of the chess piece
     ///                on the board (row, column).
-    /// * `board` - A reference to the `Board<ChessPiece>` which represents the current state of the 
+    /// * `board` - A reference to the `Board<ChessPiece>` which represents the current state of the
     ///             chess board, including all pieces and their positions.
     ///
     /// # Returns
     ///
-    /// A `Vec<ChessMoveType>` containing all possible moves for the chess piece from its current 
+    /// A `Vec<ChessMoveType>` containing all possible moves for the chess piece from its current
     /// position, based on the rules for the specific type of chess piece.
     ///
     /// # Examples
