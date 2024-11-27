@@ -184,3 +184,61 @@ impl ChessGameBuilder {
         self
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn build_basic_game_with_defaults() {
+        let mut builder = ChessGameBuilder::new();
+        let board = Board::<ChessPiece>::build(8, 8).unwrap();
+
+        builder = builder.set_board(board);
+        builder = builder.set_current_turn(Color::White);
+
+        let game_result = builder.build();
+        assert!(game_result.is_ok());
+
+        let game_result = game_result.unwrap();
+
+        assert_eq!(8, game_result.get_board().get_width());
+        assert_eq!(8, game_result.get_board().get_height());
+        assert_eq!(Color::White, game_result.get_current_players_turn());
+        assert_eq!(0, game_result.get_50_move_rule_counter());
+        assert_eq!(0, game_result.get_turn_number());
+        let (castle_wl, castle_ws, castle_bl, castle_bs) = game_result.get_castling_rights();
+        assert!(castle_wl);
+        assert!(castle_ws);
+        assert!(castle_bl);
+        assert!(castle_bs);
+    }
+
+    #[test]
+    fn build_game() {
+        let mut builder = ChessGameBuilder::new();
+        let board = Board::<ChessPiece>::build(2, 5).unwrap();
+
+        builder = builder.set_board(board);
+        builder = builder.set_current_turn(Color::Black);
+        builder = builder.set_castle_rights(false, true, false, true);
+        builder = builder.set_turn_number(9);
+        builder = builder.set_fifty_move_rule_counter(800);
+
+        let game_result = builder.build();
+        assert!(game_result.is_ok());
+
+        let game_result = game_result.unwrap();
+
+        assert_eq!(2, game_result.get_board().get_width());
+        assert_eq!(5, game_result.get_board().get_height());
+        assert_eq!(Color::Black, game_result.get_current_players_turn());
+        assert_eq!(800, game_result.get_50_move_rule_counter());
+        assert_eq!(9, game_result.get_turn_number());
+        let (castle_wl, castle_ws, castle_bl, castle_bs) = game_result.get_castling_rights();
+        assert!(castle_wl);
+        assert!(!castle_ws);
+        assert!(castle_bl);
+        assert!(!castle_bs);
+    }
+}
