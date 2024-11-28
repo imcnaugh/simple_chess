@@ -1,5 +1,6 @@
 use crate::piece::ChessPiece;
 
+#[derive(Debug, PartialEq)]
 pub enum ChessMoveType {
     Move {
         original_position: (usize, usize),

@@ -1,6 +1,7 @@
 use crate::piece::ChessPiece;
 use crate::Color;
 use game_board::Board;
+use crate::chess_move::ChessMoveType;
 
 pub struct ChessGame {
     board: Board<ChessPiece>,
@@ -11,6 +12,7 @@ pub struct ChessGame {
     can_white_castle_long: bool,
     can_black_castle_short: bool,
     can_black_castle_long: bool,
+    moves: Vec<ChessMoveType>,
 }
 
 impl ChessGame {
@@ -41,6 +43,7 @@ impl ChessGame {
             can_white_castle_long: true,
             can_black_castle_short: true,
             can_black_castle_long: true,
+            moves: Vec::new(),
         }
     }
 
@@ -53,6 +56,7 @@ impl ChessGame {
         can_white_castle_long: bool,
         can_black_castle_short: bool,
         can_black_castle_long: bool,
+        moves: Vec<ChessMoveType>,
     ) -> ChessGame {
         ChessGame {
             board,
@@ -63,6 +67,7 @@ impl ChessGame {
             can_white_castle_long,
             can_black_castle_short,
             can_black_castle_long,
+            moves
         }
     }
 
@@ -146,5 +151,44 @@ impl ChessGame {
     /// ```
     pub fn get_turn_number(&self) -> usize {
         self.turn_number
+    }
+
+
+    /// Get the list of moves made so far.
+    ///
+    /// # Returns
+    ///
+    /// `&Vec<ChessMoveType>`: A reference to the vector containing all the moves made in the game so far.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::{ChessGame, ChessMoveType};
+    /// let chess_game = ChessGame::new();
+    /// // Assuming no moves have been made yet
+    /// assert!(chess_game.get_moves().is_empty());
+    /// ```
+    pub fn get_moves(&self) -> &Vec<ChessMoveType> {
+        &self.moves
+    }
+
+
+    /// Get the last move made in the game.
+    ///
+    /// # Returns
+    ///
+    /// `Option<&ChessMoveType>`: An optional reference to the last move made.
+    /// If no moves have been made, this method returns `None`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::{ChessGame, ChessMoveType};
+    /// let chess_game = ChessGame::new();
+    /// // Assuming no moves have been made yet
+    /// assert_eq!(chess_game.get_last_move(), None);
+    /// ```
+    pub fn get_last_move(&self) -> Option<&ChessMoveType> {
+        self.moves.last()
     }
 }

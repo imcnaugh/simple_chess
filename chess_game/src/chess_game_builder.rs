@@ -1,6 +1,7 @@
 use crate::piece::ChessPiece;
 use crate::{ChessGame, Color};
 use game_board::Board;
+use crate::chess_move::ChessMoveType;
 
 /// The `ChessGameBuilder` struct is used to construct a `ChessGame`
 /// instance. It employs the builder pattern to set up various
@@ -19,6 +20,7 @@ pub struct ChessGameBuilder {
     can_white_castle_long: Option<bool>,
     can_black_castle_short: Option<bool>,
     can_black_castle_long: Option<bool>,
+    moves: Option<Vec<ChessMoveType>>,
 }
 
 impl ChessGameBuilder {
@@ -43,6 +45,7 @@ impl ChessGameBuilder {
             can_white_castle_long: None,
             can_black_castle_short: None,
             can_black_castle_long: None,
+            moves: None,
         }
     }
 
@@ -60,18 +63,29 @@ impl ChessGameBuilder {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::{ChessGameBuilder, Color};
+    /// use chess_game::{ChessGameBuilder, Color, ChessMoveType};
+    /// use chess_game::Color::White;
     /// use chess_game::piece::ChessPiece;
+    /// use chess_game::piece::PieceType::Pawn;
     /// use game_board::Board;
     ///
     /// let board: Board<ChessPiece> = Board::build(8, 8).unwrap();
     ///
+    /// let moves: Vec<ChessMoveType> = vec![ChessMoveType::Move {
+    ///     original_position: (3, 1),
+    ///     new_position: (3, 3),
+    ///     piece: ChessPiece::new(Pawn, White),
+    ///     taken_piece: None,
+    ///     promotion: None
+    /// }];
+    ///
     /// let game_result = ChessGameBuilder::new()
     ///     .set_board(board)
-    ///     .set_current_turn(Color::White)
+    ///     .set_current_turn(White)
     ///     .set_turn_number(1)
     ///     .set_fifty_move_rule_counter(0)
     ///     .set_castle_rights(true, true, true, true)
+    ///     .set_moves(moves)
     ///     .build();
     ///
     /// assert!(game_result.is_ok());
@@ -87,6 +101,7 @@ impl ChessGameBuilder {
                 self.can_white_castle_long.unwrap_or(true),
                 self.can_black_castle_short.unwrap_or(true),
                 self.can_black_castle_long.unwrap_or(true),
+                self.moves.unwrap_or_default(),
             );
             Ok(game)
         } else {
@@ -183,10 +198,30 @@ impl ChessGameBuilder {
         self.can_black_castle_long = Some(bl);
         self
     }
+
+
+    /// Sets the moves made so far in the `ChessGame`.
+    ///
+    /// This method allows you to specify the sequence of moves that have been made
+    /// so far in the game. Each move is represented by a `ChessMoveType`.
+    ///
+    /// # Arguments
+    ///
+    /// * `moves` - A `Vec<ChessMoveType>` containing the moves made in the game.
+    ///
+    /// # Returns
+    ///
+    /// * `Self` - Returns the `ChessGameBuilder` instance with the moves set.
+    pub fn set_moves(mut self, moves: Vec<ChessMoveType>) -> Self {
+        self.moves = Some(moves);
+        self
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use crate::Color::{Black, White};
+    use crate::piece::PieceType::Pawn;
     use super::*;
 
     #[test]
@@ -218,12 +253,26 @@ mod tests {
     fn build_game() {
         let mut builder = ChessGameBuilder::new();
         let board = Board::<ChessPiece>::build(2, 5).unwrap();
+        let moves: Vec<ChessMoveType> = vec![ChessMoveType::Move {
+            original_position: (3, 1),
+            new_position: (3, 3),
+            piece: ChessPiece::new(Pawn, White),
+            taken_piece: None,
+            promotion: None
+        }, ChessMoveType::Move {
+            original_position: (3, 6),
+            new_position: (3, 4),
+            piece: ChessPiece::new(Pawn, Black),
+            taken_piece: None,
+            promotion: None,
+        }];
 
         builder = builder.set_board(board);
         builder = builder.set_current_turn(Color::Black);
         builder = builder.set_castle_rights(false, true, false, true);
         builder = builder.set_turn_number(9);
         builder = builder.set_fifty_move_rule_counter(800);
+        builder = builder.set_moves(moves);
 
         let game_result = builder.build();
         assert!(game_result.is_ok());
@@ -240,5 +289,7 @@ mod tests {
         assert!(!castle_ws);
         assert!(castle_bl);
         assert!(!castle_bs);
+
+        assert_eq!(2, game_result.get_moves().len());
     }
 }
