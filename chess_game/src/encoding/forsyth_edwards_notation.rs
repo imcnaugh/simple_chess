@@ -1,6 +1,6 @@
 use crate::chess_game::ChessGame;
 use crate::chess_game_builder::ChessGameBuilder;
-use crate::piece::ChessPiece;
+use crate::piece::{ChessPiece, PieceType};
 use crate::ChessMoveType::EnPassant;
 use crate::Color;
 use crate::Color::{Black, White};
@@ -75,7 +75,42 @@ fn parse_board_from_string(
     board_as_fen_string: &str,
 ) -> ChessGameBuilder {
     let mut board = Board::build(8, 8).unwrap();
-    
+
+    let mut files = board_as_fen_string.split("/");
+
+    let mut col = 0;
+    for row in (0..8).rev() {
+        let file = files.next().unwrap();
+
+        for c in file.chars() {
+            match c {
+                '1'..='8' => {
+                    col += c.to_digit(10).unwrap() as usize;
+                }
+                _ => {
+                    let piece = match c {
+                        'P' => ChessPiece::new(PieceType::Pawn, White),
+                        'p' => ChessPiece::new(PieceType::Pawn, Black),
+                        'R' => ChessPiece::new(PieceType::Rook, White),
+                        'r' => ChessPiece::new(PieceType::Rook, Black),
+                        'N' => ChessPiece::new(PieceType::Knight, White),
+                        'n' => ChessPiece::new(PieceType::Knight, Black),
+                        'B' => ChessPiece::new(PieceType::Bishop, White),
+                        'b' => ChessPiece::new(PieceType::Bishop, Black),
+                        'Q' => ChessPiece::new(PieceType::Queen, White),
+                        'q' => ChessPiece::new(PieceType::Queen, Black),
+                        'K' => ChessPiece::new(PieceType::King, White),
+                        'k' => ChessPiece::new(PieceType::King, Black),
+                        _ => panic!("Invalid piece character in FEN string"),
+                    };
+                    board.place_piece(piece, col, row);
+                    col += 1;
+                }
+            }
+        }
+
+        col = 0;
+    }
     
     builder.set_board(board)
 }
@@ -230,5 +265,21 @@ mod tests {
         let game = build_game_from_string(starting_position_as_fen_string);
         assert_eq!(game.is_ok(), true);
         todo!("check the game is in the correct state")
+    }
+
+    #[test]
+    fn parse_board_from_string_() {
+        let starting_position_as_fen_string =
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        let mut game_builder = ChessGameBuilder::new();
+
+        game_builder = parse_board_from_string(game_builder, starting_position_as_fen_string);
+        game_builder = game_builder.set_current_turn(White);
+
+        let game = game_builder.build().unwrap();
+        println!("{}", game.get_board());
+
+        assert_eq!(game.get_board().get_piece_at_space(0, 0).unwrap(), &ChessPiece::new(PieceType::Rook, White));
+        assert_eq!(game.get_board().get_piece_at_space(0, 7).unwrap(), &ChessPiece::new(PieceType::Rook, Black));
     }
 }
