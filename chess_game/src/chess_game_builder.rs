@@ -1,7 +1,7 @@
+use crate::chess_move::ChessMoveType;
 use crate::piece::ChessPiece;
 use crate::{ChessGame, Color};
 use game_board::Board;
-use crate::chess_move::ChessMoveType;
 
 /// The `ChessGameBuilder` struct is used to construct a `ChessGame`
 /// instance. It employs the builder pattern to set up various
@@ -199,7 +199,6 @@ impl ChessGameBuilder {
         self
     }
 
-
     /// Sets the moves made so far in the `ChessGame`.
     ///
     /// This method allows you to specify the sequence of moves that have been made
@@ -220,9 +219,9 @@ impl ChessGameBuilder {
 
 #[cfg(test)]
 mod tests {
-    use crate::Color::{Black, White};
-    use crate::piece::PieceType::Pawn;
     use super::*;
+    use crate::piece::PieceType::Pawn;
+    use crate::Color::{Black, White};
 
     #[test]
     fn build_basic_game_with_defaults() {
@@ -253,19 +252,22 @@ mod tests {
     fn build_game() {
         let mut builder = ChessGameBuilder::new();
         let board = Board::<ChessPiece>::build(2, 5).unwrap();
-        let moves: Vec<ChessMoveType> = vec![ChessMoveType::Move {
-            original_position: (3, 1),
-            new_position: (3, 3),
-            piece: ChessPiece::new(Pawn, White),
-            taken_piece: None,
-            promotion: None
-        }, ChessMoveType::Move {
-            original_position: (3, 6),
-            new_position: (3, 4),
-            piece: ChessPiece::new(Pawn, Black),
-            taken_piece: None,
-            promotion: None,
-        }];
+        let moves: Vec<ChessMoveType> = vec![
+            ChessMoveType::Move {
+                original_position: (3, 1),
+                new_position: (3, 3),
+                piece: ChessPiece::new(Pawn, White),
+                taken_piece: None,
+                promotion: None,
+            },
+            ChessMoveType::Move {
+                original_position: (3, 6),
+                new_position: (3, 4),
+                piece: ChessPiece::new(Pawn, Black),
+                taken_piece: None,
+                promotion: None,
+            },
+        ];
 
         builder = builder.set_board(board);
         builder = builder.set_current_turn(Color::Black);

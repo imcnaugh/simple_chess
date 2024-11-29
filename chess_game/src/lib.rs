@@ -8,5 +8,5 @@ mod chess_move;
 pub mod encoding;
 pub use chess_game::ChessGame;
 pub use chess_game_builder::ChessGameBuilder;
-pub use color::Color;
 pub use chess_move::ChessMoveType;
+pub use color::Color;

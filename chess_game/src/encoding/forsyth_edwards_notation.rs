@@ -1,9 +1,10 @@
 use crate::chess_game::ChessGame;
 use crate::chess_game_builder::ChessGameBuilder;
 use crate::piece::ChessPiece;
-use crate::Color;
-use game_board::Board;
 use crate::ChessMoveType::EnPassant;
+use crate::Color;
+use crate::Color::{Black, White};
+use game_board::Board;
 
 /// Encodes the current state of the chess game as a string in FEN (Forsyth-Edwards Notation) format.
 ///
@@ -80,7 +81,11 @@ fn parse_current_turn_from_string(
     builder: ChessGameBuilder,
     current_turn_string: &str,
 ) -> ChessGameBuilder {
-    todo!()
+    match current_turn_string {
+        "w" => {builder.set_current_turn(White)},
+        "b" => {builder.set_current_turn(Black)},
+        _ => panic!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received {}", current_turn_string)
+    }
 }
 
 fn parse_castling_rights_from_string(
@@ -176,7 +181,6 @@ fn get_castling_rights(game: &ChessGame) -> String {
     result
 }
 
-
 /// Extracts the en passant target square for the last move in the chess game, if available.
 ///
 /// # Returns
@@ -188,9 +192,13 @@ fn get_castling_rights(game: &ChessGame) -> String {
 ///
 /// * `game` - A reference to the `ChessGame` instance representing the current state of the game.
 fn get_en_passent(game: &ChessGame) -> String {
-    if let Some(EnPassant { new_position: (col, row), .. }) = game.get_last_move() {
+    if let Some(EnPassant {
+        new_position: (col, row),
+        ..
+    }) = game.get_last_move()
+    {
         game_board::get_square_name_from_row_and_col(*col, *row)
-    }  else {
+    } else {
         String::from("-")
     }
 }

@@ -1,7 +1,7 @@
+use crate::chess_move::ChessMoveType;
 use crate::piece::ChessPiece;
 use crate::Color;
 use game_board::Board;
-use crate::chess_move::ChessMoveType;
 
 pub struct ChessGame {
     board: Board<ChessPiece>,
@@ -67,7 +67,7 @@ impl ChessGame {
             can_white_castle_long,
             can_black_castle_short,
             can_black_castle_long,
-            moves
+            moves,
         }
     }
 
@@ -153,7 +153,6 @@ impl ChessGame {
         self.turn_number
     }
 
-
     /// Get the list of moves made so far.
     ///
     /// # Returns
@@ -171,7 +170,6 @@ impl ChessGame {
     pub fn get_moves(&self) -> &Vec<ChessMoveType> {
         &self.moves
     }
-
 
     /// Get the last move made in the game.
     ///
