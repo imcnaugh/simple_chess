@@ -3,6 +3,7 @@ use crate::chess_game_builder::ChessGameBuilder;
 use crate::piece::ChessPiece;
 use crate::Color;
 use game_board::Board;
+use crate::ChessMoveType::EnPassant;
 
 /// Encodes the current state of the chess game as a string in FEN (Forsyth-Edwards Notation) format.
 ///
@@ -33,7 +34,7 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
         get_board_as_fen_string(game),
         get_current_turn_char(game),
         get_castling_rights(game),
-        todo!(),
+        get_en_passent(game),
         game.get_50_move_rule_counter(),
         game.get_turn_number()
     )
@@ -173,6 +174,25 @@ fn get_castling_rights(game: &ChessGame) -> String {
     };
 
     result
+}
+
+
+/// Extracts the en passant target square for the last move in the chess game, if available.
+///
+/// # Returns
+///
+/// A `String` representing the algebraic notation of the target square for en passant capture,
+/// such as 'e3'. If no en passant target square is available, returns a dash '-'.
+///
+/// # Arguments
+///
+/// * `game` - A reference to the `ChessGame` instance representing the current state of the game.
+fn get_en_passent(game: &ChessGame) -> String {
+    if let Some(EnPassant { new_position: (col, row), .. }) = game.get_last_move() {
+        game_board::get_square_name_from_row_and_col(*col, *row)
+    }  else {
+        String::from("-")
+    }
 }
 
 #[cfg(test)]
