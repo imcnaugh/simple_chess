@@ -1,3 +1,4 @@
+use std::fmt::{Display, Formatter};
 use crate::chess_move::ChessMoveType;
 use crate::Color;
 use game_board::Board;
@@ -167,5 +168,11 @@ impl ChessPiece {
             PieceType::Knight => knight::possible_moves(self.color, position, board),
             PieceType::Pawn => pawn::possible_moves(self.color, position, board, last_move),
         }
+    }
+}
+
+impl Display for ChessPiece {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_utf_str())
     }
 }
