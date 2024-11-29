@@ -5,7 +5,7 @@ pub mod piece;
 
 mod chess_move;
 
-pub mod encoding;
+pub mod codec;
 pub use chess_game::ChessGame;
 pub use chess_game_builder::ChessGameBuilder;
 pub use chess_move::ChessMoveType;
