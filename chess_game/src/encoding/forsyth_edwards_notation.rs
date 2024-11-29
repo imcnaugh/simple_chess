@@ -74,7 +74,10 @@ fn parse_board_from_string(
     builder: ChessGameBuilder,
     board_as_fen_string: &str,
 ) -> ChessGameBuilder {
-    todo!()
+    let mut board = Board::build(8, 8).unwrap();
+    
+    
+    builder.set_board(board)
 }
 
 fn parse_current_turn_from_string(
