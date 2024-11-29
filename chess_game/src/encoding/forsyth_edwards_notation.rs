@@ -61,7 +61,10 @@ pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
 
     for step in steps {
         if let Some(next) = parts.next() {
-            builder = step(builder, next);
+            builder = match step(builder, next) {
+                Ok(g) => g,
+                Err(e) => panic!("{}", e),
+            };
         } else {
             return Err("Missing some parts of the string");
         }
@@ -73,7 +76,7 @@ pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
 fn parse_board_from_string(
     builder: ChessGameBuilder,
     board_as_fen_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     let mut board = Board::build(8, 8).unwrap();
 
     let mut files = board_as_fen_string.split("/");
@@ -109,19 +112,23 @@ fn parse_board_from_string(
             }
         }
 
+        if col != 8 {
+            return Err("Invalid FEN string, file {} is not complete", file);
+        }
+
         col = 0;
     }
     
-    builder.set_board(board)
+    Ok(builder.set_board(board))
 }
 
 fn parse_current_turn_from_string(
     builder: ChessGameBuilder,
     current_turn_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     match current_turn_string {
-        "w" => {builder.set_current_turn(White)},
-        "b" => {builder.set_current_turn(Black)},
+        "w" => {Ok(builder.set_current_turn(White))},
+        "b" => {Ok(builder.set_current_turn(Black))},
         _ => panic!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received {}", current_turn_string)
     }
 }
@@ -129,28 +136,28 @@ fn parse_current_turn_from_string(
 fn parse_castling_rights_from_string(
     builder: ChessGameBuilder,
     castling_rights_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     todo!()
 }
 
 fn parse_en_passant_option_from_string(
     builder: ChessGameBuilder,
     en_passent_option_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     todo!()
 }
 
 fn parse_half_turn_counter_from_string(
     builder: ChessGameBuilder,
     half_turn_counter_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     todo!()
 }
 
 fn parse_turn_number_from_string(
     builder: ChessGameBuilder,
     turn_number_string: &str,
-) -> ChessGameBuilder {
+) -> Result<ChessGameBuilder, &str> {
     todo!()
 }
 
@@ -243,6 +250,7 @@ fn get_en_passent(game: &ChessGame) -> String {
 
 #[cfg(test)]
 mod tests {
+    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
     use super::*;
 
     #[test]
@@ -268,18 +276,40 @@ mod tests {
     }
 
     #[test]
-    fn parse_board_from_string_() {
+    fn parse_fen_starting_position_to_board() {
         let starting_position_as_fen_string =
             "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         let mut game_builder = ChessGameBuilder::new();
 
-        game_builder = parse_board_from_string(game_builder, starting_position_as_fen_string);
+        game_builder = parse_board_from_string(game_builder, starting_position_as_fen_string).unwrap();
         game_builder = game_builder.set_current_turn(White);
 
-        let game = game_builder.build().unwrap();
-        println!("{}", game.get_board());
+        let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
 
-        assert_eq!(game.get_board().get_piece_at_space(0, 0).unwrap(), &ChessPiece::new(PieceType::Rook, White));
-        assert_eq!(game.get_board().get_piece_at_space(0, 7).unwrap(), &ChessPiece::new(PieceType::Rook, Black));
+        let game = game_builder.build().unwrap();
+        let board = game.get_board();
+        for (col, expected_type) in expected_piece_type.iter().enumerate() {
+            assert_eq!(board.get_piece_at_space(col, 0).unwrap(), &ChessPiece::new(*expected_type, White));
+            assert_eq!(board.get_piece_at_space(col, 1).unwrap(), &ChessPiece::new(Pawn, White));
+            assert!(board.get_piece_at_space(col, 2).is_none());
+            assert!(board.get_piece_at_space(col, 3).is_none());
+            assert!(board.get_piece_at_space(col, 4).is_none());
+            assert!(board.get_piece_at_space(col, 5).is_none());
+            assert_eq!(board.get_piece_at_space(col, 6).unwrap(), &ChessPiece::new(Pawn, Black));
+            assert_eq!(board.get_piece_at_space(col, 7).unwrap(), &ChessPiece::new(*expected_type, Black));
+        }
+    }
+
+    #[test]
+    fn parse_fen_board_string_panics() {
+        let starting_position_as_fen_string_missing_pawn =
+            "rnbqkbnr/ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        let game_builder = ChessGameBuilder::new();
+
+        let result = parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
+        match result {
+            Ok(_) => panic!("expected error"),
+            Err(e) => {assert_eq!("Invalid FEN string, file ppppppp is not complete", e)}
+        }
     }
 }
