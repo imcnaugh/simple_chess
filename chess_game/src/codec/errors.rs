@@ -1,3 +1,3 @@
-enum DecodingError {
-    g
+pub enum DecodingError {
+    FenBoardError { reason: String},
 }
