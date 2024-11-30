@@ -43,6 +43,19 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
     )
 }
 
+/// Builds a `ChessGame` from a string in Forsyth-Edwards Notation (FEN) format.
+///
+/// This function parses the FEN string and constructs the game state, including the board layout,
+/// current turn, castling rights, en passant target square, half-move counter, and full move number.
+///
+/// # Arguments
+///
+/// * `fen_string` - A string slice representing the state of the chess game in FEN format.
+///
+/// # Returns
+///
+/// A `Result` which is `Ok` if the `ChessGame` was built successfully, or an `Err` containing
+/// a `ForsythEdwardsNotationError` if the FEN string is invalid or cannot be parsed.
 pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, ForsythEdwardsNotationError> {
     let fen_string = fen_string.trim();
     if fen_string.is_empty() {
@@ -291,16 +304,6 @@ fn get_castling_rights(game: &ChessGame) -> String {
     result
 }
 
-/// Extracts the en passant target square for the last move in the chess game, if available.
-///
-/// # Returns
-///
-/// A `String` representing the algebraic notation of the target square for en passant capture,
-/// such as 'e3'. If no en passant target square is available, returns a dash '-'.
-///
-/// # Arguments
-///
-/// * `game` - A reference to the `ChessGame` instance representing the current state of the game.
 fn get_en_passent(game: &ChessGame) -> String {
     if let Some(EnPassant {
         new_position: (col, row),
