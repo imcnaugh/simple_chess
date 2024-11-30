@@ -274,9 +274,10 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
         } else {
             empty_space_counter += 1;
         }
-        if empty_space_counter != 0 {
-            result.push_str(&empty_space_counter.to_string());
-        }
+    }
+
+    if empty_space_counter != 0 {
+        result.push_str(&empty_space_counter.to_string());
     }
     result
 }
