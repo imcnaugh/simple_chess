@@ -140,13 +140,7 @@ mod tests {
         let game = build_game_from_string("8/1P1Q4/2b5/3K4/8/8/8/8 w KQkq - 0 1").unwrap();
         let board = game.get_board();
 
-        println!("{}", board);
-
         let moves = black_bishop.possible_moves((2, 5), board, None);
-
-        for m in &moves {
-            println!("{:?}", m);
-        }
 
         [
             (0, 3, None),
