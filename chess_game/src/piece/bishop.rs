@@ -39,6 +39,8 @@ pub fn possible_moves(
                         taken_piece: Some(*piece),
                         promotion: None,
                     });
+                } else {
+                    break;
                 }
             } else {
                 possible_moves.push(ChessMoveType::Move {
@@ -59,6 +61,7 @@ pub fn possible_moves(
 
 #[cfg(test)]
 mod tests {
+    use game_board::get_square_name_from_row_and_col;
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
     use crate::ChessMoveType::Move;
@@ -72,35 +75,73 @@ mod tests {
         let game = build_game_from_string("8/8/2B5/8/8/8/8/8 w KQkq - 0 1").unwrap();
         let board = game.get_board();
 
-        let moves = white_bishop.possible_moves((2, 2), board, None);
+        println!("{}", board);
+
+        let moves = white_bishop.possible_moves((2, 5), board, None);
         assert_eq!(moves.len(), 11);
 
-        let expected_new_positions = [
-            (0, 0),
-            (0, 4),
-            (1, 1),
-            (1, 3),
-            (3, 1),
-            (3, 3),
-            (4, 0),
-            (4, 4),
-            (5, 5),
-            (6, 6),
-            (7, 7),
-        ];
-
-        let expected_moves = expected_new_positions.map(|(new_col, new_row)| -> ChessMoveType {
-            Move {
-                original_position: (2, 2),
+        [
+            (0, 7),
+            (0, 3),
+            (1, 6),
+            (1, 4),
+            (3, 6),
+            (3, 4),
+            (4, 7),
+            (4, 3),
+            (5, 2),
+            (6, 1),
+            (7, 0),
+        ]
+        .map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (2, 5),
                 new_position: (new_col, new_row),
                 piece: ChessPiece::new(PieceType::Bishop, Color::White),
                 taken_piece: None,
                 promotion: None,
-            }
-        });
-
-        for expected_move in expected_moves {
+            };
             assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn bishop_blocked_by_friendly_pieces_movement() {
+        let white_bishop = ChessPiece {
+            piece_type: PieceType::Bishop,
+            color: Color::White,
+        };
+        let game = build_game_from_string("8/8/2B5/3K4/8/8/8/8 w KQkq - 0 1").unwrap();
+        let board = game.get_board();
+
+        println!("{board}");
+
+        let moves = white_bishop.possible_moves((2, 5), board, None);
+        for m in &moves {
+            if let Move{ new_position, ..} = m {
+                println!("{}", get_square_name_from_row_and_col(new_position.0, new_position.1));
+            }
         }
+
+        assert_eq!(6, moves.len());
+
+        [
+            (0, 7),
+            (0, 3),
+            (1, 6),
+            (1, 4),
+            (3, 6),
+            (4, 7),
+        ]
+            .map(|(new_col, new_row)| {
+                let expected_move = Move {
+                    original_position: (2, 5),
+                    new_position: (new_col, new_row),
+                    piece: ChessPiece::new(PieceType::Bishop, Color::White),
+                    taken_piece: None,
+                    promotion: None,
+                };
+                assert!(moves.contains(&expected_move));
+            });
     }
 }
