@@ -351,298 +351,317 @@ impl Error for ForsythEdwardsNotationError {}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 
-    #[test]
-    fn building_game_from_empty_string() {
-        let res = build_game_from_string("");
-        match res {
-            Ok(_) => {
-                panic!("expected error")
+    mod decoding_tests {
+        use super::super::*;
+
+        #[test]
+        fn new_game_parses_to_starting_position() {
+            let game = ChessGame::new();
+            let fen_string = encode_game_as_string(&game);
+            assert_eq!(
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                fen_string
+            );
+        }
+    }
+
+    mod encoding_tests {
+        use super::super::*;
+        use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+
+        #[test]
+        fn building_game_from_empty_string() {
+            let res = build_game_from_string("");
+            match res {
+                Ok(_) => {
+                    panic!("expected error")
+                }
+                Err(e) => {
+                    assert_eq!(
+                        "argument must be a string in Forsyth–Edwards Notation",
+                        e.reason
+                    )
+                }
             }
-            Err(e) => {
+        }
+
+        #[test]
+        fn building_game_in_starting_position() {
+            let starting_position_as_fen_string =
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+            let game = build_game_from_string(starting_position_as_fen_string);
+            assert_eq!(game.is_ok(), true);
+            let game = game.unwrap();
+
+            let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+            let board = game.get_board();
+            for (col, expected_type) in expected_piece_type.iter().enumerate() {
                 assert_eq!(
-                    "argument must be a string in Forsyth–Edwards Notation",
-                    e.reason
-                )
-            }
-        }
-    }
-
-    #[test]
-    fn building_game_in_starting_position() {
-        let starting_position_as_fen_string =
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        let game = build_game_from_string(starting_position_as_fen_string);
-        assert_eq!(game.is_ok(), true);
-        let game = game.unwrap();
-
-        let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
-        let board = game.get_board();
-        for (col, expected_type) in expected_piece_type.iter().enumerate() {
-            assert_eq!(
-                board.get_piece_at_space(col, 0).unwrap(),
-                &ChessPiece::new(*expected_type, White)
-            );
-            assert_eq!(
-                board.get_piece_at_space(col, 1).unwrap(),
-                &ChessPiece::new(Pawn, White)
-            );
-            assert!(board.get_piece_at_space(col, 2).is_none());
-            assert!(board.get_piece_at_space(col, 3).is_none());
-            assert!(board.get_piece_at_space(col, 4).is_none());
-            assert!(board.get_piece_at_space(col, 5).is_none());
-            assert_eq!(
-                board.get_piece_at_space(col, 6).unwrap(),
-                &ChessPiece::new(Pawn, Black)
-            );
-            assert_eq!(
-                board.get_piece_at_space(col, 7).unwrap(),
-                &ChessPiece::new(*expected_type, Black)
-            );
-        }
-
-        assert_eq!(White, game.get_current_players_turn());
-        assert_eq!((true, true, true, true), game.get_castling_rights());
-        assert_eq!(0, game.get_moves().len());
-        assert_eq!(0, game.get_50_move_rule_counter());
-        assert_eq!(1, game.get_turn_number());
-    }
-
-    #[test]
-    fn parse_fen_starting_position_to_board() {
-        let mut game_builder = ChessGameBuilder::new();
-
-        game_builder =
-            parse_board_from_string(game_builder, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR")
-                .unwrap();
-        game_builder = game_builder.set_current_turn(White);
-
-        let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
-
-        let game = game_builder.build().unwrap();
-        let board = game.get_board();
-        for (col, expected_type) in expected_piece_type.iter().enumerate() {
-            assert_eq!(
-                board.get_piece_at_space(col, 0).unwrap(),
-                &ChessPiece::new(*expected_type, White)
-            );
-            assert_eq!(
-                board.get_piece_at_space(col, 1).unwrap(),
-                &ChessPiece::new(Pawn, White)
-            );
-            assert!(board.get_piece_at_space(col, 2).is_none());
-            assert!(board.get_piece_at_space(col, 3).is_none());
-            assert!(board.get_piece_at_space(col, 4).is_none());
-            assert!(board.get_piece_at_space(col, 5).is_none());
-            assert_eq!(
-                board.get_piece_at_space(col, 6).unwrap(),
-                &ChessPiece::new(Pawn, Black)
-            );
-            assert_eq!(
-                board.get_piece_at_space(col, 7).unwrap(),
-                &ChessPiece::new(*expected_type, Black)
-            );
-        }
-    }
-
-    #[test]
-    fn parse_fen_board_from_invalid_string() {
-        let game_builder = ChessGameBuilder::new();
-
-        let result =
-            parse_board_from_string(game_builder, "rnbqkbnr/ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
-        match result {
-            Ok(_) => panic!("expected error"),
-            Err(e) => {
+                    board.get_piece_at_space(col, 0).unwrap(),
+                    &ChessPiece::new(*expected_type, White)
+                );
                 assert_eq!(
-                    "File 'ppppppp' was not 8 spaces long in piece placement data",
-                    e.reason
-                )
-            }
-        }
-
-        let starting_position_as_fen_string_missing_pawn =
-            "rnbqkbnr/fppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
-        let game_builder = ChessGameBuilder::new();
-
-        let result =
-            parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
-        match result {
-            Ok(_) => panic!("expected error"),
-            Err(e) => {
+                    board.get_piece_at_space(col, 1).unwrap(),
+                    &ChessPiece::new(Pawn, White)
+                );
+                assert!(board.get_piece_at_space(col, 2).is_none());
+                assert!(board.get_piece_at_space(col, 3).is_none());
+                assert!(board.get_piece_at_space(col, 4).is_none());
+                assert!(board.get_piece_at_space(col, 5).is_none());
                 assert_eq!(
-                    "Unexpected char 'f' in file 'fppppppp' of piece placement data",
-                    e.reason
-                )
+                    board.get_piece_at_space(col, 6).unwrap(),
+                    &ChessPiece::new(Pawn, Black)
+                );
+                assert_eq!(
+                    board.get_piece_at_space(col, 7).unwrap(),
+                    &ChessPiece::new(*expected_type, Black)
+                );
+            }
+
+            assert_eq!(White, game.get_current_players_turn());
+            assert_eq!((true, true, true, true), game.get_castling_rights());
+            assert_eq!(0, game.get_moves().len());
+            assert_eq!(0, game.get_50_move_rule_counter());
+            assert_eq!(1, game.get_turn_number());
+        }
+
+        #[test]
+        fn parse_fen_starting_position_to_board() {
+            let mut game_builder = ChessGameBuilder::new();
+
+            game_builder = parse_board_from_string(
+                game_builder,
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR",
+            )
+            .unwrap();
+            game_builder = game_builder.set_current_turn(White);
+
+            let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
+
+            let game = game_builder.build().unwrap();
+            let board = game.get_board();
+            for (col, expected_type) in expected_piece_type.iter().enumerate() {
+                assert_eq!(
+                    board.get_piece_at_space(col, 0).unwrap(),
+                    &ChessPiece::new(*expected_type, White)
+                );
+                assert_eq!(
+                    board.get_piece_at_space(col, 1).unwrap(),
+                    &ChessPiece::new(Pawn, White)
+                );
+                assert!(board.get_piece_at_space(col, 2).is_none());
+                assert!(board.get_piece_at_space(col, 3).is_none());
+                assert!(board.get_piece_at_space(col, 4).is_none());
+                assert!(board.get_piece_at_space(col, 5).is_none());
+                assert_eq!(
+                    board.get_piece_at_space(col, 6).unwrap(),
+                    &ChessPiece::new(Pawn, Black)
+                );
+                assert_eq!(
+                    board.get_piece_at_space(col, 7).unwrap(),
+                    &ChessPiece::new(*expected_type, Black)
+                );
             }
         }
-    }
 
-    #[test]
-    fn parse_fen_current_turn_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = parse_current_turn_from_string(game_builder, "w").unwrap();
-        game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
+        #[test]
+        fn parse_fen_board_from_invalid_string() {
+            let game_builder = ChessGameBuilder::new();
 
-        let game = game_builder.build().unwrap();
-        assert_eq!(White, game.get_current_players_turn());
-    }
+            let result =
+                parse_board_from_string(game_builder, "rnbqkbnr/ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR");
+            match result {
+                Ok(_) => panic!("expected error"),
+                Err(e) => {
+                    assert_eq!(
+                        "File 'ppppppp' was not 8 spaces long in piece placement data",
+                        e.reason
+                    )
+                }
+            }
 
-    #[test]
-    fn parse_fen_invalid_current_turn_string() {
-        let game_builder = ChessGameBuilder::new();
-        match parse_current_turn_from_string(game_builder, "J") {
-            Ok(_) => panic!("expected error"),
-            Err(e) => assert_eq!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received J", e.reason),
-        }
-    }
+            let starting_position_as_fen_string_missing_pawn =
+                "rnbqkbnr/fppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+            let game_builder = ChessGameBuilder::new();
 
-    #[test]
-    fn parse_fen_no_castling_rights_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_castling_rights_from_string(game_builder, "-").unwrap();
-
-        let game = game_builder.build().unwrap();
-        assert_eq!((false, false, false, false), game.get_castling_rights());
-    }
-
-    #[test]
-    fn parse_fen_all_castling_rights_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_castling_rights_from_string(game_builder, "KQkq").unwrap();
-
-        let game = game_builder.build().unwrap();
-        assert_eq!((true, true, true, true), game.get_castling_rights());
-    }
-
-    #[test]
-    fn parse_fen_invalid_castling_rights_string() {
-        let game_builder = ChessGameBuilder::new();
-        match parse_castling_rights_from_string(game_builder, "KQn") {
-            Ok(_) => panic!("expected error"),
-            Err(e) => assert_eq!("Unexpected char 'n' in castling rights string", e.reason),
-        }
-    }
-
-    #[test]
-    fn parse_fen_en_passant_string() {
-        // White Pawn
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_en_passant_option_from_string(game_builder, "e3").unwrap();
-
-        let game = game_builder.build().unwrap();
-        if let Some(ChessMoveType::Move {
-            original_position,
-            new_position,
-            piece,
-            taken_piece,
-            promotion,
-        }) = game.get_last_move()
-        {
-            assert_eq!(&(4, 1), original_position);
-            assert_eq!(&(4, 3), new_position);
-            assert_eq!(ChessPiece::new(Pawn, White), *piece);
-            assert!(taken_piece.is_none());
-            assert!(promotion.is_none());
+            let result =
+                parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
+            match result {
+                Ok(_) => panic!("expected error"),
+                Err(e) => {
+                    assert_eq!(
+                        "Unexpected char 'f' in file 'fppppppp' of piece placement data",
+                        e.reason
+                    )
+                }
+            }
         }
 
-        // Black Pawn
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_en_passant_option_from_string(game_builder, "e6").unwrap();
+        #[test]
+        fn parse_fen_current_turn_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = parse_current_turn_from_string(game_builder, "w").unwrap();
+            game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
 
-        let game = game_builder.build().unwrap();
-        if let Some(ChessMoveType::Move {
-            original_position,
-            new_position,
-            piece,
-            taken_piece,
-            promotion,
-        }) = game.get_last_move()
-        {
-            assert_eq!(&(4, 6), original_position);
-            assert_eq!(&(4, 4), new_position);
-            assert_eq!(ChessPiece::new(Pawn, Black), *piece);
-            assert!(taken_piece.is_none());
-            assert!(promotion.is_none());
+            let game = game_builder.build().unwrap();
+            assert_eq!(White, game.get_current_players_turn());
         }
-    }
 
-    #[test]
-    fn parse_fen_no_en_passant_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_en_passant_option_from_string(game_builder, "-").unwrap();
-
-        let game = game_builder.build().unwrap();
-        assert!(game.get_last_move().is_none());
-    }
-
-    #[test]
-    fn parse_fen_invalid_en_passant_string() {
-        let game_builder = ChessGameBuilder::new();
-        match parse_en_passant_option_from_string(game_builder, "_") {
-            Ok(_) => panic!("expected error"),
-            Err(e) => assert_eq!(
-                "unable to parse en passant square '_' into a board position: Invalid input",
-                e.reason
-            ),
+        #[test]
+        fn parse_fen_invalid_current_turn_string() {
+            let game_builder = ChessGameBuilder::new();
+            match parse_current_turn_from_string(game_builder, "J") {
+                Ok(_) => panic!("expected error"),
+                Err(e) => assert_eq!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received J", e.reason),
+            }
         }
-    }
 
-    #[test]
-    fn parse_fen_half_move_counter_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_half_turn_counter_from_string(game_builder, "32").unwrap();
+        #[test]
+        fn parse_fen_no_castling_rights_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_castling_rights_from_string(game_builder, "-").unwrap();
 
-        let game = game_builder.build().unwrap();
-        assert_eq!(32, game.get_50_move_rule_counter());
-    }
-
-    #[test]
-    fn parse_fen_invalid_move_counter_string() {
-        let game_builder = ChessGameBuilder::new();
-        match parse_half_turn_counter_from_string(game_builder, "_") {
-            Ok(_) => panic!("expected error"),
-            Err(e) => assert_eq!(
-                "Unable to parse '_' into unsigned int for half turn count",
-                e.reason
-            ),
+            let game = game_builder.build().unwrap();
+            assert_eq!((false, false, false, false), game.get_castling_rights());
         }
-    }
 
-    #[test]
-    fn parse_fen_turn_counter_string() {
-        let mut game_builder = ChessGameBuilder::new();
-        game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
-        game_builder = game_builder.set_current_turn(White);
-        game_builder = parse_turn_number_from_string(game_builder, "15").unwrap();
+        #[test]
+        fn parse_fen_all_castling_rights_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(1, 1).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_castling_rights_from_string(game_builder, "KQkq").unwrap();
 
-        let game = game_builder.build().unwrap();
-        assert_eq!(15, game.get_turn_number());
-    }
+            let game = game_builder.build().unwrap();
+            assert_eq!((true, true, true, true), game.get_castling_rights());
+        }
 
-    #[test]
-    fn parse_fen_invalid_turn_counter_string() {
-        let game_builder = ChessGameBuilder::new();
-        match parse_turn_number_from_string(game_builder, "ns") {
-            Ok(_) => panic!("expected error"),
-            Err(e) => assert_eq!(
-                "unable to parse 'ns' into unsigned int for turn count",
-                e.reason
-            ),
+        #[test]
+        fn parse_fen_invalid_castling_rights_string() {
+            let game_builder = ChessGameBuilder::new();
+            match parse_castling_rights_from_string(game_builder, "KQn") {
+                Ok(_) => panic!("expected error"),
+                Err(e) => assert_eq!("Unexpected char 'n' in castling rights string", e.reason),
+            }
+        }
+
+        #[test]
+        fn parse_fen_en_passant_string() {
+            // White Pawn
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_en_passant_option_from_string(game_builder, "e3").unwrap();
+
+            let game = game_builder.build().unwrap();
+            if let Some(ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                promotion,
+            }) = game.get_last_move()
+            {
+                assert_eq!(&(4, 1), original_position);
+                assert_eq!(&(4, 3), new_position);
+                assert_eq!(ChessPiece::new(Pawn, White), *piece);
+                assert!(taken_piece.is_none());
+                assert!(promotion.is_none());
+            }
+
+            // Black Pawn
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_en_passant_option_from_string(game_builder, "e6").unwrap();
+
+            let game = game_builder.build().unwrap();
+            if let Some(ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                promotion,
+            }) = game.get_last_move()
+            {
+                assert_eq!(&(4, 6), original_position);
+                assert_eq!(&(4, 4), new_position);
+                assert_eq!(ChessPiece::new(Pawn, Black), *piece);
+                assert!(taken_piece.is_none());
+                assert!(promotion.is_none());
+            }
+        }
+
+        #[test]
+        fn parse_fen_no_en_passant_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_en_passant_option_from_string(game_builder, "-").unwrap();
+
+            let game = game_builder.build().unwrap();
+            assert!(game.get_last_move().is_none());
+        }
+
+        #[test]
+        fn parse_fen_invalid_en_passant_string() {
+            let game_builder = ChessGameBuilder::new();
+            match parse_en_passant_option_from_string(game_builder, "_") {
+                Ok(_) => panic!("expected error"),
+                Err(e) => assert_eq!(
+                    "unable to parse en passant square '_' into a board position: Invalid input",
+                    e.reason
+                ),
+            }
+        }
+
+        #[test]
+        fn parse_fen_half_move_counter_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_half_turn_counter_from_string(game_builder, "32").unwrap();
+
+            let game = game_builder.build().unwrap();
+            assert_eq!(32, game.get_50_move_rule_counter());
+        }
+
+        #[test]
+        fn parse_fen_invalid_move_counter_string() {
+            let game_builder = ChessGameBuilder::new();
+            match parse_half_turn_counter_from_string(game_builder, "_") {
+                Ok(_) => panic!("expected error"),
+                Err(e) => assert_eq!(
+                    "Unable to parse '_' into unsigned int for half turn count",
+                    e.reason
+                ),
+            }
+        }
+
+        #[test]
+        fn parse_fen_turn_counter_string() {
+            let mut game_builder = ChessGameBuilder::new();
+            game_builder = game_builder.set_board(Board::build(8, 8).unwrap());
+            game_builder = game_builder.set_current_turn(White);
+            game_builder = parse_turn_number_from_string(game_builder, "15").unwrap();
+
+            let game = game_builder.build().unwrap();
+            assert_eq!(15, game.get_turn_number());
+        }
+
+        #[test]
+        fn parse_fen_invalid_turn_counter_string() {
+            let game_builder = ChessGameBuilder::new();
+            match parse_turn_number_from_string(game_builder, "ns") {
+                Ok(_) => panic!("expected error"),
+                Err(e) => assert_eq!(
+                    "unable to parse 'ns' into unsigned int for turn count",
+                    e.reason
+                ),
+            }
         }
     }
 }
