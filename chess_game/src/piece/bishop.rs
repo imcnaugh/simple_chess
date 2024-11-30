@@ -39,6 +39,7 @@ pub fn possible_moves(
                         taken_piece: Some(*piece),
                         promotion: None,
                     });
+                    break;
                 } else {
                     break;
                 }
@@ -63,8 +64,9 @@ pub fn possible_moves(
 mod tests {
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::{King, Pawn, Queen};
     use crate::ChessMoveType::Move;
-    use game_board::get_square_name_from_row_and_col;
+    use crate::Color::{Black, White};
 
     #[test]
     fn bishop_movement() {
@@ -115,15 +117,6 @@ mod tests {
         let board = game.get_board();
 
         let moves = white_bishop.possible_moves((2, 5), board, None);
-        for m in &moves {
-            if let Move { new_position, .. } = m {
-                println!(
-                    "{}",
-                    get_square_name_from_row_and_col(new_position.0, new_position.1)
-                );
-            }
-        }
-
         assert_eq!(6, moves.len());
 
         [(0, 7), (0, 3), (1, 6), (1, 4), (3, 6), (4, 7)].map(|(new_col, new_row)| {
@@ -132,6 +125,46 @@ mod tests {
                 new_position: (new_col, new_row),
                 piece: ChessPiece::new(PieceType::Bishop, Color::White),
                 taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn bishop_can_take() {
+        let black_bishop = ChessPiece {
+            piece_type: PieceType::Bishop,
+            color: Black,
+        };
+        let game = build_game_from_string("8/1P1Q4/2b5/3K4/8/8/8/8 w KQkq - 0 1").unwrap();
+        let board = game.get_board();
+
+        println!("{}", board);
+
+        let moves = black_bishop.possible_moves((2, 5), board, None);
+
+        for m in &moves {
+            println!("{:?}", m);
+        }
+
+        [
+            (0, 3, None),
+            (1, 4, None),
+            (1, 6, Some(Pawn)),
+            (3, 4, Some(King)),
+            (3, 6, Some(Queen)),
+        ]
+        .map(|(new_col, new_row, take)| {
+            let taken_piece = match take {
+                None => None,
+                Some(t) => Some(ChessPiece::new(t, White)),
+            };
+            let expected_move = Move {
+                original_position: (2, 5),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(PieceType::Bishop, Black),
+                taken_piece,
                 promotion: None,
             };
             assert!(moves.contains(&expected_move));
