@@ -61,10 +61,10 @@ pub fn possible_moves(
 
 #[cfg(test)]
 mod tests {
-    use game_board::get_square_name_from_row_and_col;
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
     use crate::ChessMoveType::Move;
+    use game_board::get_square_name_from_row_and_col;
 
     #[test]
     fn bishop_movement() {
@@ -114,34 +114,27 @@ mod tests {
         let game = build_game_from_string("8/8/2B5/3K4/8/8/8/8 w KQkq - 0 1").unwrap();
         let board = game.get_board();
 
-        println!("{board}");
-
         let moves = white_bishop.possible_moves((2, 5), board, None);
         for m in &moves {
-            if let Move{ new_position, ..} = m {
-                println!("{}", get_square_name_from_row_and_col(new_position.0, new_position.1));
+            if let Move { new_position, .. } = m {
+                println!(
+                    "{}",
+                    get_square_name_from_row_and_col(new_position.0, new_position.1)
+                );
             }
         }
 
         assert_eq!(6, moves.len());
 
-        [
-            (0, 7),
-            (0, 3),
-            (1, 6),
-            (1, 4),
-            (3, 6),
-            (4, 7),
-        ]
-            .map(|(new_col, new_row)| {
-                let expected_move = Move {
-                    original_position: (2, 5),
-                    new_position: (new_col, new_row),
-                    piece: ChessPiece::new(PieceType::Bishop, Color::White),
-                    taken_piece: None,
-                    promotion: None,
-                };
-                assert!(moves.contains(&expected_move));
-            });
+        [(0, 7), (0, 3), (1, 6), (1, 4), (3, 6), (4, 7)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (2, 5),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(PieceType::Bishop, Color::White),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
     }
 }
