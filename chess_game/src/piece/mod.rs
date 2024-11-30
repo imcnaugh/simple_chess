@@ -1,7 +1,7 @@
-use std::fmt::{Display, Formatter};
 use crate::chess_move::ChessMoveType;
 use crate::Color;
 use game_board::Board;
+use std::fmt::{Display, Formatter};
 use std::thread::current;
 
 mod bishop;

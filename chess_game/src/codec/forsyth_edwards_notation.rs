@@ -5,6 +5,8 @@ use crate::ChessMoveType::EnPassant;
 use crate::Color;
 use crate::Color::{Black, White};
 use game_board::Board;
+use std::error::Error;
+use std::fmt::{Debug, Display, Formatter};
 
 /// Encodes the current state of the chess game as a string in FEN (Forsyth-Edwards Notation) format.
 ///
@@ -41,10 +43,12 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
     )
 }
 
-pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
+pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, ForsythEdwardsNotationError> {
     let fen_string = fen_string.trim();
     if fen_string.is_empty() {
-        return Err("argument must be a string in Forsyth–Edwards Notation");
+        return Err(ForsythEdwardsNotationError::new(
+            "argument must be a string in Forsyth–Edwards Notation".to_string(),
+        ));
     }
 
     let steps = [
@@ -63,20 +67,25 @@ pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, &str> {
         if let Some(next) = parts.next() {
             builder = match step(builder, next) {
                 Ok(g) => g,
-                Err(e) => panic!("{}", e),
+                Err(e) => return Err(e),
             };
         } else {
-            return Err("Missing some parts of the string");
+            return Err(ForsythEdwardsNotationError::new(
+                "Missing some parts of the string".to_string(),
+            ));
         }
     }
 
-    builder.build()
+    match builder.build() {
+        Ok(g) => Ok(g),
+        Err(e) => Err(ForsythEdwardsNotationError::new(e.to_string())),
+    }
 }
 
 fn parse_board_from_string(
     builder: ChessGameBuilder,
     board_as_fen_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     let mut board = Board::build(8, 8).unwrap();
 
     let mut files = board_as_fen_string.split("/");
@@ -91,21 +100,24 @@ fn parse_board_from_string(
                     col += c.to_digit(10).unwrap() as usize;
                 }
                 _ => {
-                    let piece = match c {
-                        'P' => ChessPiece::new(PieceType::Pawn, White),
-                        'p' => ChessPiece::new(PieceType::Pawn, Black),
-                        'R' => ChessPiece::new(PieceType::Rook, White),
-                        'r' => ChessPiece::new(PieceType::Rook, Black),
-                        'N' => ChessPiece::new(PieceType::Knight, White),
-                        'n' => ChessPiece::new(PieceType::Knight, Black),
-                        'B' => ChessPiece::new(PieceType::Bishop, White),
-                        'b' => ChessPiece::new(PieceType::Bishop, Black),
-                        'Q' => ChessPiece::new(PieceType::Queen, White),
-                        'q' => ChessPiece::new(PieceType::Queen, Black),
-                        'K' => ChessPiece::new(PieceType::King, White),
-                        'k' => ChessPiece::new(PieceType::King, Black),
-                        _ => panic!("Invalid piece character in FEN string"),
-                    };
+                    let piece =
+                        match c {
+                            'P' => ChessPiece::new(PieceType::Pawn, White),
+                            'p' => ChessPiece::new(PieceType::Pawn, Black),
+                            'R' => ChessPiece::new(PieceType::Rook, White),
+                            'r' => ChessPiece::new(PieceType::Rook, Black),
+                            'N' => ChessPiece::new(PieceType::Knight, White),
+                            'n' => ChessPiece::new(PieceType::Knight, Black),
+                            'B' => ChessPiece::new(PieceType::Bishop, White),
+                            'b' => ChessPiece::new(PieceType::Bishop, Black),
+                            'Q' => ChessPiece::new(PieceType::Queen, White),
+                            'q' => ChessPiece::new(PieceType::Queen, Black),
+                            'K' => ChessPiece::new(PieceType::King, White),
+                            'k' => ChessPiece::new(PieceType::King, Black),
+                            _ => return Err(ForsythEdwardsNotationError::new(format!(
+                                "Unexpected char '{c}' in file '{file}' of piece placement data"
+                            ))),
+                        };
                     board.place_piece(piece, col, row);
                     col += 1;
                 }
@@ -113,51 +125,53 @@ fn parse_board_from_string(
         }
 
         if col != 8 {
-            return Err("Invalid FEN string, file {} is not complete", file);
+            return Err(ForsythEdwardsNotationError::new(format!(
+                "File '{file}' was not 8 spaces long in piece placement data"
+            )));
         }
 
         col = 0;
     }
-    
+
     Ok(builder.set_board(board))
 }
 
 fn parse_current_turn_from_string(
     builder: ChessGameBuilder,
     current_turn_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     match current_turn_string {
-        "w" => {Ok(builder.set_current_turn(White))},
-        "b" => {Ok(builder.set_current_turn(Black))},
-        _ => panic!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received {}", current_turn_string)
+        "w" => Ok(builder.set_current_turn(White)),
+        "b" => Ok(builder.set_current_turn(Black)),
+        _ => Err(ForsythEdwardsNotationError::new(format!("encountered unexpected token parsing turn from FEN string, Expected 'w' or 'b', received {current_turn_string}")))
     }
 }
 
 fn parse_castling_rights_from_string(
     builder: ChessGameBuilder,
     castling_rights_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     todo!()
 }
 
 fn parse_en_passant_option_from_string(
     builder: ChessGameBuilder,
     en_passent_option_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     todo!()
 }
 
 fn parse_half_turn_counter_from_string(
     builder: ChessGameBuilder,
     half_turn_counter_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     todo!()
 }
 
 fn parse_turn_number_from_string(
     builder: ChessGameBuilder,
     turn_number_string: &str,
-) -> Result<ChessGameBuilder, &str> {
+) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
     todo!()
 }
 
@@ -196,8 +210,8 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
 
 fn get_current_turn_char(game: &ChessGame) -> char {
     let current_turn = match game.get_current_players_turn() {
-        Color::White => 'w',
-        Color::Black => 'b',
+        White => 'w',
+        Black => 'b',
     };
     current_turn
 }
@@ -248,10 +262,34 @@ fn get_en_passent(game: &ChessGame) -> String {
     }
 }
 
+pub struct ForsythEdwardsNotationError {
+    reason: String,
+}
+
+impl ForsythEdwardsNotationError {
+    fn new(reason: String) -> Self {
+        Self { reason }
+    }
+}
+
+impl Display for ForsythEdwardsNotationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Forsyth-Edwards Notation Error: {}", self.reason)
+    }
+}
+
+impl Debug for ForsythEdwardsNotationError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Forsyth-EdwardsNotationError: {}", self.reason)
+    }
+}
+
+impl Error for ForsythEdwardsNotationError {}
+
 #[cfg(test)]
 mod tests {
-    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
     use super::*;
+    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 
     #[test]
     fn building_game_from_empty_string() {
@@ -261,7 +299,10 @@ mod tests {
                 panic!("expected error")
             }
             Err(e) => {
-                assert_eq!("argument must be a string in Forsyth–Edwards Notation", e)
+                assert_eq!(
+                    "argument must be a string in Forsyth–Edwards Notation",
+                    e.reason
+                )
             }
         }
     }
@@ -277,11 +318,11 @@ mod tests {
 
     #[test]
     fn parse_fen_starting_position_to_board() {
-        let starting_position_as_fen_string =
-            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        let starting_position_as_fen_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         let mut game_builder = ChessGameBuilder::new();
 
-        game_builder = parse_board_from_string(game_builder, starting_position_as_fen_string).unwrap();
+        game_builder =
+            parse_board_from_string(game_builder, starting_position_as_fen_string).unwrap();
         game_builder = game_builder.set_current_turn(White);
 
         let expected_piece_type = [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook];
@@ -289,27 +330,61 @@ mod tests {
         let game = game_builder.build().unwrap();
         let board = game.get_board();
         for (col, expected_type) in expected_piece_type.iter().enumerate() {
-            assert_eq!(board.get_piece_at_space(col, 0).unwrap(), &ChessPiece::new(*expected_type, White));
-            assert_eq!(board.get_piece_at_space(col, 1).unwrap(), &ChessPiece::new(Pawn, White));
+            assert_eq!(
+                board.get_piece_at_space(col, 0).unwrap(),
+                &ChessPiece::new(*expected_type, White)
+            );
+            assert_eq!(
+                board.get_piece_at_space(col, 1).unwrap(),
+                &ChessPiece::new(Pawn, White)
+            );
             assert!(board.get_piece_at_space(col, 2).is_none());
             assert!(board.get_piece_at_space(col, 3).is_none());
             assert!(board.get_piece_at_space(col, 4).is_none());
             assert!(board.get_piece_at_space(col, 5).is_none());
-            assert_eq!(board.get_piece_at_space(col, 6).unwrap(), &ChessPiece::new(Pawn, Black));
-            assert_eq!(board.get_piece_at_space(col, 7).unwrap(), &ChessPiece::new(*expected_type, Black));
+            assert_eq!(
+                board.get_piece_at_space(col, 6).unwrap(),
+                &ChessPiece::new(Pawn, Black)
+            );
+            assert_eq!(
+                board.get_piece_at_space(col, 7).unwrap(),
+                &ChessPiece::new(*expected_type, Black)
+            );
         }
     }
 
     #[test]
-    fn parse_fen_board_string_panics() {
+    fn parse_fen_board_from_invalid_string() {
         let starting_position_as_fen_string_missing_pawn =
             "rnbqkbnr/ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
         let game_builder = ChessGameBuilder::new();
 
-        let result = parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
+        let result =
+            parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
         match result {
             Ok(_) => panic!("expected error"),
-            Err(e) => {assert_eq!("Invalid FEN string, file ppppppp is not complete", e)}
+            Err(e) => {
+                assert_eq!(
+                    "File 'ppppppp' was not 8 spaces long in piece placement data",
+                    e.reason
+                )
+            }
+        }
+
+        let starting_position_as_fen_string_missing_pawn =
+            "rnbqkbnr/fppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR";
+        let game_builder = ChessGameBuilder::new();
+
+        let result =
+            parse_board_from_string(game_builder, starting_position_as_fen_string_missing_pawn);
+        match result {
+            Ok(_) => panic!("expected error"),
+            Err(e) => {
+                assert_eq!(
+                    "Unexpected char 'f' in file 'fppppppp' of piece placement data",
+                    e.reason
+                )
+            }
         }
     }
 }
