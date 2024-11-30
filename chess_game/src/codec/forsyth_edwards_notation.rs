@@ -56,6 +56,15 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
 ///
 /// A `Result` which is `Ok` if the `ChessGame` was built successfully, or an `Err` containing
 /// a `ForsythEdwardsNotationError` if the FEN string is invalid or cannot be parsed.
+///
+/// # Example
+/// ```
+/// use chess_game::codec::forsyth_edwards_notation::build_game_from_string;
+///
+/// let starting_position_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+/// let game = build_game_from_string(starting_position_string);
+/// assert!(game.is_ok());
+/// ```
 pub fn build_game_from_string(fen_string: &str) -> Result<ChessGame, ForsythEdwardsNotationError> {
     let fen_string = fen_string.trim();
     if fen_string.is_empty() {
