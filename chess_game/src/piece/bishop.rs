@@ -20,7 +20,7 @@ pub fn as_fen_char(color: Color) -> char {
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),
-    board: Board<ChessPiece>,
+    board: &Board<ChessPiece>,
 ) -> Vec<ChessMoveType> {
     let mut possible_moves: Vec<ChessMoveType> = Vec::new();
 
@@ -55,4 +55,52 @@ pub fn possible_moves(
     }
 
     possible_moves
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::ChessMoveType::Move;
+
+    #[test]
+    fn bishop_movement() {
+        let white_bishop = ChessPiece {
+            piece_type: PieceType::Bishop,
+            color: Color::White,
+        };
+        let game = build_game_from_string("8/8/2B5/8/8/8/8/8 w KQkq - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_bishop.possible_moves((2, 2), board, None);
+        assert_eq!(moves.len(), 11);
+
+        let expected_new_positions = [
+            (0, 0),
+            (0, 4),
+            (1, 1),
+            (1, 3),
+            (3, 1),
+            (3, 3),
+            (4, 0),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+        ];
+
+        let expected_moves = expected_new_positions.map(|(new_col, new_row)| -> ChessMoveType {
+            Move {
+                original_position: (2, 2),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(PieceType::Bishop, Color::White),
+                taken_piece: None,
+                promotion: None,
+            }
+        });
+
+        for expected_move in expected_moves {
+            assert!(moves.contains(&expected_move));
+        }
+    }
 }

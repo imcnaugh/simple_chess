@@ -27,7 +27,7 @@ pub fn as_fen_char(color: Color) -> char {
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),
-    board: Board<ChessPiece>,
+    board: &Board<ChessPiece>,
     last_move_type: Option<ChessMoveType>,
 ) -> Vec<ChessMoveType> {
     let mut possible_moves: Vec<ChessMoveType> = Vec::new();

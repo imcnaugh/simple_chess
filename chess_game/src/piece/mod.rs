@@ -151,13 +151,13 @@ impl ChessPiece {
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// let board = Board::build(8, 8).unwrap();
-    /// let moves = white_king.possible_moves((0, 4), board, None);
+    /// let moves = white_king.possible_moves((0, 4), &board, None);
     /// assert_eq!(5, moves.len());
     /// ```
     pub fn possible_moves(
         &self,
         position: (usize, usize),
-        board: Board<ChessPiece>,
+        board: &Board<ChessPiece>,
         last_move: Option<ChessMoveType>,
     ) -> Vec<ChessMoveType> {
         match self.piece_type {
