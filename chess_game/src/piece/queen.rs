@@ -64,3 +64,55 @@ pub fn possible_moves(
 
     possible_moves
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::Queen;
+    use crate::ChessMoveType::Move;
+    use crate::Color::White;
+
+    #[test]
+    fn queen_can_move_freely() {
+        let white_queen = ChessPiece::new(Queen, White);
+        let game = build_game_from_string("8/8/8/8/8/5Q2/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_queen.possible_moves((5, 2), board, None);
+        assert_eq!(25, moves.len());
+
+        [
+            (4, 1),
+            (3, 0),
+            (5, 1),
+            (5, 0),
+            (6, 1),
+            (7, 0),
+            (6, 2),
+            (7, 2),
+            (6, 3),
+            (7, 4),
+            (5, 3),
+            (5, 4),
+            (5, 5),
+            (5, 6),
+            (5, 7),
+            (4, 3),
+            (3, 4),
+            (2, 5),
+            (1, 6),
+            (0, 7),
+        ]
+        .map(|new_position| {
+            let expected_move = Move {
+                original_position: (5, 2),
+                new_position: new_position,
+                piece: ChessPiece::new(Queen, White),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+}

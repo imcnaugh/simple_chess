@@ -245,7 +245,7 @@ fn create_possible_en_passant(
 mod tests {
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
-    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen};
+    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
     use crate::ChessMoveType::{EnPassant, Move};
     use crate::Color::{Black, White};
 
@@ -481,5 +481,49 @@ mod tests {
             promotion: None,
         };
         assert_eq!(expected_move, moves[0]);
+    }
+
+    #[test]
+    fn white_pawn_can_promote() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/P7/8/8/8/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((0, 6), board, game.get_last_move());
+
+        assert_eq!(4, moves.len());
+
+        [Queen, Rook, Bishop, Knight].map(|promotion_option| {
+            let expected_move = Move {
+                original_position: (0, 6),
+                new_position: (0, 7),
+                piece: ChessPiece::new(Pawn, White),
+                taken_piece: None,
+                promotion: Some(ChessPiece::new(promotion_option, White)),
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn black_pawn_can_promote() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/8/8/8/8/8/6p1/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((6, 1), board, game.get_last_move());
+
+        assert_eq!(4, moves.len());
+
+        [Queen, Rook, Bishop, Knight].map(|promotion_option| {
+            let expected_move = Move {
+                original_position: (6, 1),
+                new_position: (6, 0),
+                piece: ChessPiece::new(Pawn, Black),
+                taken_piece: None,
+                promotion: Some(ChessPiece::new(promotion_option, Black)),
+            };
+            assert!(moves.contains(&expected_move));
+        });
     }
 }
