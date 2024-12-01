@@ -1,5 +1,5 @@
+pub mod chess_game_builder;
 mod chess_game;
-mod chess_game_builder;
 mod color;
 pub mod piece;
 

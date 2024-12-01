@@ -11,3 +11,5 @@ members = [
 
 [dependencies]
 rand = "0.8.5"
+chess_game = { path = "chess_game" }
+game_board = { path = "game_board" }

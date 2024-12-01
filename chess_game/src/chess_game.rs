@@ -2,6 +2,8 @@ use crate::chess_move::ChessMoveType;
 use crate::piece::ChessPiece;
 use crate::Color;
 use game_board::Board;
+use crate::Color::{Black, White};
+use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 
 pub struct ChessGame {
     board: Board<ChessPiece>,
@@ -13,6 +15,19 @@ pub struct ChessGame {
     can_black_castle_short: bool,
     can_black_castle_long: bool,
     moves: Vec<ChessMoveType>,
+}
+
+fn build_board_with_starting_position() -> Board<ChessPiece> {
+    let mut board = Board::<ChessPiece>::build(8, 8).unwrap();
+
+    for (col, piece_type) in [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook].iter().enumerate() {
+        board.place_piece(ChessPiece::new(*piece_type, Black), col, 7);
+        board.place_piece(ChessPiece::new(Pawn, Black), col, 6);
+        board.place_piece(ChessPiece::new(Pawn, White), col, 1);
+        board.place_piece(ChessPiece::new(*piece_type, White), col, 0);
+    }
+
+    board
 }
 
 impl ChessGame {
@@ -34,9 +49,8 @@ impl ChessGame {
     /// ```
     pub fn new() -> ChessGame {
         ChessGame {
-            // TODO setup the board in starting position
-            board: Board::<ChessPiece>::build(8, 8).unwrap(),
-            current_players_turn: Color::White,
+            board: build_board_with_starting_position(),
+            current_players_turn: White,
             turn_number: 1,
             fifty_move_rule_counter: 0,
             can_white_castle_short: true,
@@ -188,5 +202,18 @@ impl ChessGame {
     /// ```
     pub fn get_last_move(&self) -> Option<&ChessMoveType> {
         self.moves.last()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::codec::forsyth_edwards_notation::encode_game_as_string;
+    use super::*;
+
+    #[test]
+    fn new_game_start_correctly() {
+        let game = ChessGame::new();
+        let fen_string = encode_game_as_string(&game);
+        assert_eq!("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", fen_string);
     }
 }
