@@ -64,3 +64,106 @@ pub fn possible_moves(
 
     possible_moves
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+    use crate::ChessMoveType::Move;
+    use crate::Color::{Black, White};
+
+    #[test]
+    fn knight_can_move_to_open_spaces() {
+        let black_knight = ChessPiece::new(Knight, Black);
+        let game = build_game_from_string("8/8/8/8/4n3/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_knight.possible_moves((4, 3), board, None);
+        assert_eq!(8, moves.len());
+
+        [
+            (2, 2),
+            (3, 1),
+            (5, 1),
+            (6, 2),
+            (2, 4),
+            (3, 5),
+            (5, 5),
+            (6, 4),
+        ]
+        .map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (4, 3),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Knight, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn knight_respects_board_boundaries() {
+        let black_knight = ChessPiece::new(Knight, Black);
+        let game = build_game_from_string("8/8/8/8/8/8/8/n7 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_knight.possible_moves((0, 0), board, None);
+        assert_eq!(2, moves.len());
+
+        [(1, 2), (2, 1)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (0, 0),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Knight, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn knight_respects_teammates() {
+        let black_knight = ChessPiece::new(Knight, Black);
+        let game = build_game_from_string("8/8/3n1q2/2b3r1/4n3/2b3r1/3p1p2/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_knight.possible_moves((4, 3), board, None);
+        assert_eq!(0, moves.len());
+    }
+
+    #[test]
+    fn knight_yeets_onto_opponents() {
+        let black_knight = ChessPiece::new(Knight, White);
+        let game =
+            build_game_from_string("8/8/3n1q2/2bPPPr1/3PNP2/2bPPPr1/3p1p2/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_knight.possible_moves((4, 3), board, None);
+        assert_eq!(8, moves.len());
+
+        [
+            (2, 2, Bishop),
+            (3, 1, Pawn),
+            (5, 1, Pawn),
+            (6, 2, Rook),
+            (6, 4, Rook),
+            (5, 5, Queen),
+            (3, 5, Knight),
+            (2, 4, Bishop),
+        ]
+        .map(|(new_col, new_row, taken_piece)| {
+            let expected_move = Move {
+                original_position: (4, 3),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Knight, White),
+                taken_piece: Some(ChessPiece::new(taken_piece, Black)),
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+}
