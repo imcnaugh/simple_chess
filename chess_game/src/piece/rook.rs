@@ -39,6 +39,7 @@ pub fn possible_moves(
                         promotion: None,
                     });
                 }
+                break;
             } else {
                 possible_moves.push(ChessMoveType::Move {
                     original_position: position,
@@ -54,4 +55,112 @@ pub fn possible_moves(
     }
 
     possible_moves
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::{Bishop, Knight, Pawn, Rook};
+    use crate::ChessMoveType::Move;
+    use crate::Color::{Black, White};
+
+    #[test]
+    fn rook_can_move_freely() {
+        let black_rook = ChessPiece::new(Rook, Black);
+        let game = build_game_from_string("8/8/6r1/8/8/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_rook.possible_moves((6, 5), board, None);
+        assert_eq!(14, moves.len());
+
+        [
+            (6, 6),
+            (6, 7),
+            (7, 5),
+            (6, 4),
+            (6, 3),
+            (6, 2),
+            (6, 1),
+            (6, 0),
+            (5, 5),
+            (4, 5),
+            (3, 5),
+            (2, 5),
+            (1, 5),
+            (0, 5),
+        ]
+        .map(|new_position| {
+            let expected_move = Move {
+                original_position: (6, 5),
+                new_position,
+                piece: ChessPiece::new(Rook, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn rook_is_blocked_by_teammates() {
+        let black_rook = ChessPiece::new(Rook, Black);
+        let game = build_game_from_string("6n1/8/3q2rp/8/8/8/6b1/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        println!("{board}");
+
+        let moves = black_rook.possible_moves((6, 5), board, None);
+        assert_eq!(6, moves.len());
+
+        [(6, 6), (6, 4), (6, 3), (6, 2), (5, 5), (4, 5)].map(|new_position| {
+            let expected_move = Move {
+                original_position: (6, 5),
+                new_position,
+                piece: ChessPiece::new(Rook, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn rook_can_take_opponent() {
+        let black_rook = ChessPiece::new(Rook, Black);
+        let game = build_game_from_string("6N1/8/3P2rP/8/8/8/6B1/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        println!("{board}");
+
+        let moves = black_rook.possible_moves((6, 5), board, None);
+        assert_eq!(10, moves.len());
+
+        [
+            ((6, 6), None),
+            ((6, 4), None),
+            ((6, 3), None),
+            ((6, 2), None),
+            ((5, 5), None),
+            ((4, 5), None),
+            ((3, 5), Some(Pawn)),
+            ((6, 7), Some(Knight)),
+            ((7, 5), Some(Pawn)),
+            ((6, 1), Some(Bishop)),
+        ]
+        .map(|(new_position, taken_piece)| {
+            let taken_piece = match taken_piece {
+                Some(piece) => Some(ChessPiece::new(piece, White)),
+                None => None,
+            };
+            let expected_move = Move {
+                original_position: (6, 5),
+                new_position,
+                piece: ChessPiece::new(Rook, Black),
+                taken_piece,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
 }
