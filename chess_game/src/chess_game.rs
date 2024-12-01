@@ -1,9 +1,9 @@
 use crate::chess_move::ChessMoveType;
 use crate::piece::ChessPiece;
-use crate::Color;
-use game_board::Board;
-use crate::Color::{Black, White};
 use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+use crate::Color;
+use crate::Color::{Black, White};
+use game_board::Board;
 
 pub struct ChessGame {
     board: Board<ChessPiece>,
@@ -20,7 +20,10 @@ pub struct ChessGame {
 fn build_board_with_starting_position() -> Board<ChessPiece> {
     let mut board = Board::<ChessPiece>::build(8, 8).unwrap();
 
-    for (col, piece_type) in [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook].iter().enumerate() {
+    for (col, piece_type) in [Rook, Knight, Bishop, Queen, King, Bishop, Knight, Rook]
+        .iter()
+        .enumerate()
+    {
         board.place_piece(ChessPiece::new(*piece_type, Black), col, 7);
         board.place_piece(ChessPiece::new(Pawn, Black), col, 6);
         board.place_piece(ChessPiece::new(Pawn, White), col, 1);
@@ -207,13 +210,16 @@ impl ChessGame {
 
 #[cfg(test)]
 mod tests {
-    use crate::codec::forsyth_edwards_notation::encode_game_as_string;
     use super::*;
+    use crate::codec::forsyth_edwards_notation::encode_game_as_string;
 
     #[test]
     fn new_game_start_correctly() {
         let game = ChessGame::new();
         let fen_string = encode_game_as_string(&game);
-        assert_eq!("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", fen_string);
+        assert_eq!(
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            fen_string
+        );
     }
 }
