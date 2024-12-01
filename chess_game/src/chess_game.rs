@@ -96,7 +96,6 @@ impl ChessGame {
         &self.board
     }
 
-
     /// Get a mutable reference to the board
     ///
     /// This method provides mutable access to the chess board, allowing for

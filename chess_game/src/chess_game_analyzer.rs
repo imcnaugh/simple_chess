@@ -1,7 +1,7 @@
 use crate::piece::ChessPiece;
+use crate::piece::PieceType::King;
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
-use crate::piece::PieceType::King;
 
 pub fn get_legal_moves(mut game: ChessGame) -> Vec<ChessMoveType> {
     let current_turn = game.get_current_players_turn();
@@ -9,13 +9,16 @@ pub fn get_legal_moves(mut game: ChessGame) -> Vec<ChessMoveType> {
     let board = game.get_board();
 
     let all_moves = get_all_moves_for_color(current_turn.opposite(), board, last_move);
-    all_moves.into_iter().filter(|possible_move| {
-        let board = game.get_board_mut();
-        possible_move.make_move(board);
-        let in_check = is_in_check(current_turn, &board, Some(possible_move));
-        possible_move.undo_move(board);
-        !in_check
-    }).collect::<Vec<ChessMoveType>>()
+    all_moves
+        .into_iter()
+        .filter(|possible_move| {
+            let board = game.get_board_mut();
+            possible_move.make_move(board);
+            let in_check = is_in_check(current_turn, &board, Some(possible_move));
+            possible_move.undo_move(board);
+            !in_check
+        })
+        .collect::<Vec<ChessMoveType>>()
 }
 
 fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&ChessMoveType>) -> bool {
@@ -29,13 +32,13 @@ fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&Chess
                             ChessMoveType::Move { taken_piece, .. } => {
                                 if let Some(taken_piece) = taken_piece {
                                     if taken_piece.get_piece_type() == King {
-                                        return true
+                                        return true;
                                     }
                                 }
                             }
                             ChessMoveType::EnPassant { taken_piece, .. } => {
                                 if taken_piece.get_piece_type() == King {
-                                    return true
+                                    return true;
                                 }
                             }
                         }
@@ -47,7 +50,11 @@ fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&Chess
     false
 }
 
-fn get_all_moves_for_color(color: Color, board: &Board<ChessPiece>, last_move: Option<&ChessMoveType>) -> Vec<ChessMoveType> {
+fn get_all_moves_for_color(
+    color: Color,
+    board: &Board<ChessPiece>,
+    last_move: Option<&ChessMoveType>,
+) -> Vec<ChessMoveType> {
     let mut moves: Vec<ChessMoveType> = Vec::new();
 
     for row in 0..board.get_height() {
@@ -62,4 +69,3 @@ fn get_all_moves_for_color(color: Color, board: &Board<ChessPiece>, last_move: O
 
     moves
 }
-

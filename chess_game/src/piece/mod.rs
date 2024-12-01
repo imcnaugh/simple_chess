@@ -69,7 +69,6 @@ impl ChessPiece {
         self.color
     }
 
-
     /// Returns the type of the chess piece.
     ///
     /// # Examples
