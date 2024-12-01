@@ -48,6 +48,7 @@ pub fn possible_moves(
                         promotion: None,
                     });
                 }
+                break;
             } else {
                 possible_moves.push(ChessMoveType::Move {
                     original_position: position,
@@ -69,9 +70,9 @@ pub fn possible_moves(
 mod tests {
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
-    use crate::piece::PieceType::Queen;
+    use crate::piece::PieceType::{Knight, Pawn, Queen};
     use crate::ChessMoveType::Move;
-    use crate::Color::White;
+    use crate::Color::{Black, White};
 
     #[test]
     fn queen_can_move_freely() {
@@ -110,6 +111,67 @@ mod tests {
                 new_position: new_position,
                 piece: ChessPiece::new(Queen, White),
                 taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn queen_respects_teammates() {
+        let white_queen = ChessPiece::new(Queen, White);
+        let game = build_game_from_string("8/8/2P5/5Q2/6N1/3P1Q1P/4PPP1/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_queen.possible_moves((5, 2), board, None);
+        assert_eq!(5, moves.len());
+
+        [(3, 4), (4, 3), (4, 2), (6, 2), (5, 3)].map(|new_position| {
+            let expected_move = Move {
+                original_position: (5, 2),
+                new_position: new_position,
+                piece: ChessPiece::new(Queen, White),
+                taken_piece: None,
+                promotion: None,
+            };
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn queen_can_take_opponents() {
+        let white_queen = ChessPiece::new(Queen, White);
+        let game = build_game_from_string("8/8/2p5/5q2/6n1/3p1Q1p/4ppp1/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_queen.possible_moves((5, 2), board, None);
+        assert_eq!(13, moves.len());
+
+        [
+            (3, 4, None),
+            (4, 3, None),
+            (4, 2, None),
+            (6, 2, None),
+            (5, 3, None),
+            (2, 5, Some(Pawn)),
+            (3, 2, Some(Pawn)),
+            (4, 1, Some(Pawn)),
+            (5, 1, Some(Pawn)),
+            (6, 1, Some(Pawn)),
+            (7, 2, Some(Pawn)),
+            (6, 3, Some(Knight)),
+            (5, 4, Some(Queen)),
+        ]
+        .map(|(new_col, new_row, taken_piece)| {
+            let taken_piece = match taken_piece {
+                Some(piece) => Some(ChessPiece::new(piece, Black)),
+                None => None,
+            };
+            let expected_move = Move {
+                original_position: (5, 2),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Queen, White),
+                taken_piece,
                 promotion: None,
             };
             assert!(moves.contains(&expected_move));
