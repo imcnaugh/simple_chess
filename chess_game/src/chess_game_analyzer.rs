@@ -8,7 +8,7 @@ pub fn get_legal_moves(mut game: ChessGame) -> Vec<ChessMoveType> {
     let last_move = game.get_last_move();
     let board = game.get_board();
 
-    let all_moves = get_all_moves_for_color(current_turn.opposite(), board, last_move);
+    let all_moves = get_all_moves_for_color(current_turn, board, last_move);
     all_moves
         .into_iter()
         .filter(|possible_move| {
@@ -68,4 +68,65 @@ fn get_all_moves_for_color(
     }
 
     moves
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::ChessMoveType::Move;
+    use crate::Color::White;
+    use crate::piece::PieceType::{Knight, Pawn};
+    use super::*;
+
+    #[test]
+    fn get_legal_moves_for_starting_position() {
+        let game = ChessGame::new();
+        let legal_moves = get_legal_moves(game);
+        assert_eq!(legal_moves.len(), 20);
+
+        for col in 0..8 {
+            for pawn_move_length in 1..=2 {
+                let move_type = Move {
+                    original_position: (col, 1),
+                    new_position: (col, pawn_move_length + 1),
+                    piece: ChessPiece::new(Pawn, White),
+                    taken_piece: None,
+                    promotion: None,
+                };
+                assert!(legal_moves.contains(&move_type));
+            }
+        }
+
+        let knight_a3 = Move {
+            original_position: (1, 0),
+            new_position: (0, 2),
+            piece: ChessPiece::new(Knight, White),
+            taken_piece: None,
+            promotion: None,
+        };
+        let knight_c3 = Move {
+            original_position: (1, 0),
+            new_position: (2, 2),
+            piece: ChessPiece::new(Knight, White),
+            taken_piece: None,
+            promotion: None,
+        };
+        let knight_f3 = Move {
+            original_position: (6, 0),
+            new_position: (5, 2),
+            piece: ChessPiece::new(Knight, White),
+            taken_piece: None,
+            promotion: None,
+        };
+        let knight_h3 = Move {
+            original_position: (6, 0),
+            new_position: (7, 2),
+            piece: ChessPiece::new(Knight, White),
+            taken_piece: None,
+            promotion: None,
+        };
+        assert!(legal_moves.contains(&knight_a3));
+        assert!(legal_moves.contains(&knight_c3));
+        assert!(legal_moves.contains(&knight_f3));
+        assert!(legal_moves.contains(&knight_h3));
+    }
 }
