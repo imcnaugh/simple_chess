@@ -69,6 +69,25 @@ impl ChessPiece {
         self.color
     }
 
+
+    /// Returns the type of the chess piece.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::piece::{ChessPiece, PieceType};
+    /// use chess_game::Color;
+    ///
+    /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
+    /// assert_eq!(white_pawn.get_piece_type(), PieceType::Pawn);
+    ///
+    /// let black_queen = ChessPiece::new(PieceType::Queen, Color::Black);
+    /// assert_eq!(black_queen.get_piece_type(), PieceType::Queen);
+    /// ```
+    pub fn get_piece_type(&self) -> PieceType {
+        self.piece_type
+    }
+
     /// Returns the UTF-8 string representation of the chess piece based on its type and color.
     ///
     /// # Examples

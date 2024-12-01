@@ -96,6 +96,29 @@ impl ChessGame {
         &self.board
     }
 
+
+    /// Get a mutable reference to the board
+    ///
+    /// This method provides mutable access to the chess board, allowing for
+    /// modifications to be made directly to the board's state. This can be useful
+    /// when making moves or updating the board after certain actions during the game.
+    ///
+    /// # Returns
+    ///
+    /// `&mut Board<ChessPiece>`: A mutable reference to the board in its current state
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessGame;
+    /// let mut chess_game = ChessGame::new();
+    /// let board = chess_game.get_board_mut();
+    /// // Modify the board or make moves
+    /// ```
+    pub fn get_board_mut(&mut self) -> &mut Board<ChessPiece> {
+        &mut self.board
+    }
+
     /// Returns the color of the player whose turn it is.
     ///
     /// # Returns

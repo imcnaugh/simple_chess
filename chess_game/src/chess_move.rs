@@ -48,6 +48,36 @@ impl ChessMoveType {
         }
     }
 
+    pub fn undo_move(&self, board: &mut Board<ChessPiece>) {
+        match self {
+            ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                ..
+            } => {
+                Self::place_piece(board, original_position, piece, &None);
+                board.remove_piece(new_position.0, new_position.1);
+                if let Some(taken_piece) = taken_piece {
+                    Self::place_piece(board, new_position, taken_piece, &None);
+                }
+            }
+            ChessMoveType::EnPassant {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                taken_piece_position,
+                ..
+            } => {
+                Self::place_piece(board, original_position, piece, &None);
+                Self::place_piece(board, taken_piece_position, taken_piece, &None);
+                board.remove_piece(new_position.0, new_position.1);
+            }
+        }
+    }
+
     fn place_piece(
         board: &mut Board<ChessPiece>,
         new_position: &(usize, usize),
