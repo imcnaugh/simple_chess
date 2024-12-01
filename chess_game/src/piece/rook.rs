@@ -108,8 +108,6 @@ mod tests {
         let game = build_game_from_string("6n1/8/3q2rp/8/8/8/6b1/8 w - - 0 1").unwrap();
         let board = game.get_board();
 
-        println!("{board}");
-
         let moves = black_rook.possible_moves((6, 5), board, None);
         assert_eq!(6, moves.len());
 
@@ -130,8 +128,6 @@ mod tests {
         let black_rook = ChessPiece::new(Rook, Black);
         let game = build_game_from_string("6N1/8/3P2rP/8/8/8/6B1/8 w - - 0 1").unwrap();
         let board = game.get_board();
-
-        println!("{board}");
 
         let moves = black_rook.possible_moves((6, 5), board, None);
         assert_eq!(10, moves.len());

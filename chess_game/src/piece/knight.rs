@@ -69,7 +69,7 @@ pub fn possible_moves(
 mod tests {
     use super::*;
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
-    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+    use crate::piece::PieceType::{Bishop, Knight, Pawn, Queen, Rook};
     use crate::ChessMoveType::Move;
     use crate::Color::{Black, White};
 

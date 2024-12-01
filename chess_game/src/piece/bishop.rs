@@ -77,8 +77,6 @@ mod tests {
         let game = build_game_from_string("8/8/2B5/8/8/8/8/8 w KQkq - 0 1").unwrap();
         let board = game.get_board();
 
-        println!("{}", board);
-
         let moves = white_bishop.possible_moves((2, 5), board, None);
         assert_eq!(moves.len(), 11);
 
