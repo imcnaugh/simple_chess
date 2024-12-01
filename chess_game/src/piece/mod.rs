@@ -157,7 +157,7 @@ impl ChessPiece {
         &self,
         position: (usize, usize),
         board: &Board<ChessPiece>,
-        last_move: Option<ChessMoveType>,
+        last_move: Option<&ChessMoveType>,
     ) -> Vec<ChessMoveType> {
         match self.piece_type {
             PieceType::King => king::possible_moves(self.color, position, board),

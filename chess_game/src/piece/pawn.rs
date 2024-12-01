@@ -28,7 +28,7 @@ pub fn possible_moves(
     color: Color,
     position: (usize, usize),
     board: &Board<ChessPiece>,
-    last_move_type: Option<ChessMoveType>,
+    last_move_type: Option<&ChessMoveType>,
 ) -> Vec<ChessMoveType> {
     let mut possible_moves: Vec<ChessMoveType> = Vec::new();
 
@@ -119,8 +119,8 @@ pub fn possible_moves(
                         position,
                         (position.0 - 1, next_row as usize),
                         color,
-                        piece,
-                        new_position,
+                        *piece,
+                        *new_position,
                         next_row as usize == promotion_row,
                     ));
                 }
@@ -163,8 +163,8 @@ pub fn possible_moves(
                         position,
                         (position.0 + 1, next_row as usize),
                         color,
-                        piece,
-                        new_position,
+                        *piece,
+                        *new_position,
                         next_row as usize == promotion_row,
                     ));
                 }
@@ -239,4 +239,247 @@ fn create_possible_en_passant(
     }
 
     possible_en_passants
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen};
+    use crate::ChessMoveType::{EnPassant, Move};
+    use crate::Color::{Black, White};
+
+    #[test]
+    fn white_pawn_moves_forward() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/8/8/8/4P3/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((4, 3), board, None);
+        assert_eq!(1, moves.len());
+
+        let expected_move = Move {
+            original_position: (4, 3),
+            new_position: (4, 4),
+            piece: ChessPiece::new(Pawn, White),
+            taken_piece: None,
+            promotion: None,
+        };
+
+        assert_eq!(expected_move, moves[0]);
+    }
+
+    #[test]
+    fn black_pawn_moves_forward() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/8/8/8/4b3/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((4, 3), board, None);
+        assert_eq!(1, moves.len());
+
+        let expected_move = Move {
+            original_position: (4, 3),
+            new_position: (4, 2),
+            piece: ChessPiece::new(Pawn, Black),
+            taken_piece: None,
+            promotion: None,
+        };
+
+        assert_eq!(expected_move, moves[0]);
+    }
+
+    #[test]
+    fn pawn_can_not_trample_teammate() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/8/8/8/4b3/4k3/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((4, 3), board, None);
+        assert_eq!(0, moves.len());
+    }
+
+    #[test]
+    fn white_pawn_can_move_2_spaces_if_on_starting_square() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/8/8/8/8/8/4P3/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((4, 1), board, None);
+        assert_eq!(2, moves.len());
+
+        [(4, 2), (4, 3)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (4, 1),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Pawn, White),
+                taken_piece: None,
+                promotion: None,
+            };
+
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn black_pawn_can_move_2_spaces_if_on_starting_square() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/2P5/8/8/8/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((2, 6), board, None);
+        assert_eq!(2, moves.len());
+
+        [(2, 5), (2, 4)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (2, 6),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Pawn, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn white_pawn_blocked_from_moving_2_spaces_if_on_starting_square() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/8/8/8/4P3/8/4P3/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((4, 1), board, None);
+        assert_eq!(1, moves.len());
+
+        [(4, 2)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (4, 1),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Pawn, White),
+                taken_piece: None,
+                promotion: None,
+            };
+
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn black_pawn_blocked_from_moving_2_spaces_if_on_starting_square() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/2P5/8/2P5/8/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((2, 6), board, None);
+        assert_eq!(1, moves.len());
+
+        [(2, 5)].map(|(new_col, new_row)| {
+            let expected_move = Move {
+                original_position: (2, 6),
+                new_position: (new_col, new_row),
+                piece: ChessPiece::new(Pawn, Black),
+                taken_piece: None,
+                promotion: None,
+            };
+
+            assert!(moves.contains(&expected_move));
+        });
+    }
+
+    #[test]
+    fn white_pawn_can_take_to_either_side() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/8/8/2n1q3/3P4/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((3, 3), board, None);
+        assert_eq!(3, moves.len());
+
+        [(2, 4, Some(Knight)), (4, 4, Some(Queen)), (3, 4, None)].map(
+            |(new_col, new_row, taken_piece)| {
+                let taken_piece = match taken_piece {
+                    Some(p) => Some(ChessPiece::new(p, Black)),
+                    None => None,
+                };
+                let expected_move = Move {
+                    original_position: (3, 3),
+                    new_position: (new_col, new_row),
+                    piece: ChessPiece::new(Pawn, White),
+                    taken_piece,
+                    promotion: None,
+                };
+
+                assert!(moves.contains(&expected_move));
+            },
+        );
+    }
+
+    #[test]
+    fn black_pawn_can_take_to_either_side() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/8/8/3p4/2K1B3/8/8/8 w - - 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((3, 4), board, None);
+        assert_eq!(3, moves.len());
+
+        [(2, 3, Some(King)), (4, 3, Some(Bishop)), (3, 3, None)].map(
+            |(new_col, new_row, taken_piece)| {
+                let taken_piece = match taken_piece {
+                    Some(p) => Some(ChessPiece::new(p, White)),
+                    None => None,
+                };
+                let expected_move = Move {
+                    original_position: (3, 4),
+                    new_position: (new_col, new_row),
+                    piece: ChessPiece::new(Pawn, Black),
+                    taken_piece,
+                    promotion: None,
+                };
+
+                assert!(moves.contains(&expected_move));
+            },
+        );
+    }
+
+    #[test]
+    fn white_en_passent() {
+        let white_pawn = ChessPiece::new(Pawn, White);
+        let game = build_game_from_string("8/8/4N3/4Pp2/8/8/8/8 w - f6 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = white_pawn.possible_moves((4, 4), board, game.get_last_move());
+        assert_eq!(1, moves.len());
+
+        let expected_move = EnPassant {
+            original_position: (4, 4),
+            new_position: (5, 5),
+            piece: ChessPiece::new(Pawn, White),
+            taken_piece: ChessPiece::new(Pawn, Black),
+            taken_piece_position: (5, 4),
+            promotion: None,
+        };
+        assert_eq!(expected_move, moves[0]);
+    }
+
+    #[test]
+    fn black_en_passent() {
+        let black_pawn = ChessPiece::new(Pawn, Black);
+        let game = build_game_from_string("8/8/8/8/Pp6/1n6/8/8 w - a3 0 1").unwrap();
+        let board = game.get_board();
+
+        let moves = black_pawn.possible_moves((1, 3), board, game.get_last_move());
+        assert_eq!(1, moves.len());
+
+        let expected_move = EnPassant {
+            original_position: (1, 3),
+            new_position: (0, 2),
+            piece: ChessPiece::new(Pawn, Black),
+            taken_piece: ChessPiece::new(Pawn, White),
+            taken_piece_position: (0, 3),
+            promotion: None,
+        };
+        assert_eq!(expected_move, moves[0]);
+    }
 }
