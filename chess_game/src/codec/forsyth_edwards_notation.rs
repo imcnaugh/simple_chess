@@ -295,17 +295,17 @@ fn get_castling_rights(game: &ChessGame) -> String {
 
     let (wq, wk, bq, bk) = game.get_castling_rights();
 
-    if wq {
-        result.push('Q');
-    }
     if wk {
         result.push('K');
     }
-    if bq {
-        result.push('q');
+    if wq {
+        result.push('Q');
     }
     if bk {
         result.push('k');
+    }
+    if bq {
+        result.push('q');
     }
     if result.is_empty() {
         result.push('-')
@@ -357,8 +357,10 @@ mod tests {
         use super::super::*;
 
         #[test]
-        fn new_game_parses_to_starting_position() {
-            let game = ChessGame::new();
+        fn create_new_game_from_string_and_verify_encoding_of_game() {
+            let game =
+                build_game_from_string("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+                    .unwrap();
             let fen_string = encode_game_as_string(&game);
             assert_eq!(
                 "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
