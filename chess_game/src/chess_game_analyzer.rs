@@ -4,6 +4,31 @@ use crate::ChessMoveType::{Castle, Move};
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
 
+pub enum GameState {
+    InProgress { legal_moves: Vec<ChessMoveType>},
+    Check { legal_moves: Vec<ChessMoveType>},
+    Checkmate,
+    Stalemate,
+}
+
+
+pub fn get_game_state(game: &mut ChessGame) -> GameState {
+    let legal_moves = get_legal_moves(game);
+    if is_in_check(game.get_current_players_turn(), game.get_board()) {
+        if legal_moves.is_empty() {
+            GameState::Checkmate
+        } else {
+            GameState::Check { legal_moves }
+        }
+    } else {
+        if legal_moves.is_empty() {
+            GameState::Stalemate
+        } else {
+            GameState::InProgress { legal_moves }
+        }
+    }
+}
+
 ///
 /// Returns a vector of legal moves for the current player's turn in the given chess game.
 ///
