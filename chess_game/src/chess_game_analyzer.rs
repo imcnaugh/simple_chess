@@ -89,7 +89,7 @@ fn generate_possible_castling_moves(
     if is_in_check(color, board) {return moves}
     if long_castle {
         for col in 1..board.get_width() {
-            if let Some(piece) = board.get_piece_at_space(row, col) {
+            if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_piece_type() != King || piece.get_color() != color {
                     break;
                 }
@@ -115,7 +115,7 @@ fn generate_possible_castling_moves(
     }
     if short_castle {
         for col in (0..board.get_width() - 1).rev() {
-            if let Some(piece) = board.get_piece_at_space(row, col) {
+            if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_piece_type() != King || piece.get_color() != color {
                     break;
                 }
@@ -289,5 +289,80 @@ mod tests {
         let mut game = build_game_from_string("1r4b1/8/8/8/8/8/8/K7 w - - 0 1").unwrap();
         let legal_moves = get_legal_moves(&mut game);
         assert_eq!(0, legal_moves.len());
+    }
+
+    #[test]
+    fn can_castle_if_in_check() {
+        let mut game = build_game_from_string("8/8/8/8/8/8/8/R3K2R w KQkq - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+
+        assert!(legal_moves.contains(&Castle {
+            rook_original_position: (7, 0),
+            rook_new_position: (5, 0),
+            king_original_position: (4, 0),
+            king_new_position: (6, 0),
+        }));
+        assert!(legal_moves.contains(&Castle {
+            rook_original_position: (0, 0),
+            rook_new_position: (3, 0),
+            king_original_position: (4, 0),
+            king_new_position: (2, 0),
+        }))
+    }
+
+    #[test]
+    fn can_not_castle_if_in_check() {
+        let mut game = build_game_from_string("4r3/8/8/8/8/8/8/R3K2R w KQkq - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+        assert_eq!(4, legal_moves.len());
+        for mov in legal_moves {
+            if let Castle { .. } = mov {
+                panic!("Should not be able to castle");
+            }
+        }
+    }
+
+    #[test]
+    fn can_not_castle_through_check() {
+        let mut game = build_game_from_string("3r4/8/8/8/8/8/8/R3K3 w Q - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+        for mov in legal_moves {
+            if let Castle { .. } = mov {
+                panic!("Should not be able to castle");
+            }
+        }
+    }
+
+    #[test]
+    fn can_not_castle_into_check() {
+        let mut game = build_game_from_string("2r5/8/8/8/8/8/8/R3K3 w Q - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+        for mov in legal_moves {
+            if let Castle { .. } = mov {
+                panic!("Should not be able to castle");
+            }
+        }
+    }
+
+    #[test]
+    fn can_not_castle_through_pieces(){
+        let mut game = build_game_from_string("8/8/8/8/8/8/8/R1P1K1bR w KQ - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+        for mov in legal_moves {
+            if let Castle { .. } = mov {
+                panic!("Should not be able to castle");
+            }
+        }
+    }
+
+    #[test]
+    fn can_not_castle_if_you_do_not_have_the_right() {
+        let mut game = build_game_from_string("8/8/8/8/8/8/8/R3K2R w kq - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
+        for mov in legal_moves {
+            if let Castle { .. } = mov {
+                panic!("Should not be able to castle");
+            }
+        }
     }
 }
