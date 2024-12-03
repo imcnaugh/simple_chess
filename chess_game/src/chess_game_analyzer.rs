@@ -41,6 +41,7 @@ pub fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&C
                                     return true;
                                 }
                             }
+                            ChessMoveType::Castle {..} => return false,
                         }
                     }
                 }
