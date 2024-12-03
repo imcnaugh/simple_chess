@@ -23,7 +23,7 @@ pub enum ChessMoveType {
         rook_new_position: (usize, usize),
         king_original_position: (usize, usize),
         king_new_position: (usize, usize),
-    }
+    },
 }
 
 impl ChessMoveType {
@@ -35,7 +35,9 @@ impl ChessMoveType {
                 promotion,
                 ..
             } => {
-                let piece = board.remove_piece(original_position.0, original_position.1).unwrap();
+                let piece = board
+                    .remove_piece(original_position.0, original_position.1)
+                    .unwrap();
                 Self::place_piece(board, new_position, piece, *promotion);
             }
             ChessMoveType::EnPassant {
@@ -45,15 +47,24 @@ impl ChessMoveType {
                 promotion,
                 ..
             } => {
-                let moving_pawn = board.remove_piece(original_position.0, original_position.1).unwrap();
+                let moving_pawn = board
+                    .remove_piece(original_position.0, original_position.1)
+                    .unwrap();
                 board.remove_piece(taken_piece_position.0, taken_piece_position.1);
                 Self::place_piece(board, new_position, moving_pawn, *promotion);
             }
             ChessMoveType::Castle {
-                rook_original_position, rook_new_position, king_original_position, king_new_position
+                rook_original_position,
+                rook_new_position,
+                king_original_position,
+                king_new_position,
             } => {
-                let rook = board.remove_piece(rook_original_position.0, rook_original_position.1).unwrap();
-                let king = board.remove_piece(king_original_position.0, king_original_position.1).unwrap();
+                let rook = board
+                    .remove_piece(rook_original_position.0, rook_original_position.1)
+                    .unwrap();
+                let king = board
+                    .remove_piece(king_original_position.0, king_original_position.1)
+                    .unwrap();
                 board.place_piece(rook, rook_new_position.0, rook_new_position.1);
                 board.place_piece(king, king_new_position.0, king_new_position.1);
             }
@@ -88,10 +99,17 @@ impl ChessMoveType {
                 board.remove_piece(new_position.0, new_position.1);
             }
             ChessMoveType::Castle {
-                rook_original_position, rook_new_position, king_original_position, king_new_position
+                rook_original_position,
+                rook_new_position,
+                king_original_position,
+                king_new_position,
             } => {
-                let rook = board.remove_piece(rook_new_position.0, rook_new_position.1).unwrap();
-                let king = board.remove_piece(king_new_position.0, king_new_position.1).unwrap();
+                let rook = board
+                    .remove_piece(rook_new_position.0, rook_new_position.1)
+                    .unwrap();
+                let king = board
+                    .remove_piece(king_new_position.0, king_new_position.1)
+                    .unwrap();
                 board.place_piece(rook, rook_original_position.0, rook_original_position.1);
                 board.place_piece(king, king_original_position.0, king_original_position.1);
             }
