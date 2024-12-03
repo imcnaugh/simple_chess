@@ -2,46 +2,40 @@ use crate::piece::ChessPiece;
 use crate::piece::PieceType::King;
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
+use crate::ChessMoveType::{Castle, Move};
 
-pub fn get_legal_moves(mut game: ChessGame) -> Vec<ChessMoveType> {
+pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
     let current_turn = game.get_current_players_turn();
-    let last_move = game.get_last_move();
-    let board = game.get_board();
 
-    let all_moves = get_all_moves_for_color(current_turn, board, last_move);
+    let all_moves = get_all_moves_for_color(current_turn, game);
     all_moves
         .into_iter()
         .filter(|possible_move| {
             let board = game.get_board_mut();
             possible_move.make_move(board);
-            let in_check = is_in_check(current_turn, &board, Some(possible_move));
+            let in_check = is_in_check(current_turn, &board);
             possible_move.undo_move(board);
             !in_check
         })
         .collect::<Vec<ChessMoveType>>()
 }
 
-pub fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&ChessMoveType>) -> bool {
+pub fn is_in_check(color: Color, board: &Board<ChessPiece>) -> bool {
     for row in 0..board.get_height() {
         for col in 0..board.get_width() {
             if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_color() == color.opposite() {
-                    let moves = piece.possible_moves((col, row), board, last_move);
+                    let moves = piece.possible_moves((col, row), board, None);
                     for m in moves {
                         match m {
-                            ChessMoveType::Move { taken_piece, .. } => {
+                            Move { taken_piece, .. } => {
                                 if let Some(taken_piece) = taken_piece {
                                     if taken_piece.get_piece_type() == King {
                                         return true;
                                     }
                                 }
                             }
-                            ChessMoveType::EnPassant { taken_piece, .. } => {
-                                if taken_piece.get_piece_type() == King {
-                                    return true;
-                                }
-                            }
-                            ChessMoveType::Castle {..} => return false,
+                            _ => return false,
                         }
                     }
                 }
@@ -53,17 +47,95 @@ pub fn is_in_check(color: Color, board: &Board<ChessPiece>, last_move: Option<&C
 
 fn get_all_moves_for_color(
     color: Color,
-    board: &Board<ChessPiece>,
-    last_move: Option<&ChessMoveType>,
+    game: &mut ChessGame,
 ) -> Vec<ChessMoveType> {
     let mut moves: Vec<ChessMoveType> = Vec::new();
+    let board = game.get_board();
 
     for row in 0..board.get_height() {
         for col in 0..board.get_width() {
             if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_color() == color {
-                    moves.append(&mut piece.possible_moves((col, row), board, last_move));
+                    moves.append(&mut piece.possible_moves((col, row), board, game.get_last_move()));
                 }
+            }
+        }
+    }
+
+    let castling_moves = generate_possible_castling_moves(color, game);
+    moves.extend(castling_moves);
+
+    moves
+}
+
+fn generate_possible_castling_moves(
+    color: Color,
+    game: &mut ChessGame,
+) -> Vec<ChessMoveType> {
+    let castling_rights = game.get_castling_rights();
+    let (long_castle, short_castle) = match color {
+        Color::White => (castling_rights.0, castling_rights.1),
+        Color::Black => (castling_rights.2, castling_rights.3),
+    };
+
+    let mut moves = Vec::new();
+    let board = game.get_board_mut();
+    let row = match color {
+        Color::White => 0,
+        Color::Black => board.get_height() - 1
+    };
+
+
+    if is_in_check(color, board) {return moves}
+    if long_castle {
+        for col in 1..board.get_width() {
+            if let Some(piece) = board.get_piece_at_space(row, col) {
+                if piece.get_piece_type() != King || piece.get_color() != color {
+                    break;
+                }
+                let tmp_move = Move {
+                    original_position: (col, row),
+                    new_position: (col - 1, row),
+                    piece: ChessPiece::new(King, color),
+                    taken_piece: None,
+                    promotion: None,
+                };
+                tmp_move.make_move(board);
+                if !is_in_check(color, board) {
+                    moves.push(Castle {
+                        rook_original_position: (0, row),
+                        rook_new_position: (col - 1, row),
+                        king_original_position: (col, row),
+                        king_new_position: (col - 2, row),
+                    })
+                }
+                tmp_move.undo_move(board);
+            }
+        }
+    }
+    if short_castle {
+        for col in (0..board.get_width() - 1).rev() {
+            if let Some(piece) = board.get_piece_at_space(row, col) {
+                if piece.get_piece_type() != King || piece.get_color() != color {
+                    break;
+                }
+                let tmp_move = Move {
+                    original_position: (col, row),
+                    new_position: (col + 1, row),
+                    piece: ChessPiece::new(King, color),
+                    taken_piece: None,
+                    promotion: None,
+                };
+                tmp_move.make_move(board);
+                if !is_in_check(color, board) {
+                    moves.push(Castle {
+                        rook_original_position: (board.get_width() - 1, row),
+                        rook_new_position: (col + 1, row),
+                        king_original_position: (col, row),
+                        king_new_position: (col + 2, row),
+                    });
+                }
+                tmp_move.undo_move(board);
             }
         }
     }
@@ -81,8 +153,8 @@ mod tests {
 
     #[test]
     fn get_legal_moves_for_starting_position() {
-        let game = ChessGame::new();
-        let legal_moves = get_legal_moves(game);
+        let mut game = ChessGame::new();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(20, legal_moves.len());
 
         for col in 0..8 {
@@ -134,15 +206,15 @@ mod tests {
 
     #[test]
     fn player_in_checkmate_has_no_legal_moves() {
-        let game = build_game_from_string("k6R/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("k6R/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(legal_moves.len(), 0);
     }
 
     #[test]
     fn king_in_check_limits_legal_moves() {
-        let game = build_game_from_string("k6R/1ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("k6R/1ppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(1, legal_moves.len());
         let expected_move = Move {
             original_position: (0, 7),
@@ -156,15 +228,15 @@ mod tests {
 
     #[test]
     fn more_complex_checkmate() {
-        let game = build_game_from_string("8/8/8/8/2n5/1p5r/K7/BB6 w - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("8/8/8/8/2n5/1p5r/K7/BB6 w - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(0, legal_moves.len());
     }
 
     #[test]
     fn pieces_can_be_pinned_to_the_king() {
-        let game = build_game_from_string("K2B3r/8/8/8/8/8/8/8 w - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("K2B3r/8/8/8/8/8/8/8 w - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(3, legal_moves.len());
         let make_king_moves = |new_position| -> ChessMoveType {
             Move {
@@ -183,8 +255,8 @@ mod tests {
 
     #[test]
     fn pawns_can_promote() {
-        let game = build_game_from_string("8/4P3/8/8/8/8/8/8 w - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("8/4P3/8/8/8/8/8/8 w - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(4, legal_moves.len());
         [Queen, Rook, Bishop, Knight].iter().for_each(|promotion_option| {
             let expected_move = Move {
@@ -200,22 +272,22 @@ mod tests {
 
     #[test]
     fn cannot_en_passant_if_pawn_pinned() {
-        let game = build_game_from_string("2r5/8/8/2Pp4/8/8/8/2K5 w - d6 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("2r5/8/8/2Pp4/8/8/8/2K5 w - d6 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(6, legal_moves.len());
     }
 
     #[test]
     fn can_en_passant() {
-        let game = build_game_from_string("8/8/8/2Pp4/8/8/8/2K5 w - d6 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("8/8/8/2Pp4/8/8/8/2K5 w - d6 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(7, legal_moves.len());
     }
 
     #[test]
     fn stalemate_should_yield_no_legal_moves() {
-        let game = build_game_from_string("1r4b1/8/8/8/8/8/8/K7 w - - 0 1").unwrap();
-        let legal_moves = get_legal_moves(game);
+        let mut game = build_game_from_string("1r4b1/8/8/8/8/8/8/K7 w - - 0 1").unwrap();
+        let legal_moves = get_legal_moves(&mut game);
         assert_eq!(0, legal_moves.len());
     }
 }
