@@ -4,6 +4,28 @@ use crate::ChessMoveType::{Castle, Move};
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
 
+///
+/// Returns a vector of legal moves for the current player's turn in the given chess game.
+///
+/// # Arguments
+///
+/// * `game` - A mutable reference to the `ChessGame` instance for which legal moves
+/// need to be determined.
+///
+/// # Returns
+///
+/// A vector of `ChessMoveType` that represents all possible legal moves that the current
+/// player can make without putting their king in check.
+///
+/// # Example
+///
+/// ```
+/// use chess_game::ChessGame;
+/// use chess_game::chess_game_analyzer::get_legal_moves;
+/// let mut game = ChessGame::new();
+/// let legal_moves = get_legal_moves(&mut game);
+/// assert!(!legal_moves.is_empty());
+/// ```
 pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
     let current_turn = game.get_current_players_turn();
 
@@ -20,6 +42,33 @@ pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
         .collect::<Vec<ChessMoveType>>()
 }
 
+///
+/// Determines if the player of the specified color is in check.
+///
+/// This function checks if any of the pieces of the opponent color can potentially
+/// move to a position occupied by the player's king, indicating that the king
+/// is in check.
+///
+/// # Arguments
+///
+/// * `color` - The `Color` of the player for whom we are checking the check status.
+/// * `board` - A reference to the `Board` containing the current state of the game.
+///
+/// # Returns
+///
+/// A boolean value indicating whether the king of the specified color is in check.
+///
+/// # Example
+///
+/// ```rust
+/// use chess_game::Color;
+/// use game_board::Board;
+/// use chess_game::chess_game_analyzer::is_in_check;
+///
+/// let board = Board::build(8, 8).unwrap(); // Assuming Board::new initializes a default board
+/// let in_check = is_in_check(Color::White, &board);
+/// assert_eq!(in_check, false); // Change 'false' to the expected value based on board state
+/// ```
 pub fn is_in_check(color: Color, board: &Board<ChessPiece>) -> bool {
     for row in 0..board.get_height() {
         for col in 0..board.get_width() {
