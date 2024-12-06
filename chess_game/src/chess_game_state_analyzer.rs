@@ -6,9 +6,17 @@ use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
 
 pub enum GameState {
-    InProgress { legal_moves: Vec<ChessMoveType> },
-    Check { legal_moves: Vec<ChessMoveType> },
-    Checkmate,
+    InProgress {
+        legal_moves: Vec<ChessMoveType>,
+        turn: Color,
+    },
+    Check {
+        legal_moves: Vec<ChessMoveType>,
+        turn: Color,
+    },
+    Checkmate {
+        winner: Color,
+    },
     Stalemate,
 }
 
@@ -16,15 +24,23 @@ pub fn get_game_state(game: &mut ChessGame) -> GameState {
     let legal_moves = chess_game_move_analyzer::get_legal_moves(game);
     if is_in_check(game.get_current_players_turn(), game.get_board()) {
         if legal_moves.is_empty() {
-            GameState::Checkmate
+            GameState::Checkmate {
+                winner: game.get_current_players_turn(),
+            }
         } else {
-            GameState::Check { legal_moves }
+            GameState::Check {
+                legal_moves,
+                turn: game.get_current_players_turn().opposite(),
+            }
         }
     } else {
         if legal_moves.is_empty() {
             GameState::Stalemate
         } else {
-            GameState::InProgress { legal_moves }
+            GameState::InProgress {
+                legal_moves,
+                turn: game.get_current_players_turn().opposite(),
+            }
         }
     }
 }
