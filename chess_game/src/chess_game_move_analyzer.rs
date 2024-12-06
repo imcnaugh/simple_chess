@@ -1,33 +1,8 @@
+use crate::chess_game_state_analyzer::is_in_check;
 use crate::piece::ChessPiece;
 use crate::piece::PieceType::King;
 use crate::ChessMoveType::{Castle, Move};
 use crate::{ChessGame, ChessMoveType, Color};
-use game_board::Board;
-
-pub enum GameState {
-    InProgress { legal_moves: Vec<ChessMoveType>},
-    Check { legal_moves: Vec<ChessMoveType>},
-    Checkmate,
-    Stalemate,
-}
-
-
-pub fn get_game_state(game: &mut ChessGame) -> GameState {
-    let legal_moves = get_legal_moves(game);
-    if is_in_check(game.get_current_players_turn(), game.get_board()) {
-        if legal_moves.is_empty() {
-            GameState::Checkmate
-        } else {
-            GameState::Check { legal_moves }
-        }
-    } else {
-        if legal_moves.is_empty() {
-            GameState::Stalemate
-        } else {
-            GameState::InProgress { legal_moves }
-        }
-    }
-}
 
 ///
 /// Returns a vector of legal moves for the current player's turn in the given chess game.
@@ -46,7 +21,7 @@ pub fn get_game_state(game: &mut ChessGame) -> GameState {
 ///
 /// ```
 /// use chess_game::ChessGame;
-/// use chess_game::chess_game_analyzer::get_legal_moves;
+/// use chess_game::chess_game_move_analyzer::get_legal_moves;
 /// let mut game = ChessGame::new();
 /// let legal_moves = get_legal_moves(&mut game);
 /// assert!(!legal_moves.is_empty());
@@ -65,58 +40,6 @@ pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
             !in_check
         })
         .collect::<Vec<ChessMoveType>>()
-}
-
-///
-/// Determines if the player of the specified color is in check.
-///
-/// This function checks if any of the pieces of the opponent color can potentially
-/// move to a position occupied by the player's king, indicating that the king
-/// is in check.
-///
-/// # Arguments
-///
-/// * `color` - The `Color` of the player for whom we are checking the check status.
-/// * `board` - A reference to the `Board` containing the current state of the game.
-///
-/// # Returns
-///
-/// A boolean value indicating whether the king of the specified color is in check.
-///
-/// # Example
-///
-/// ```rust
-/// use chess_game::Color;
-/// use game_board::Board;
-/// use chess_game::chess_game_analyzer::is_in_check;
-///
-/// let board = Board::build(8, 8).unwrap(); // Assuming Board::new initializes a default board
-/// let in_check = is_in_check(Color::White, &board);
-/// assert_eq!(in_check, false); // Change 'false' to the expected value based on board state
-/// ```
-pub fn is_in_check(color: Color, board: &Board<ChessPiece>) -> bool {
-    for row in 0..board.get_height() {
-        for col in 0..board.get_width() {
-            if let Some(piece) = board.get_piece_at_space(col, row) {
-                if piece.get_color() == color.opposite() {
-                    let moves = piece.possible_moves((col, row), board, None);
-                    for m in moves {
-                        match m {
-                            Move { taken_piece, .. } => {
-                                if let Some(taken_piece) = taken_piece {
-                                    if taken_piece.get_piece_type() == King {
-                                        return true;
-                                    }
-                                }
-                            }
-                            _ => return false,
-                        }
-                    }
-                }
-            }
-        }
-    }
-    false
 }
 
 fn get_all_moves_for_color(color: Color, game: &mut ChessGame) -> Vec<ChessMoveType> {

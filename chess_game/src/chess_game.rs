@@ -1,6 +1,7 @@
+use crate::chess_game_state_analyzer::{get_game_state, GameState};
 use crate::chess_move::ChessMoveType;
-use crate::piece::ChessPiece;
 use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
+use crate::piece::ChessPiece;
 use crate::Color;
 use crate::Color::{Black, White};
 use game_board::Board;
@@ -227,6 +228,80 @@ impl ChessGame {
     /// ```
     pub fn get_last_move(&self) -> Option<&ChessMoveType> {
         self.moves.last()
+    }
+
+    pub fn make_move(&mut self, chess_move: ChessMoveType) -> GameState {
+        chess_move.make_move(&mut self.board);
+        if self.current_players_turn == Black {
+            self.turn_number += 1;
+        }
+
+        match chess_move {
+            ChessMoveType::Move {
+                taken_piece,
+                piece,
+                original_position,
+                ..
+            } => {
+                if taken_piece.is_some() || piece.get_piece_type() == Pawn {
+                    self.fifty_move_rule_counter = 0;
+                } else {
+                    self.fifty_move_rule_counter += 1;
+                }
+
+                if piece.get_piece_type() == Rook {
+                    if original_position.0 < self.board.get_width() / 2 {
+                        match self.current_players_turn {
+                            White => self.can_white_castle_long = false,
+                            Black => self.can_black_castle_long = false,
+                        }
+                    } else {
+                        match self.current_players_turn {
+                            White => self.can_white_castle_short = false,
+                            Black => self.can_black_castle_short = false,
+                        }
+                    }
+                }
+
+                if piece.get_piece_type() == King {
+                    match self.current_players_turn {
+                        White => {
+                            self.can_white_castle_long = false;
+                            self.can_white_castle_short = false;
+                        }
+                        Black => {
+                            self.can_black_castle_long = false;
+                            self.can_black_castle_short = false;
+                        }
+                    }
+                }
+            }
+            ChessMoveType::Castle { .. } => {
+                match self.current_players_turn {
+                    White => {
+                        self.can_white_castle_short = false;
+                        self.can_white_castle_long = false;
+                    }
+                    Black => {
+                        self.can_black_castle_short = false;
+                        self.can_black_castle_long = false;
+                    }
+                }
+                self.fifty_move_rule_counter = 0;
+            }
+            _ => {
+                self.fifty_move_rule_counter = 0;
+            }
+        }
+
+        self.current_players_turn = self.current_players_turn.opposite();
+        self.moves.push(chess_move);
+
+        self.get_game_state()
+    }
+
+    pub fn get_game_state(&mut self) -> GameState {
+        get_game_state(self)
     }
 }
 
