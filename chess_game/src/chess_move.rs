@@ -1,9 +1,22 @@
 use crate::piece::ChessPiece;
 use game_board::{get_square_name_from_row_and_col, Board};
-use std::fmt::{write, Display, Formatter};
+use std::fmt::{Display, Formatter};
 
+
+/// Represents different types of chess moves.
+///
+/// This enum captures the state and specific details of various types of legal chess moves.
+/// It provides functionality to apply and undo these moves on a chess board.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ChessMoveType {
+    /// A regular piece move which might include capturing an opponent's piece or promoting a pawn.
+    ///
+    /// Fields:
+    /// - `original_position`: (usize, usize) - The starting position of the chess piece.
+    /// - `new_position`: (usize, usize) - The destination position of the chess piece.
+    /// - `piece`: ChessPiece - The chess piece being moved.
+    /// - `taken_piece`: Option<ChessPiece> - The opponent's piece captured during this move, if any.
+    /// - `promotion`: Option<ChessPiece> - The piece type a pawn is promoted to, if applicable.
     Move {
         original_position: (usize, usize),
         new_position: (usize, usize),
@@ -11,6 +24,17 @@ pub enum ChessMoveType {
         taken_piece: Option<ChessPiece>,
         promotion: Option<ChessPiece>,
     },
+
+    /// A special pawn capture move where a pawn captures another pawn that has moved
+    /// two squares forward from its starting position on the previous turn.
+    ///
+    /// Fields:
+    /// - `original_position`: (usize, usize) - The starting position of the pawn.
+    /// - `new_position`: (usize, usize) - The destination position of the pawn after capturing.
+    /// - `piece`: ChessPiece - The pawn performing the en passant capture.
+    /// - `taken_piece`: ChessPiece - The opponent's pawn being captured.
+    /// - `taken_piece_position`: (usize, usize) - The position of the captured pawn.
+    /// - `promotion`: Option<ChessPiece> - The piece type if the pawn is promoted, if applicable.
     EnPassant {
         original_position: (usize, usize),
         new_position: (usize, usize),
@@ -19,6 +43,14 @@ pub enum ChessMoveType {
         taken_piece_position: (usize, usize),
         promotion: Option<ChessPiece>,
     },
+
+    /// A special move involving the king and a rook where both pieces move simultaneously.
+    ///
+    /// Fields:
+    /// - `rook_original_position`: (usize, usize) - The starting position of the rook.
+    /// - `rook_new_position`: (usize, usize) - The destination position of the rook.
+    /// - `king_original_position`: (usize, usize) - The starting position of the king.
+    /// - `king_new_position`: (usize, usize) - The destination position of the king.
     Castle {
         rook_original_position: (usize, usize),
         rook_new_position: (usize, usize),
@@ -28,6 +60,43 @@ pub enum ChessMoveType {
 }
 
 impl ChessMoveType {
+    /// Applies the current move to the chess board.
+    ///
+    /// This method performs the actual move on the board by repositioning the involved
+    /// pieces according to the move type.
+    ///
+    /// # Arguments
+    ///
+    /// * `board` - A mutable reference to the chess board on which the move will be applied.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessMoveType;
+    /// use chess_game::Color::White;
+    /// use chess_game::piece::ChessPiece;
+    /// use chess_game::piece::PieceType::Pawn;
+    /// use game_board::Board;
+    /// let mut board = Board::build(8, 8).unwrap();
+    /// let original_position = (0, 1);
+    ///
+    /// board.place_piece(ChessPiece::new(Pawn, White), original_position.0, original_position.1);
+    ///
+    /// let game_move = ChessMoveType::Move {
+    ///     original_position,
+    ///     new_position: (0, 2),
+    ///     piece: *board.get_piece_at_space(original_position.0, original_position.1).unwrap(),
+    ///     taken_piece: None,
+    ///     promotion: None,
+    /// };
+    ///
+    /// assert!(board.get_piece_at_space(0, 2).is_none());
+    /// game_move.make_move(&mut board);
+    ///
+    /// assert!(board.get_piece_at_space(original_position.0, original_position.1).is_none());
+    /// assert_eq!(Pawn, board.get_piece_at_space(0, 2).unwrap().get_piece_type());
+    /// assert_eq!(White, board.get_piece_at_space(0, 2).unwrap().get_color());
+    /// ```
     pub fn make_move(&self, board: &mut Board<ChessPiece>) {
         match self {
             ChessMoveType::Move {

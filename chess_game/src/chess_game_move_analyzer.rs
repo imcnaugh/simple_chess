@@ -16,16 +16,6 @@ use crate::{ChessGame, ChessMoveType, Color};
 ///
 /// A vector of `ChessMoveType` that represents all possible legal moves that the current
 /// player can make without putting their king in check.
-///
-/// # Example
-///
-/// ```
-/// use chess_game::ChessGame;
-/// use chess_game::chess_game_move_analyzer::get_legal_moves;
-/// let mut game = ChessGame::new();
-/// let legal_moves = get_legal_moves(&mut game);
-/// assert!(!legal_moves.is_empty());
-/// ```
 pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
     let current_turn = game.get_current_players_turn();
 
