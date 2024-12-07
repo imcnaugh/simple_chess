@@ -1,7 +1,7 @@
 use crate::chess_game_state_analyzer::{get_game_state, GameState};
 use crate::chess_move::ChessMoveType;
-use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::piece::ChessPiece;
+use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::Color;
 use crate::Color::{Black, White};
 use game_board::Board;

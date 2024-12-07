@@ -1,7 +1,6 @@
-use std::any::Any;
-use std::fmt::{write, Display, Formatter};
 use crate::piece::ChessPiece;
 use game_board::{get_square_name_from_row_and_col, Board};
+use std::fmt::{write, Display, Formatter};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ChessMoveType {
@@ -134,7 +133,13 @@ impl ChessMoveType {
 impl Display for ChessMoveType {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ChessMoveType::Move { original_position, new_position, piece, taken_piece, promotion } => {
+            ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                promotion,
+            } => {
                 let take_string = if let Some(taken_piece) = taken_piece {
                     format!("takes {:?}", taken_piece.get_piece_type())
                 } else {
@@ -147,9 +152,24 @@ impl Display for ChessMoveType {
                     String::new()
                 };
 
-                write!(f, "{:?} at {} {} at {} {}", piece.get_piece_type(), get_square_name_from_row_and_col(original_position.0, original_position.1), take_string, get_square_name_from_row_and_col(new_position.0, new_position.1), promotion_string)
+                write!(
+                    f,
+                    "{:?} at {} {} at {} {}",
+                    piece.get_piece_type(),
+                    get_square_name_from_row_and_col(original_position.0, original_position.1),
+                    take_string,
+                    get_square_name_from_row_and_col(new_position.0, new_position.1),
+                    promotion_string
+                )
             }
-            ChessMoveType::EnPassant { original_position, new_position, piece, taken_piece, taken_piece_position, promotion } => {
+            ChessMoveType::EnPassant {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                taken_piece_position,
+                promotion,
+            } => {
                 write!(f, "en passant from {:?}", original_position)
             }
             ChessMoveType::Castle { .. } => {
