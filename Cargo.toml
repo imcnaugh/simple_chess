@@ -1,15 +1,15 @@
 [package]
-name = "chess"
+name = "chess_cli"
 version = "1.0.0"
 edition = "2021"
 
 [workspace]
 members = [
     "game_board",
-    "chess_game",
+    "chess",
 ]
 
 [dependencies]
 rand = "0.8.5"
-chess_game = { path = "chess_game" }
+chess = { path = "chess" }
 game_board = { path = "game_board" }

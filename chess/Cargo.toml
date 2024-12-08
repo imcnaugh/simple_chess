@@ -1,5 +1,6 @@
 [package]
-name = "chess_game"
+name = "chess"
+description = "A simple chess game implimentation"
 version = "1.0.0"
 edition = "2021"
 

@@ -1,9 +1,8 @@
-use chess_game::chess_game_state_analyzer::GameState;
-use chess_game::codec::forsyth_edwards_notation::encode_game_as_string;
-use chess_game::{ChessGame, ChessMoveType, Color};
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use chess_game::piece::ChessPiece;
+use chess::chess_game_state_analyzer::GameState;
+use chess::{ChessGame, ChessMoveType, Color};
+use chess::piece::ChessPiece;
 use game_board::Board;
 
 fn main() {
