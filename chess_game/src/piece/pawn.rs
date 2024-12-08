@@ -24,6 +24,13 @@ pub fn as_fen_char(color: Color) -> char {
     }
 }
 
+pub fn as_binary(color: Color) -> u8 {
+    match color {
+        Color::White => 0b0010,
+        Color::Black => 0b0011,
+    }
+}
+
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),
@@ -87,13 +94,15 @@ pub fn possible_moves(
     // Taking to the left
     if position.0 > 0 {
         if let Some(piece) = board.get_piece_at_space(position.0 - 1, next_row as usize) {
-            possible_moves.append(&mut create_possible_moves(
-                position,
-                (position.0 - 1, next_row as usize),
-                color,
-                Some(piece.clone()),
-                next_row as usize == promotion_row,
-            ));
+            if piece.color != color {
+                possible_moves.append(&mut create_possible_moves(
+                    position,
+                    (position.0 - 1, next_row as usize),
+                    color,
+                    Some(*piece),
+                    next_row as usize == promotion_row,
+                ));
+            }
         }
 
         // En Passant
@@ -104,7 +113,7 @@ pub fn possible_moves(
             ..
         }) = last_move_type
         {
-            if piece.piece_type == PieceType::Pawn {
+            if piece.piece_type == PieceType::Pawn && piece.color != color {
                 let rows_moved = if original_position.1 < new_position.1 {
                     new_position.1 - original_position.1
                 } else {
@@ -131,13 +140,15 @@ pub fn possible_moves(
     // Taking to the right
     if position.0 < board.get_width() - 1 {
         if let Some(piece) = board.get_piece_at_space(position.0 + 1, next_row as usize) {
-            possible_moves.append(&mut create_possible_moves(
-                position,
-                (position.0 + 1, next_row as usize),
-                color,
-                Some(piece.clone()),
-                next_row as usize == promotion_row,
-            ));
+            if piece.color != color {
+                possible_moves.append(&mut create_possible_moves(
+                    position,
+                    (position.0 + 1, next_row as usize),
+                    color,
+                    Some(*piece),
+                    next_row as usize == promotion_row,
+                ));
+            }
         }
 
         // En Passant
@@ -148,7 +159,7 @@ pub fn possible_moves(
             ..
         }) = last_move_type
         {
-            if piece.piece_type == PieceType::Pawn {
+            if piece.piece_type == PieceType::Pawn && piece.color != color {
                 let rows_moved = if original_position.1 < new_position.1 {
                     new_position.1 - original_position.1
                 } else {

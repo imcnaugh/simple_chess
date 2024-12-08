@@ -9,8 +9,7 @@ use crate::{ChessGame, ChessMoveType, Color};
 ///
 /// # Arguments
 ///
-/// * `game` - A mutable reference to the `ChessGame` instance for which legal moves
-/// need to be determined.
+/// * `game` - A mutable reference to the `ChessGame` instance for which legal moves need to be determined.
 ///
 /// # Returns
 ///
@@ -25,7 +24,7 @@ pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
         .filter(|possible_move| {
             let board = game.get_board_mut();
             possible_move.make_move(board);
-            let in_check = is_in_check(current_turn, &board);
+            let in_check = is_in_check(current_turn, board);
             possible_move.undo_move(board);
             !in_check
         })
@@ -74,7 +73,7 @@ fn generate_possible_castling_moves(color: Color, game: &mut ChessGame) -> Vec<C
         return moves;
     }
     if long_castle {
-        for col in 1..board.get_width() {
+        for col in 1..board.get_width() - 1 {
             if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_piece_type() != King || piece.get_color() != color {
                     break;

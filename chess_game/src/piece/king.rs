@@ -18,6 +18,13 @@ pub fn as_fen_char(color: Color) -> char {
     }
 }
 
+pub fn as_binary(color: Color) -> u8 {
+    match color {
+        Color::White => 0b1010,
+        Color::Black => 0b1011,
+    }
+}
+
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),
