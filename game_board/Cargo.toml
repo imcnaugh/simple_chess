@@ -4,7 +4,7 @@ description = "A rectangular game board of squares, for use in games like chess 
 authors = ["Ian McNaughton <IanMcNaugh@gmail.com>"]
 readme = "README.md"
 license = "MIT"
-repository = "https://github.com/imcnaugh/chess_game/tree/main/game_board"
+repository = "https://github.com/imcnaugh/simple_chess/tree/main/game_board"
 version = "1.0.0"
 edition = "2021"
 
