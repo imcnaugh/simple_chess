@@ -1,4 +1,6 @@
 /target
 .idea/
 ._target
+game_board/target/
+simple_chess/target/
 
