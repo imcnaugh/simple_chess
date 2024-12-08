@@ -1,11 +1,13 @@
-use crate::chess_game::DrawReason::InsufficientPieces;
+use crate::chess_game::DrawReason::{FiftyMoveRule, InsufficientPieces, Repetition};
 use crate::chess_game_state_analyzer::{get_game_state, is_insufficient_material, GameState};
 use crate::chess_move::ChessMoveType;
+use crate::codec::binary::encode_board_as_binary;
 use crate::piece::ChessPiece;
 use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::Color;
 use crate::Color::{Black, White};
 use game_board::Board;
+use std::collections::HashMap;
 
 pub struct ChessGame {
     board: Board<ChessPiece>,
@@ -17,6 +19,7 @@ pub struct ChessGame {
     can_black_castle_short: bool,
     can_black_castle_long: bool,
     moves: Vec<ChessMoveType>,
+    previous_board_states: Vec<Vec<u8>>,
 }
 
 pub enum DrawReason {
@@ -69,6 +72,7 @@ impl ChessGame {
             can_black_castle_short: true,
             can_black_castle_long: true,
             moves: Vec::new(),
+            previous_board_states: Vec::new(),
         }
     }
 
@@ -93,6 +97,7 @@ impl ChessGame {
             can_black_castle_short,
             can_black_castle_long,
             moves,
+            previous_board_states: vec![], // TODO generate previous board states from moves
         }
     }
 
@@ -237,6 +242,24 @@ impl ChessGame {
         self.fifty_move_rule_counter
     }
 
+    /// Executes a given move on the chess board.
+    ///
+    /// # Arguments
+    ///
+    /// * `chess_move` - An instance of `ChessMoveType` representing the move to be made on the board.
+    ///
+    /// # Effects
+    ///
+    /// - The move is applied to the internal board representation.
+    /// - The turn number is incremented if it was Black's turn.
+    /// - Updates internal state for castling rights and the fifty-move rule counter.
+    /// - Alternates the current player's turn.
+    /// - Adds the move to the move history and updates previous board states.
+    ///
+    /// # Returns
+    ///
+    /// * `GameState` - The new state of the game after the move is applied, which includes checks for checks, checkmates, and draws.
+    ///
     pub fn make_move(&mut self, chess_move: ChessMoveType) -> GameState {
         chess_move.make_move(&mut self.board);
         if self.current_players_turn == Black {
@@ -252,6 +275,7 @@ impl ChessGame {
             } => {
                 if taken_piece.is_some() || piece.get_piece_type() == Pawn {
                     self.fifty_move_rule_counter = 0;
+                    self.previous_board_states = vec![];
                 } else {
                     self.fifty_move_rule_counter += 1;
                 }
@@ -303,23 +327,71 @@ impl ChessGame {
 
         self.current_players_turn = self.current_players_turn.opposite();
         self.moves.push(chess_move);
+        self.previous_board_states
+            .push(encode_board_as_binary(self.get_board()));
 
         self.get_game_state()
     }
 
+    /// Get the current state of the game.
+    ///
+    /// # Returns
+    ///
+    /// `GameState`: The current state of the game, which can be calculated
+    /// based on various factors like board configuration, move history, etc.
+    ///
+    /// This method internally calls a function to determine the game state
+    /// and returns the result.
+    ///
     pub fn get_game_state(&mut self) -> GameState {
         get_game_state(self)
     }
 
+    ///
+    /// Determines if a draw can be claimed in the game based on specific rules.
+    ///
+    /// # Returns
+    ///
+    /// `Option<DrawReason>`: An optional `DrawReason` indicating the reason a draw can be claimed.
+    /// Returns `None` if a draw cannot be claimed.
+    ///
+    /// A draw can be claimed based on:
+    ///
+    /// - The fifty-move rule: If fifty moves have been made without a pawn move or piece capture.
+    /// - Insufficient material: If the material left on the board is not enough for a checkmate.
+    /// - Repetition: If the same board state has been repeated three times.
+    ///
+    ///
     pub fn can_claim_draw(&self) -> Option<DrawReason> {
         if self.fifty_move_rule_counter >= 100 {
-            return Some(DrawReason::Repetition);
+            return Some(FiftyMoveRule);
         }
         if is_insufficient_material(self.get_board()) {
             return Some(InsufficientPieces);
         }
-        // TODO: add by repetition
+        if self.can_claim_draw_by_repetition() {
+            return Some(Repetition);
+        }
         None
+    }
+
+    fn can_claim_draw_by_repetition(&self) -> bool {
+        let mut previous_board_states: HashMap<Vec<u8>, usize> = HashMap::new();
+        for previous_state in &self.previous_board_states {
+            match previous_board_states.get(previous_state) {
+                None => {
+                    previous_board_states.insert(previous_state.clone(), 1);
+                }
+                Some(count) => {
+                    if *count > 2 {
+                        return true;
+                    }
+                    let new_count = count + 1;
+                    previous_board_states.insert(previous_state.clone(), new_count);
+                }
+            }
+        }
+        false
     }
 }
 

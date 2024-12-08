@@ -1,6 +1,5 @@
-use game_board::Board;
 use crate::piece::ChessPiece;
-
+use game_board::Board;
 
 /// Encodes a chess board into a binary vector representation.
 ///
@@ -63,10 +62,10 @@ pub fn encode_board_as_binary(board: &Board<ChessPiece>) -> Vec<u8> {
 mod tests {
 
     mod encoding_tests {
+        use super::super::*;
+        use crate::piece::PieceType::King;
         use crate::ChessGame;
         use crate::Color::Black;
-        use crate::piece::PieceType::King;
-        use super::super::*;
 
         #[test]
         fn encode_starting_position() {
