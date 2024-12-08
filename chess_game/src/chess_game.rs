@@ -311,7 +311,13 @@ impl ChessGame {
         self.get_game_state()
     }
 
-    fn update_castling_rights(&mut self, taken_piece: Option<ChessPiece>, piece: ChessPiece, original_position: (usize, usize), new_position: (usize, usize)) {
+    fn update_castling_rights(
+        &mut self,
+        taken_piece: Option<ChessPiece>,
+        piece: ChessPiece,
+        original_position: (usize, usize),
+        new_position: (usize, usize),
+    ) {
         if let Some(piece) = taken_piece {
             if piece.get_piece_type() == Rook {
                 match piece.get_color() {
@@ -320,17 +326,17 @@ impl ChessGame {
                             if new_position.0 == 0 {
                                 self.can_white_castle_long = false;
                             }
-                            if new_position.0 == self.board.get_width() -1  {
+                            if new_position.0 == self.board.get_width() - 1 {
                                 self.can_white_castle_short = false;
                             }
                         }
                     }
                     Black => {
-                        if new_position.1 == self.board.get_height() -1 {
+                        if new_position.1 == self.board.get_height() - 1 {
                             if new_position.0 == 0 {
                                 self.can_black_castle_long = false;
                             }
-                            if new_position.0 == self.board.get_width() -1  {
+                            if new_position.0 == self.board.get_width() - 1 {
                                 self.can_black_castle_short = false;
                             }
                         }
