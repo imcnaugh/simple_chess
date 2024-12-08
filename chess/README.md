@@ -1,4 +1,4 @@
-# Chess
+# Simple Chess
 
 This package provides a comprehensive implementation of the game of chess. It includes all the necessary components to
 simulate a chess game, and offers functionalities for game setup, move validation, and game state evaluation. This

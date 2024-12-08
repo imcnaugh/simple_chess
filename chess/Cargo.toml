@@ -1,5 +1,5 @@
 [package]
-name = "chess"
+name = "simple_chess"
 description = "A simple chess game implimentation"
 authors = ["Ian McNaughton <IanMcNaugh@gmail.com>"]
 readme = "README.md"
