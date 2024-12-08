@@ -1,7 +1,8 @@
-use crate::chess_game_state_analyzer::{get_game_state, GameState};
+use crate::chess_game::DrawReason::InsufficientPieces;
+use crate::chess_game_state_analyzer::{get_game_state, is_insufficient_material, GameState};
 use crate::chess_move::ChessMoveType;
-use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::piece::ChessPiece;
+use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::Color;
 use crate::Color::{Black, White};
 use game_board::Board;
@@ -16,6 +17,12 @@ pub struct ChessGame {
     can_black_castle_short: bool,
     can_black_castle_long: bool,
     moves: Vec<ChessMoveType>,
+}
+
+pub enum DrawReason {
+    InsufficientPieces,
+    Repetition,
+    FiftyMoveRule,
 }
 
 fn build_board_with_starting_position() -> Board<ChessPiece> {
@@ -155,26 +162,6 @@ impl ChessGame {
         )
     }
 
-    /// Get the fifty-move rule counter
-    ///
-    /// # Returns
-    ///
-    /// `usize`: The current count of half-moves since the last capture or pawn move.
-    /// This counter is used to determine if the fifty-move rule has been reached,
-    /// which allows a player to claim a draw if fifty consecutive moves have been
-    /// made without any pawn movement or piece capture.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use chess_game::ChessGame;
-    /// let chess_game = ChessGame::new();
-    /// assert_eq!(chess_game.get_50_move_rule_counter(), 0);
-    /// ```
-    pub fn get_50_move_rule_counter(&self) -> usize {
-        self.fifty_move_rule_counter
-    }
-
     /// Returns the current turn number.
     ///
     /// # Returns
@@ -228,6 +215,26 @@ impl ChessGame {
     /// ```
     pub fn get_last_move(&self) -> Option<&ChessMoveType> {
         self.moves.last()
+    }
+
+    /// Get the fifty-move rule counter
+    ///
+    /// # Returns
+    ///
+    /// `usize`: The current count of half-moves since the last capture or pawn move.
+    /// This counter is used to determine if the fifty-move rule has been reached,
+    /// which allows a player to claim a draw if fifty consecutive moves have been
+    /// made without any pawn movement or piece capture.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use chess_game::ChessGame;
+    /// let chess_game = ChessGame::new();
+    /// assert_eq!(chess_game.get_50_move_rule_counter(), 0);
+    /// ```
+    pub fn get_50_move_rule_counter(&self) -> usize {
+        self.fifty_move_rule_counter
     }
 
     pub fn make_move(&mut self, chess_move: ChessMoveType) -> GameState {
@@ -302,6 +309,17 @@ impl ChessGame {
 
     pub fn get_game_state(&mut self) -> GameState {
         get_game_state(self)
+    }
+
+    pub fn can_claim_draw(&self) -> Option<DrawReason> {
+        if self.fifty_move_rule_counter >= 100 {
+            return Some(DrawReason::Repetition);
+        }
+        if is_insufficient_material(self.get_board()) {
+            return Some(InsufficientPieces);
+        }
+        // TODO: add by repetition
+        None
     }
 }
 

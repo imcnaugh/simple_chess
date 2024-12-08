@@ -47,7 +47,9 @@ fn list_moves_and_select_one(moves: Vec<ChessMoveType>) -> ChessMoveType {
     }
 
     let mut input = String::new();
-    std::io::stdin().read_line(&mut input).expect("Failed to read line");
+    std::io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line");
     let input: usize = input.trim().parse().expect("Please enter a valid number");
 
     moves[input]
