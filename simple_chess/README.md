@@ -13,15 +13,6 @@ package is suitable for both hobbyists and developers looking to integrate a che
 - Undo and redo moves
 - Serializing/Deserializing via [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
 
-## Installation
-
-To use this package in your project, add the following line to your `Cargo.toml` file:
-
-```toml
-[dependencies]
-chess = "1.0.0"
-```
-
 ## Usage
 
 Below is a basic usage example showcasing how to create a new chess game and make a move:
