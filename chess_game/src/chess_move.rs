@@ -2,7 +2,6 @@ use crate::piece::ChessPiece;
 use game_board::{get_square_name_from_row_and_col, Board};
 use std::fmt::{Display, Formatter};
 
-
 /// Represents different types of chess moves.
 ///
 /// This enum captures the state and specific details of various types of legal chess moves.

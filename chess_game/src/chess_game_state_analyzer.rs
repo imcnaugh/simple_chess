@@ -1,6 +1,6 @@
 use crate::chess_game_move_analyzer;
-use crate::piece::{ChessPiece, PieceType};
 use crate::piece::PieceType::King;
+use crate::piece::{ChessPiece, PieceType};
 use crate::ChessMoveType::Move;
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
@@ -36,7 +36,6 @@ pub enum GameState {
     },
     Stalemate,
 }
-
 
 /// Determines the current state of a chess game.
 ///
@@ -83,7 +82,6 @@ pub fn get_game_state(game: &mut ChessGame) -> GameState {
     }
 }
 
-
 /// Checks if the player of the specified color is in check.
 ///
 /// This function evaluates the board to determine if the player's king is under threat from any opposing pieces.
@@ -122,21 +120,20 @@ pub fn is_in_check(color: Color, board: &Board<ChessPiece>) -> bool {
     false
 }
 
-
 /// Determines if there is insufficient material on the board to continue the game.
 ///
-/// The `is_insufficient_material` function checks if both players have insufficient material 
-/// to reach a checkmate. The game would end in a draw if neither player can checkmate the opponent, 
+/// The `is_insufficient_material` function checks if both players have insufficient material
+/// to reach a checkmate. The game would end in a draw if neither player can checkmate the opponent,
 /// regardless of the moves made.
 ///
 /// # Parameters
 ///
-/// - `board`: A reference to the `Board<ChessPiece>` containing chess pieces, representing 
+/// - `board`: A reference to the `Board<ChessPiece>` containing chess pieces, representing
 ///   the current state of the game.
 ///
 /// # Returns
 ///
-/// - `bool`: Returns `true` if both players have insufficient material to reach checkmate. 
+/// - `bool`: Returns `true` if both players have insufficient material to reach checkmate.
 ///   Otherwise, it returns `false`.
 pub fn is_insufficient_material(board: &Board<ChessPiece>) -> bool {
     let mut white_pieces = vec![];
@@ -159,14 +156,18 @@ pub fn is_insufficient_material(board: &Board<ChessPiece>) -> bool {
             let piece_type_a = pieces[0].get_piece_type();
             let piece_type_b = pieces[1].get_piece_type();
 
-            let other = if piece_type_a == King {piece_type_b} else {piece_type_a};
+            let other = if piece_type_a == King {
+                piece_type_b
+            } else {
+                piece_type_a
+            };
             return match other {
                 PieceType::Knight => true,
                 PieceType::Bishop => true,
                 _ => false,
-            }
+            };
         }
-        return false
+        return false;
     };
 
     check(&white_pieces) && check(&black_pieces)
@@ -174,10 +175,10 @@ pub fn is_insufficient_material(board: &Board<ChessPiece>) -> bool {
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     use crate::chess_game_state_analyzer::GameState::{Check, Checkmate, InProgress, Stalemate};
     use crate::codec::forsyth_edwards_notation::build_game_from_string;
     use crate::Color::{Black, White};
-    use super::*;
 
     #[test]
     fn game_with_starting_position_is_in_progress() {
@@ -186,7 +187,7 @@ mod tests {
             InProgress { legal_moves, turn } => {
                 assert_eq!(legal_moves.len(), 20);
                 assert_eq!(White, turn);
-            },
+            }
             _ => panic!("Game state is not in progress."),
         };
     }
@@ -195,10 +196,10 @@ mod tests {
     fn game_in_check_has_legal_moves() {
         let mut game = build_game_from_string("4k3/8/8/8/8/8/8/r3R3 b - - 0 1").unwrap();
         match get_game_state(&mut game) {
-            Check {legal_moves, turn} => {
+            Check { legal_moves, turn } => {
                 assert_eq!(turn, Black);
                 assert_eq!(5, legal_moves.len())
-            },
+            }
             _ => panic!("Game state is not in progress."),
         };
     }
@@ -216,7 +217,7 @@ mod tests {
     fn game_is_in_check_mate() {
         let mut game = build_game_from_string("k6R/pp6/8/8/8/8/8/8 b - - 0 1").unwrap();
         match get_game_state(&mut game) {
-            Checkmate {winner} => assert_eq!(White, winner),
+            Checkmate { winner } => assert_eq!(White, winner),
             _ => panic!("Game state is not in progress."),
         }
     }
@@ -243,7 +244,6 @@ mod tests {
 
     #[test]
     fn king_and_bishop_or_knight_is_insufficient_material() {
-
         let game = build_game_from_string("k7/8/bN6/8/8/8/8/K7 b - - 0 1").unwrap();
         assert!(is_insufficient_material(game.get_board()));
     }

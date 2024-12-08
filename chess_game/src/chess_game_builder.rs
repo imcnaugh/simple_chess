@@ -229,7 +229,7 @@ mod tests {
         let board = Board::<ChessPiece>::build(8, 8).unwrap();
 
         builder = builder.set_board(board);
-        builder = builder.set_current_turn(Color::White);
+        builder = builder.set_current_turn(White);
 
         let game_result = builder.build();
         assert!(game_result.is_ok());
@@ -238,7 +238,7 @@ mod tests {
 
         assert_eq!(8, game_result.get_board().get_width());
         assert_eq!(8, game_result.get_board().get_height());
-        assert_eq!(Color::White, game_result.get_current_players_turn());
+        assert_eq!(White, game_result.get_current_players_turn());
         assert_eq!(0, game_result.get_50_move_rule_counter());
         assert_eq!(0, game_result.get_turn_number());
         let (castle_wl, castle_ws, castle_bl, castle_bs) = game_result.get_castling_rights();
