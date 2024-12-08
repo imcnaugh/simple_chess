@@ -138,6 +138,17 @@ impl ChessPiece {
         }
     }
 
+    pub fn as_binary(&self) -> u8 {
+        match self.piece_type {
+            PieceType::Pawn => pawn::as_binary(self.color),
+            PieceType::Rook => rook::as_binary(self.color),
+            PieceType::Knight => knight::as_binary(self.color),
+            PieceType::Bishop => bishop::as_binary(self.color),
+            PieceType::Queen => queen::as_binary(self.color),
+            PieceType::King => king::as_binary(self.color),
+        }
+    }
+
     /// Returns a vector of possible moves for the chess piece from a given position on the board.
     ///
     /// This function computes the possible moves for the chess piece, based on its type, current
