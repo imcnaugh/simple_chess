@@ -22,6 +22,7 @@ pub struct ChessGame {
     previous_board_states: Vec<Vec<u8>>,
 }
 
+#[derive(Debug)]
 pub enum DrawReason {
     InsufficientPieces,
     Repetition,
@@ -271,6 +272,7 @@ impl ChessGame {
                 taken_piece,
                 piece,
                 original_position,
+                new_position,
                 ..
             } => {
                 if taken_piece.is_some() || piece.get_piece_type() == Pawn {
@@ -278,6 +280,28 @@ impl ChessGame {
                     self.previous_board_states = vec![];
                 } else {
                     self.fifty_move_rule_counter += 1;
+                }
+
+                if let Some(piece) = taken_piece {
+                    if piece.get_piece_type() == Rook {
+                        let starting_row = match piece.get_color() {
+                            White => 0,
+                            Black => self.board.get_height() -1
+                        };
+                        if new_position.1 == starting_row {
+                            if new_position.0 == 0 {
+                                match self.current_players_turn {
+                                    White => self.can_white_castle_long = false,
+                                    Black => self.can_black_castle_long = false,
+                                }
+                            } else if new_position.0 == self.board.get_width() - 1 {
+                                match self.current_players_turn {
+                                    White => self.can_white_castle_short = false,
+                                    Black => self.can_black_castle_short = false,
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if piece.get_piece_type() == Rook {
@@ -322,13 +346,14 @@ impl ChessGame {
             }
             _ => {
                 self.fifty_move_rule_counter = 0;
+                self.previous_board_states = vec![];
             }
         }
 
-        self.current_players_turn = self.current_players_turn.opposite();
         self.moves.push(chess_move);
         self.previous_board_states
             .push(encode_board_as_binary(self.get_board()));
+        self.current_players_turn = self.current_players_turn.opposite();
 
         self.get_game_state()
     }
