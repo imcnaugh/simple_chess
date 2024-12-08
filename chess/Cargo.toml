@@ -1,6 +1,10 @@
 [package]
 name = "chess"
 description = "A simple chess game implimentation"
+authors = ["Ian McNaughton <IanMcNaugh@gmail.com>"]
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/imcnaugh/chess_game/tree/main/chess"
 version = "1.0.0"
 edition = "2021"
 
