@@ -163,7 +163,7 @@ pub fn is_insufficient_material(board: &Board<ChessPiece>) -> bool {
             };
             return matches!(other, PieceType::Knight | PieceType::Bishop)
         }
-        return false;
+        false
     };
 
     check(&white_pieces) && check(&black_pieces)

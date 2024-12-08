@@ -217,6 +217,12 @@ impl ChessGameBuilder {
     }
 }
 
+impl Default for ChessGameBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

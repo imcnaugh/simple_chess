@@ -9,8 +9,7 @@ use crate::{ChessGame, ChessMoveType, Color};
 ///
 /// # Arguments
 ///
-/// * `game` - A mutable reference to the `ChessGame` instance for which legal moves
-/// need to be determined.
+/// * `game` - A mutable reference to the `ChessGame` instance for which legal moves need to be determined.
 ///
 /// # Returns
 ///
@@ -25,7 +24,7 @@ pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
         .filter(|possible_move| {
             let board = game.get_board_mut();
             possible_move.make_move(board);
-            let in_check = is_in_check(current_turn, &board);
+            let in_check = is_in_check(current_turn, board);
             possible_move.undo_move(board);
             !in_check
         })
