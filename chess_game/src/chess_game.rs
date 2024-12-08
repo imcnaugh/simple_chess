@@ -282,54 +282,7 @@ impl ChessGame {
                     self.fifty_move_rule_counter += 1;
                 }
 
-                if let Some(piece) = taken_piece {
-                    if piece.get_piece_type() == Rook {
-                        let starting_row = match piece.get_color() {
-                            White => 0,
-                            Black => self.board.get_height() -1
-                        };
-                        if new_position.1 == starting_row {
-                            if new_position.0 == 0 {
-                                match self.current_players_turn {
-                                    White => self.can_white_castle_long = false,
-                                    Black => self.can_black_castle_long = false,
-                                }
-                            } else if new_position.0 == self.board.get_width() - 1 {
-                                match self.current_players_turn {
-                                    White => self.can_white_castle_short = false,
-                                    Black => self.can_black_castle_short = false,
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if piece.get_piece_type() == Rook {
-                    if original_position.0 < self.board.get_width() / 2 {
-                        match self.current_players_turn {
-                            White => self.can_white_castle_long = false,
-                            Black => self.can_black_castle_long = false,
-                        }
-                    } else {
-                        match self.current_players_turn {
-                            White => self.can_white_castle_short = false,
-                            Black => self.can_black_castle_short = false,
-                        }
-                    }
-                }
-
-                if piece.get_piece_type() == King {
-                    match self.current_players_turn {
-                        White => {
-                            self.can_white_castle_long = false;
-                            self.can_white_castle_short = false;
-                        }
-                        Black => {
-                            self.can_black_castle_long = false;
-                            self.can_black_castle_short = false;
-                        }
-                    }
-                }
+                self.update_castling_rights(taken_piece, piece, original_position, new_position);
             }
             ChessMoveType::Castle { .. } => {
                 match self.current_players_turn {
@@ -356,6 +309,62 @@ impl ChessGame {
         self.current_players_turn = self.current_players_turn.opposite();
 
         self.get_game_state()
+    }
+
+    fn update_castling_rights(&mut self, taken_piece: Option<ChessPiece>, piece: ChessPiece, original_position: (usize, usize), new_position: (usize, usize)) {
+        if let Some(piece) = taken_piece {
+            if piece.get_piece_type() == Rook {
+                match piece.get_color() {
+                    White => {
+                        if new_position.1 == 0 {
+                            if new_position.0 == 0 {
+                                self.can_white_castle_long = false;
+                            }
+                            if new_position.0 == self.board.get_width() -1  {
+                                self.can_white_castle_short = false;
+                            }
+                        }
+                    }
+                    Black => {
+                        if new_position.1 == self.board.get_height() -1 {
+                            if new_position.0 == 0 {
+                                self.can_black_castle_long = false;
+                            }
+                            if new_position.0 == self.board.get_width() -1  {
+                                self.can_black_castle_short = false;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if piece.get_piece_type() == Rook {
+            if original_position.0 < self.board.get_width() / 2 {
+                match self.current_players_turn {
+                    White => self.can_white_castle_long = false,
+                    Black => self.can_black_castle_long = false,
+                }
+            } else {
+                match self.current_players_turn {
+                    White => self.can_white_castle_short = false,
+                    Black => self.can_black_castle_short = false,
+                }
+            }
+        }
+
+        if piece.get_piece_type() == King {
+            match self.current_players_turn {
+                White => {
+                    self.can_white_castle_long = false;
+                    self.can_white_castle_short = false;
+                }
+                Black => {
+                    self.can_black_castle_long = false;
+                    self.can_black_castle_short = false;
+                }
+            }
+        }
     }
 
     /// Get the current state of the game.

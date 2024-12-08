@@ -73,7 +73,7 @@ fn generate_possible_castling_moves(color: Color, game: &mut ChessGame) -> Vec<C
         return moves;
     }
     if long_castle {
-        for col in 1..board.get_width() {
+        for col in 1..board.get_width() - 1 {
             if let Some(piece) = board.get_piece_at_space(col, row) {
                 if piece.get_piece_type() != King || piece.get_color() != color {
                     break;
