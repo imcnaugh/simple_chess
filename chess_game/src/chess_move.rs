@@ -232,11 +232,7 @@ impl Display for ChessMoveType {
             }
             ChessMoveType::EnPassant {
                 original_position,
-                new_position,
-                piece,
-                taken_piece,
-                taken_piece_position,
-                promotion,
+                ..
             } => {
                 write!(f, "en passant from {:?}", original_position)
             }

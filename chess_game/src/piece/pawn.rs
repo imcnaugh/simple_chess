@@ -98,7 +98,7 @@ pub fn possible_moves(
                 position,
                 (position.0 - 1, next_row as usize),
                 color,
-                Some(piece.clone()),
+                Some(*piece),
                 next_row as usize == promotion_row,
             ));
         }
@@ -142,7 +142,7 @@ pub fn possible_moves(
                 position,
                 (position.0 + 1, next_row as usize),
                 color,
-                Some(piece.clone()),
+                Some(*piece),
                 next_row as usize == promotion_row,
             ));
         }

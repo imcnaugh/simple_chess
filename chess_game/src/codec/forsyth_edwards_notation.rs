@@ -283,11 +283,10 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
 }
 
 fn get_current_turn_char(game: &ChessGame) -> char {
-    let current_turn = match game.get_current_players_turn() {
+    match game.get_current_players_turn() {
         White => 'w',
         Black => 'b',
-    };
-    current_turn
+    }
 }
 
 fn get_castling_rights(game: &ChessGame) -> String {
