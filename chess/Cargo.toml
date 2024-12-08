@@ -9,4 +9,4 @@ version = "1.0.0"
 edition = "2021"
 
 [dependencies]
-game_board = { path = "../game_board" }
+game_board = "1.0.0"
