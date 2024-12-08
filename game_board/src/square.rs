@@ -2,7 +2,7 @@ use crate::color::SquareColor;
 use core::fmt;
 use std::fmt::{Display, Formatter};
 
-/// Converts a given column and row to a chess-style coordinate string.
+/// Converts a given column and row to a simple_chess-style coordinate string.
 ///
 /// The function works by repeatedly dividing the column index by 26 to
 /// convert it to a base-26 representation, with 'a' representing 1, 'b'
@@ -16,7 +16,7 @@ use std::fmt::{Display, Formatter};
 ///
 /// # Returns
 ///
-/// A `String` containing the coordinate in chess notation.
+/// A `String` containing the coordinate in simple_chess notation.
 ///
 /// # Examples
 ///
@@ -51,7 +51,7 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
     format!("{}{}", col_id, row + 1)
 }
 
-/// Converts a chess-style coordinate string to a given column and row.
+/// Converts a simple_chess-style coordinate string to a given column and row.
 ///
 /// The function works by separating the alphabetic characters (columns)
 /// from the numeric characters (rows) in the input string. Once split,
@@ -60,7 +60,7 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
 ///
 /// # Arguments
 ///
-/// * `name` - A `&str` representing the coordinate in chess notation,
+/// * `name` - A `&str` representing the coordinate in simple_chess notation,
 ///            with alphabetic characters for the column and numeric
 ///            characters for the row. Examples include "a1", "b2", "z2", etc.
 ///
@@ -139,7 +139,7 @@ pub fn get_column_and_row_from_square_name(name: &str) -> Result<(usize, usize),
     Ok((column - 1, row - 1))
 }
 
-/// Represents a square on a chess board.
+/// Represents a square on a simple_chess board.
 ///
 /// The `Square` struct holds the column and row indices, the color of the square,
 /// and an optional piece that might occupy the square. The color is determined based
@@ -282,7 +282,7 @@ impl<P> Square<P> {
         self.color
     }
 
-    /// Gets the name of the square in standard chess notation.
+    /// Gets the name of the square in standard simple_chess notation.
     ///
     /// # Examples
     ///

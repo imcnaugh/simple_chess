@@ -46,7 +46,7 @@ fn build_board_with_starting_position() -> Board<ChessPiece> {
 }
 
 impl ChessGame {
-    /// Initialize a new chess game.
+    /// Initialize a new simple_chess game.
     ///
     /// This function sets up a `ChessGame` with a starting board configuration,
     /// sets the current player's turn to white, initializes the turn number and
@@ -59,7 +59,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessGame;
+    /// use simple_chess::ChessGame;
     /// let game = ChessGame::new();
     /// ```
     pub fn new() -> ChessGame {
@@ -112,7 +112,7 @@ impl ChessGame {
 
     /// Get a mutable reference to the board
     ///
-    /// This method provides mutable access to the chess board, allowing for
+    /// This method provides mutable access to the simple_chess board, allowing for
     /// modifications to be made directly to the board's state. This can be useful
     /// when making moves or updating the board after certain actions during the game.
     ///
@@ -123,7 +123,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessGame;
+    /// use simple_chess::ChessGame;
     /// let mut chess_game = ChessGame::new();
     /// let board = chess_game.get_board_mut();
     /// // Modify the board or make moves
@@ -141,7 +141,7 @@ impl ChessGame {
     ///
     /// # Examples
     /// ```
-    /// use chess_game::{ChessGame, Color};
+    /// use simple_chess::{ChessGame, Color};
     /// let chess_game = ChessGame::new();
     /// // Assuming the game starts with White's turn
     /// assert_eq!(chess_game.get_current_players_turn(), Color::White);
@@ -178,7 +178,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessGame;
+    /// use simple_chess::ChessGame;
     /// let chess_game = ChessGame::new();
     /// assert_eq!(chess_game.get_turn_number(), 1);
     /// ```
@@ -195,7 +195,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::{ChessGame, ChessMoveType};
+    /// use simple_chess::{ChessGame, ChessMoveType};
     /// let chess_game = ChessGame::new();
     /// // Assuming no moves have been made yet
     /// assert!(chess_game.get_moves().is_empty());
@@ -214,7 +214,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::{ChessGame, ChessMoveType};
+    /// use simple_chess::{ChessGame, ChessMoveType};
     /// let chess_game = ChessGame::new();
     /// // Assuming no moves have been made yet
     /// assert_eq!(chess_game.get_last_move(), None);
@@ -235,7 +235,7 @@ impl ChessGame {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessGame;
+    /// use simple_chess::ChessGame;
     /// let chess_game = ChessGame::new();
     /// assert_eq!(chess_game.get_50_move_rule_counter(), 0);
     /// ```
@@ -243,7 +243,7 @@ impl ChessGame {
         self.fifty_move_rule_counter
     }
 
-    /// Executes a given move on the chess board.
+    /// Executes a given move on the simple_chess board.
     ///
     /// # Arguments
     ///

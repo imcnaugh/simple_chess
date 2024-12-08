@@ -8,7 +8,7 @@ use game_board::Board;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
-/// Encodes the current state of the chess game as a string in FEN (Forsyth-Edwards Notation) format.
+/// Encodes the current state of the simple_chess game as a string in FEN (Forsyth-Edwards Notation) format.
 ///
 /// The resulting string consists of the following parts:
 ///
@@ -30,7 +30,7 @@ use std::fmt::{Debug, Display, Formatter};
 ///
 /// # Returns
 ///
-/// A `String` representing the current state of the chess game.
+/// A `String` representing the current state of the simple_chess game.
 pub fn encode_game_as_string(game: &ChessGame) -> String {
     format!(
         "{} {} {} {} {} {}",
@@ -50,7 +50,7 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
 ///
 /// # Arguments
 ///
-/// * `fen_string` - A string slice representing the state of the chess game in FEN format.
+/// * `fen_string` - A string slice representing the state of the simple_chess game in FEN format.
 ///
 /// # Returns
 ///
@@ -59,7 +59,7 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
 ///
 /// # Example
 /// ```
-/// use chess_game::codec::forsyth_edwards_notation::build_game_from_string;
+/// use simple_chess::codec::forsyth_edwards_notation::build_game_from_string;
 ///
 /// let starting_position_string = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 /// let game = build_game_from_string(starting_position_string);

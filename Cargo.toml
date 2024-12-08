@@ -3,13 +3,7 @@ name = "chess_cli"
 version = "1.0.0"
 edition = "2021"
 
-[workspace]
-members = [
-    "game_board",
-    "chess",
-]
-
 [dependencies]
 rand = "0.8.5"
-chess = { path = "chess" }
-game_board = { path = "game_board" }
+game_board = "1.0.0"
+simple_chess = "1.0.0"

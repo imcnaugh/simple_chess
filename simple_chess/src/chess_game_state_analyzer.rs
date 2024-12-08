@@ -5,9 +5,9 @@ use crate::ChessMoveType::Move;
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
 
-/// Represents the current state of a chess game.
+/// Represents the current state of a simple_chess game.
 ///
-/// The `GameState` enum is used to track the status of an ongoing chess game.
+/// The `GameState` enum is used to track the status of an ongoing simple_chess game.
 /// It can be one of four possible states:
 ///
 /// - `InProgress`: The game is actively being played, with available legal moves for the current turn.
@@ -37,9 +37,9 @@ pub enum GameState {
     Stalemate,
 }
 
-/// Determines the current state of a chess game.
+/// Determines the current state of a simple_chess game.
 ///
-/// The `get_game_state` function analyzes the chess game to determine
+/// The `get_game_state` function analyzes the simple_chess game to determine
 /// its current status. It will return one of the `GameState` variants:
 ///
 /// - `InProgress`: If there are legal moves available and the game continues.
@@ -56,7 +56,7 @@ pub enum GameState {
 ///
 /// # Returns
 ///
-/// - `GameState`: Enum variant representing the current state of the chess game.
+/// - `GameState`: Enum variant representing the current state of the simple_chess game.
 pub fn get_game_state(game: &mut ChessGame) -> GameState {
     let legal_moves = chess_game_move_analyzer::get_legal_moves(game);
     if is_in_check(game.get_current_players_turn(), game.get_board()) {
@@ -90,7 +90,7 @@ pub fn get_game_state(game: &mut ChessGame) -> GameState {
 /// # Parameters
 ///
 /// - `color`: The `Color` of the player whose king status is being checked.
-/// - `board`: A reference to the `Board` containing chess pieces, representing the current state of the game.
+/// - `board`: A reference to the `Board` containing simple_chess pieces, representing the current state of the game.
 ///
 /// # Returns
 ///
@@ -128,7 +128,7 @@ pub fn is_in_check(color: Color, board: &Board<ChessPiece>) -> bool {
 ///
 /// # Parameters
 ///
-/// - `board`: A reference to the `Board<ChessPiece>` containing chess pieces, representing
+/// - `board`: A reference to the `Board<ChessPiece>` containing simple_chess pieces, representing
 ///   the current state of the game.
 ///
 /// # Returns

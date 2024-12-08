@@ -2,18 +2,18 @@ use crate::piece::ChessPiece;
 use game_board::{get_square_name_from_row_and_col, Board};
 use std::fmt::{Display, Formatter};
 
-/// Represents different types of chess moves.
+/// Represents different types of simple_chess moves.
 ///
-/// This enum captures the state and specific details of various types of legal chess moves.
-/// It provides functionality to apply and undo these moves on a chess board.
+/// This enum captures the state and specific details of various types of legal simple_chess moves.
+/// It provides functionality to apply and undo these moves on a simple_chess board.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ChessMoveType {
     /// A regular piece move which might include capturing an opponent's piece or promoting a pawn.
     ///
     /// Fields:
-    /// - `original_position`: (usize, usize) - The starting position of the chess piece.
-    /// - `new_position`: (usize, usize) - The destination position of the chess piece.
-    /// - `piece`: ChessPiece - The chess piece being moved.
+    /// - `original_position`: (usize, usize) - The starting position of the simple_chess piece.
+    /// - `new_position`: (usize, usize) - The destination position of the simple_chess piece.
+    /// - `piece`: ChessPiece - The simple_chess piece being moved.
     /// - `taken_piece`: Option<ChessPiece> - The opponent's piece captured during this move, if any.
     /// - `promotion`: Option<ChessPiece> - The piece type a pawn is promoted to, if applicable.
     Move {
@@ -59,22 +59,22 @@ pub enum ChessMoveType {
 }
 
 impl ChessMoveType {
-    /// Applies the current move to the chess board.
+    /// Applies the current move to the simple_chess board.
     ///
     /// This method performs the actual move on the board by repositioning the involved
     /// pieces according to the move type.
     ///
     /// # Arguments
     ///
-    /// * `board` - A mutable reference to the chess board on which the move will be applied.
+    /// * `board` - A mutable reference to the simple_chess board on which the move will be applied.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessMoveType;
-    /// use chess_game::Color::White;
-    /// use chess_game::piece::ChessPiece;
-    /// use chess_game::piece::PieceType::Pawn;
+    /// use simple_chess::ChessMoveType;
+    /// use simple_chess::Color::White;
+    /// use simple_chess::piece::ChessPiece;
+    /// use simple_chess::piece::PieceType::Pawn;
     /// use game_board::Board;
     /// let mut board = Board::build(8, 8).unwrap();
     /// let original_position = (0, 1);

@@ -5,7 +5,7 @@ use crate::ChessMoveType::{Castle, Move};
 use crate::{ChessGame, ChessMoveType, Color};
 
 ///
-/// Returns a vector of legal moves for the current player's turn in the given chess game.
+/// Returns a vector of legal moves for the current player's turn in the given simple_chess game.
 ///
 /// # Arguments
 ///

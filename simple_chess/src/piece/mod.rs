@@ -20,7 +20,7 @@ pub enum PieceType {
     King,
 }
 
-/// ChessPiece represents a single chess piece on the board.
+/// ChessPiece represents a single simple_chess piece on the board.
 ///
 /// Each ChessPiece has a specific type (Pawn, Rook, Knight, Bishop, Queen, King)
 /// and a color (White or Black).
@@ -35,14 +35,14 @@ impl ChessPiece {
     ///
     /// # Arguments
     ///
-    /// * `piece_type` - The type of the chess piece (e.g., Pawn, Rook, Knight, Bishop, Queen, King).
-    /// * `color` - The color of the chess piece (e.g., White or Black).
+    /// * `piece_type` - The type of the simple_chess piece (e.g., Pawn, Rook, Knight, Bishop, Queen, King).
+    /// * `color` - The color of the simple_chess piece (e.g., White or Black).
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// let black_pawn = ChessPiece::new(PieceType::Pawn, Color::Black);
@@ -51,13 +51,13 @@ impl ChessPiece {
         Self { piece_type, color }
     }
 
-    /// Returns the color of the chess piece.
+    /// Returns the color of the simple_chess piece.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     ///
     /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
     /// assert_eq!(white_pawn.get_color(), Color::White);
@@ -69,13 +69,13 @@ impl ChessPiece {
         self.color
     }
 
-    /// Returns the type of the chess piece.
+    /// Returns the type of the simple_chess piece.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     ///
     /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
     /// assert_eq!(white_pawn.get_piece_type(), PieceType::Pawn);
@@ -87,13 +87,13 @@ impl ChessPiece {
         self.piece_type
     }
 
-    /// Returns the UTF-8 string representation of the chess piece based on its type and color.
+    /// Returns the UTF-8 string representation of the simple_chess piece based on its type and color.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// assert_eq!(white_king.as_utf_str(), "♔");
@@ -112,14 +112,14 @@ impl ChessPiece {
         }
     }
 
-    /// Returns the FEN (Forsyth-Edwards Notation) character representation of the chess piece
+    /// Returns the FEN (Forsyth-Edwards Notation) character representation of the simple_chess piece
     /// based on its type and color.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);
     /// assert_eq!(white_king.as_fen_char(), 'K');
@@ -149,32 +149,32 @@ impl ChessPiece {
         }
     }
 
-    /// Returns a vector of possible moves for the chess piece from a given position on the board.
+    /// Returns a vector of possible moves for the simple_chess piece from a given position on the board.
     ///
-    /// This function computes the possible moves for the chess piece, based on its type, current
+    /// This function computes the possible moves for the simple_chess piece, based on its type, current
     /// position on the board, and the state of the board. The rules for valid moves for each
-    /// type of chess piece are applied.
+    /// type of simple_chess piece are applied.
     ///
     /// Pins are not taken into account in this function, you will need to filter the returned
     /// vector of moves based off if they leave the king in check or not.
     ///
     /// # Arguments
     ///
-    /// * `position` - A tuple `(usize, usize)` representing the current position of the chess piece
+    /// * `position` - A tuple `(usize, usize)` representing the current position of the simple_chess piece
     ///                on the board (row, column).
     /// * `board` - A reference to the `Board<ChessPiece>` which represents the current state of the
-    ///             chess board, including all pieces and their positions.
+    ///             simple_chess board, including all pieces and their positions.
     ///
     /// # Returns
     ///
-    /// A `Vec<ChessMoveType>` containing all possible moves for the chess piece from its current
-    /// position, based on the rules for the specific type of chess piece.
+    /// A `Vec<ChessMoveType>` containing all possible moves for the simple_chess piece from its current
+    /// position, based on the rules for the specific type of simple_chess piece.
     ///
     /// # Examples
     ///
     /// ```
-    /// use chess_game::piece::{ChessPiece, PieceType};
-    /// use chess_game::Color;
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
     /// use game_board::Board;
     ///
     /// let white_king = ChessPiece::new(PieceType::King, Color::White);

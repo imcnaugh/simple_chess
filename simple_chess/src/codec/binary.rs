@@ -1,15 +1,15 @@
 use crate::piece::ChessPiece;
 use game_board::Board;
 
-/// Encodes a chess board into a binary vector representation.
+/// Encodes a simple_chess board into a binary vector representation.
 ///
 /// # Arguments
 ///
-/// * `board` - A reference to a `Board<ChessPiece>` representing the chess board to be encoded.
+/// * `board` - A reference to a `Board<ChessPiece>` representing the simple_chess board to be encoded.
 ///
 /// # Returns
 ///
-/// A `Vec<u8>` where each byte represents two chess pieces on the board. The encoding is such that:
+/// A `Vec<u8>` where each byte represents two simple_chess pieces on the board. The encoding is such that:
 /// - The board is traversed from top to bottom, left to right.
 /// - Each pair of consecutive spaces on the board is encoded into a single byte.
 /// - The first piece in the pair is stored in the higher 4 bits of the byte, and the second piece in the lower 4 bits.

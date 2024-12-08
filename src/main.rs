@@ -1,9 +1,9 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use chess::chess_game_state_analyzer::GameState;
-use chess::{ChessGame, ChessMoveType, Color};
-use chess::piece::ChessPiece;
 use game_board::Board;
+use simple_chess::chess_game_state_analyzer::GameState;
+use simple_chess::{ChessGame, ChessMoveType, Color};
+use simple_chess::piece::ChessPiece;
 
 fn main() {
     let mut game = ChessGame::new();

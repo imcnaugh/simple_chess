@@ -9,7 +9,7 @@ use game_board::Board;
 /// configured before the game can commence.
 ///
 /// # Required Fields
-/// - `board`: The chess board configuration.
+/// - `board`: The simple_chess board configuration.
 /// - `current_players_turn`: The color of the player whose turn it is.
 pub struct ChessGameBuilder {
     board: Option<Board<ChessPiece>>,
@@ -30,7 +30,7 @@ impl ChessGameBuilder {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::ChessGameBuilder;
+    /// use simple_chess::ChessGameBuilder;
     ///
     /// let builder = ChessGameBuilder::new();
     /// // Now you can set various fields using the builder methods.
@@ -52,7 +52,7 @@ impl ChessGameBuilder {
     /// Finalizes the construction of a `ChessGame` instance.
     ///
     /// This method checks if the necessary components (board and current player's turn)
-    /// for a chess game are set. If any of these components are missing, it returns an
+    /// for a simple_chess game are set. If any of these components are missing, it returns an
     /// error; otherwise, it constructs and returns a `ChessGame` instance.
     ///
     /// # Returns
@@ -63,10 +63,10 @@ impl ChessGameBuilder {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::{ChessGameBuilder, Color, ChessMoveType};
-    /// use chess_game::Color::White;
-    /// use chess_game::piece::ChessPiece;
-    /// use chess_game::piece::PieceType::Pawn;
+    /// use simple_chess::{ChessGameBuilder, Color, ChessMoveType};
+    /// use simple_chess::Color::White;
+    /// use simple_chess::piece::ChessPiece;
+    /// use simple_chess::piece::PieceType::Pawn;
     /// use game_board::Board;
     ///
     /// let board: Board<ChessPiece> = Board::build(8, 8).unwrap();
@@ -111,7 +111,7 @@ impl ChessGameBuilder {
 
     /// Sets the board for the `ChessGame`.
     ///
-    /// This method allows you to set the chess board configuration to be used in the game.
+    /// This method allows you to set the simple_chess board configuration to be used in the game.
     ///
     /// # Arguments
     ///
@@ -160,7 +160,7 @@ impl ChessGameBuilder {
     /// Sets the counter for the fifty-move rule in the `ChessGame`.
     ///
     /// This method allows you to specify the current state of the fifty-move rule
-    /// counter. The fifty-move rule in chess states that a player can claim a draw
+    /// counter. The fifty-move rule in simple_chess states that a player can claim a draw
     /// if no pawn has been moved and no capture has been made in the last fifty moves.
     ///
     /// # Arguments

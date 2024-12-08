@@ -12,7 +12,7 @@ impl Color {
     /// # Examples
     ///
     /// ```
-    /// use chess_game::Color::{Black, White};
+    /// use simple_chess::Color::{Black, White};
     ///
     /// let color = White;
     /// assert_eq!(color.opposite(), Black);
