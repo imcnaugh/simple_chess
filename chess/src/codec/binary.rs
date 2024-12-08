@@ -24,7 +24,6 @@ use game_board::Board;
 ///   |Bishop       |100                |
 ///   |King         |101                |
 ///   |Queen        |110                |
-///   |Empty        |111                |
 ///
 ///   |Color |Bit  |
 ///   | ---- | --- |

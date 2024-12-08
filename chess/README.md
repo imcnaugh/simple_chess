@@ -11,7 +11,7 @@ package is suitable for both hobbyists and developers looking to integrate a che
 - Game state management
 - Support for custom board setups
 - Undo and redo moves
-- Basic artificial intelligence for simple gameplay
+- Serializing/Deserializing via [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
 
 ## Installation
 
