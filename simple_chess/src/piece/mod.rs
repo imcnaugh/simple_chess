@@ -112,32 +112,6 @@ impl ChessPiece {
         }
     }
 
-    /// Returns the FEN (Forsyth-Edwards Notation) character representation of the simple_chess piece
-    /// based on its type and color.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use simple_chess::piece::{ChessPiece, PieceType};
-    /// use simple_chess::Color;
-    ///
-    /// let white_king = ChessPiece::new(PieceType::King, Color::White);
-    /// assert_eq!(white_king.as_fen_char(), 'K');
-    ///
-    /// let black_pawn = ChessPiece::new(PieceType::Pawn, Color::Black);
-    /// assert_eq!(black_pawn.as_fen_char(), 'p');
-    /// ```
-    pub fn as_fen_char(&self) -> char {
-        match self.piece_type {
-            PieceType::King => king::as_fen_char(self.color),
-            PieceType::Queen => queen::as_fen_char(self.color),
-            PieceType::Rook => rook::as_fen_char(self.color),
-            PieceType::Bishop => bishop::as_fen_char(self.color),
-            PieceType::Knight => knight::as_fen_char(self.color),
-            PieceType::Pawn => pawn::as_fen_char(self.color),
-        }
-    }
-
     /// Returns the PGN (Portable Game Notation) character representation of the simple_chess piece.
     ///
     /// PGN is a common notation for representing chess moves.

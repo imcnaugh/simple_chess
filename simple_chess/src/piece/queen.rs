@@ -10,13 +10,6 @@ pub fn as_utf_str(color: Color) -> &'static str {
     }
 }
 
-pub fn as_fen_char(color: Color) -> char {
-    match color {
-        Color::White => 'Q',
-        Color::Black => 'q',
-    }
-}
-
 pub fn as_pgn_char() -> Option<char> {
     Some('Q')
 }

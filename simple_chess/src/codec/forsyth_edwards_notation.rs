@@ -8,6 +8,19 @@ use game_board::Board;
 use std::error::Error;
 use std::fmt::{Debug, Display, Formatter};
 
+const WHITE_PAWN: char = 'P';
+const BLACK_PAWN: char = 'p';
+const WHITE_ROOK: char = 'R';
+const BLACK_ROOK: char = 'r';
+const WHITE_KNIGHT: char = 'N';
+const BLACK_KNIGHT: char = 'n';
+const WHITE_BISHOP: char = 'B';
+const BLACK_BISHOP: char = 'b';
+const WHITE_QUEEN: char = 'Q';
+const BLACK_QUEEN: char = 'q';
+const WHITE_KING: char = 'K';
+const BLACK_KING: char = 'k';
+
 /// Encodes the current state of the simple_chess game as a string in FEN (Forsyth-Edwards Notation) format.
 ///
 /// The resulting string consists of the following parts:
@@ -37,7 +50,7 @@ pub fn encode_game_as_string(game: &ChessGame) -> String {
         get_board_as_fen_string(game),
         get_current_turn_char(game),
         get_castling_rights(game),
-        get_en_passent(game),
+        get_en_passant(game),
         game.get_50_move_rule_counter(),
         game.get_turn_number()
     )
@@ -123,18 +136,18 @@ fn parse_board_from_string(
                 }
                 _ => {
                     let piece = match c {
-                        'P' => ChessPiece::new(PieceType::Pawn, White),
-                        'p' => ChessPiece::new(PieceType::Pawn, Black),
-                        'R' => ChessPiece::new(PieceType::Rook, White),
-                        'r' => ChessPiece::new(PieceType::Rook, Black),
-                        'N' => ChessPiece::new(PieceType::Knight, White),
-                        'n' => ChessPiece::new(PieceType::Knight, Black),
-                        'B' => ChessPiece::new(PieceType::Bishop, White),
-                        'b' => ChessPiece::new(PieceType::Bishop, Black),
-                        'Q' => ChessPiece::new(PieceType::Queen, White),
-                        'q' => ChessPiece::new(PieceType::Queen, Black),
-                        'K' => ChessPiece::new(PieceType::King, White),
-                        'k' => ChessPiece::new(PieceType::King, Black),
+                        WHITE_PAWN => ChessPiece::new(PieceType::Pawn, White),
+                        BLACK_PAWN => ChessPiece::new(PieceType::Pawn, Black),
+                        WHITE_ROOK => ChessPiece::new(PieceType::Rook, White),
+                        BLACK_ROOK => ChessPiece::new(PieceType::Rook, Black),
+                        WHITE_KNIGHT => ChessPiece::new(PieceType::Knight, White),
+                        BLACK_KNIGHT => ChessPiece::new(PieceType::Knight, Black),
+                        WHITE_BISHOP => ChessPiece::new(PieceType::Bishop, White),
+                        BLACK_BISHOP => ChessPiece::new(PieceType::Bishop, Black),
+                        WHITE_QUEEN => ChessPiece::new(PieceType::Queen, White),
+                        BLACK_QUEEN => ChessPiece::new(PieceType::Queen, Black),
+                        WHITE_KING => ChessPiece::new(PieceType::King, White),
+                        BLACK_KING => ChessPiece::new(PieceType::King, Black),
                         _ => {
                             return Err(ForsythEdwardsNotationError::new(format!(
                                 "Unexpected char '{c}' in file '{file}' of piece placement data"
@@ -196,12 +209,12 @@ fn parse_castling_rights_from_string(
 
 fn parse_en_passant_option_from_string(
     builder: ChessGameBuilder,
-    en_passent_option_string: &str,
+    en_passant_option_string: &str,
 ) -> Result<ChessGameBuilder, ForsythEdwardsNotationError> {
-    if en_passent_option_string == "-" {
+    if en_passant_option_string == "-" {
         Ok(builder)
     } else {
-        match game_board::get_column_and_row_from_square_name(en_passent_option_string) {
+        match game_board::get_column_and_row_from_square_name(en_passant_option_string) {
             Ok((col, row)) => {
                 let pawn_color = if row < 3 { White } else { Black };
                 let (original_row, new_row) = match pawn_color {
@@ -219,7 +232,7 @@ fn parse_en_passant_option_from_string(
                 let moves = vec![m];
                 Ok(builder.set_moves(moves))
             }
-            Err(e) => Err(ForsythEdwardsNotationError::new(format!("unable to parse en passant square '{en_passent_option_string}' into a board position: {}", e)))
+            Err(e) => Err(ForsythEdwardsNotationError::new(format!("unable to parse en passant square '{en_passant_option_string}' into a board position: {}", e)))
         }
     }
 }
@@ -282,6 +295,22 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
     result
 }
 
+fn encode_piece_as_fen_char(piece: &ChessPiece) -> char {
+    let fen_char = match piece.get_piece_type() {
+        PieceType::Pawn => (WHITE_PAWN, BLACK_PAWN),
+        PieceType::Rook => (WHITE_ROOK, BLACK_ROOK),
+        PieceType::Knight => (WHITE_KNIGHT, BLACK_KNIGHT),
+        PieceType::Bishop => (WHITE_BISHOP, BLACK_BISHOP),
+        PieceType::Queen => (WHITE_QUEEN, BLACK_QUEEN),
+        PieceType::King => (WHITE_KING, BLACK_KING),
+    };
+
+    match piece.get_color() {
+        White => fen_char.0,
+        Black => fen_char.1,
+    }
+}
+
 fn get_current_turn_char(game: &ChessGame) -> char {
     match game.get_current_players_turn() {
         White => 'w',
@@ -313,7 +342,7 @@ fn get_castling_rights(game: &ChessGame) -> String {
     result
 }
 
-fn get_en_passent(game: &ChessGame) -> String {
+fn get_en_passant(game: &ChessGame) -> String {
     if let Some(EnPassant {
         new_position: (col, row),
         ..
