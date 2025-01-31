@@ -18,8 +18,7 @@ use crate::{ChessGame, ChessMoveType, Color};
 pub fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
     let current_turn = game.get_current_players_turn();
 
-    let all_moves = get_all_moves_for_color(current_turn, game);
-    all_moves
+    get_all_moves_for_color(current_turn, game)
         .into_iter()
         .filter(|possible_move| {
             let board = game.get_board_mut();
