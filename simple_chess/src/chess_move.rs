@@ -187,25 +187,48 @@ impl ChessMoveType {
 
     pub fn as_long_algebraic_notation(&self) -> String {
         match self {
-            ChessMoveType::Move { original_position, new_position, piece, taken_piece, promotion } => {
+            ChessMoveType::Move {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                promotion,
+            } => {
                 let piece_char = match piece.as_pgn_char() {
                     Some(c) => String::from(c),
-                    None => String::new()
+                    None => String::new(),
                 };
-                let original_square_name = get_square_name_from_row_and_col(original_position.0, original_position.1);
+                let original_square_name =
+                    get_square_name_from_row_and_col(original_position.0, original_position.1);
                 let taken_str = match taken_piece {
                     Some(_) => "x",
-                    None => ""
+                    None => "",
                 };
-                let new_square_name = get_square_name_from_row_and_col(new_position.0, new_position.1);
+                let new_square_name =
+                    get_square_name_from_row_and_col(new_position.0, new_position.1);
                 let promotion_str = match promotion {
                     Some(promotion_piece) => format!("={}", promotion_piece.as_pgn_char().unwrap()),
-                    None => String::new()
+                    None => String::new(),
                 };
-                format!("{}{}{}{}{}", piece_char, original_square_name, taken_str, new_square_name, promotion_str)
+                format!(
+                    "{}{}{}{}{}",
+                    piece_char, original_square_name, taken_str, new_square_name, promotion_str
+                )
             }
-            ChessMoveType::EnPassant { original_position, new_position, piece, taken_piece, taken_piece_position, promotion } => String::from("en passant"),
-            ChessMoveType::Castle { rook_original_position, rook_new_position, king_original_position, king_new_position } => String::from("castle"),
+            ChessMoveType::EnPassant {
+                original_position,
+                new_position,
+                piece,
+                taken_piece,
+                taken_piece_position,
+                promotion,
+            } => String::from("en passant"),
+            ChessMoveType::Castle {
+                rook_original_position,
+                rook_new_position,
+                king_original_position,
+                king_new_position,
+            } => String::from("castle"),
         }
     }
 

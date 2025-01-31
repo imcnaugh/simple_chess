@@ -1,6 +1,6 @@
 use crate::piece::{ChessPiece, PieceType};
-use game_board::Board;
 use crate::Color::Black;
+use game_board::Board;
 
 /// Encodes a simple_chess board into a binary vector representation.
 ///
@@ -60,12 +60,12 @@ pub fn encode_board_as_binary(board: &Board<ChessPiece>) -> Vec<u8> {
 
 fn piece_to_binary(piece: &ChessPiece) -> u8 {
     let mut binary = match piece.get_piece_type() {
-        PieceType::Pawn =>      0b0010,
-        PieceType::Rook =>      0b0100,
-        PieceType::Knight =>    0b0110,
-        PieceType::Bishop =>    0b1000,
-        PieceType::King =>      0b1010,
-        PieceType::Queen =>     0b1100,
+        PieceType::Pawn => 0b0010,
+        PieceType::Rook => 0b0100,
+        PieceType::Knight => 0b0110,
+        PieceType::Bishop => 0b1000,
+        PieceType::King => 0b1010,
+        PieceType::Queen => 0b1100,
     };
 
     if piece.get_color() == Black {
