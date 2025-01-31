@@ -21,13 +21,6 @@ pub fn as_pgn_char() -> Option<char> {
     Some('N')
 }
 
-pub fn as_binary(color: Color) -> u8 {
-    match color {
-        Color::White => 0b0110,
-        Color::Black => 0b0111,
-    }
-}
-
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),

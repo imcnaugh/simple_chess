@@ -167,36 +167,6 @@ impl ChessPiece {
         }
     }
 
-
-    /// Returns the binary representation of the simple_chess piece as a `u8` value.
-    ///
-    /// This binary representation is useful for saving board state in a compact format
-    /// or for use in binary encoding schemes. The representation depends on the type
-    /// and color of the piece.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use simple_chess::piece::{ChessPiece, PieceType};
-    /// use simple_chess::Color;
-    ///
-    /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
-    /// assert_eq!(white_pawn.as_binary(), 0b0010);
-    ///
-    /// let black_knight = ChessPiece::new(PieceType::Knight, Color::Black);
-    /// assert_eq!(black_knight.as_binary(), 0b0111);
-    /// ```
-    pub fn as_binary(&self) -> u8 {
-        match self.piece_type {
-            PieceType::Pawn => pawn::as_binary(self.color),
-            PieceType::Rook => rook::as_binary(self.color),
-            PieceType::Knight => knight::as_binary(self.color),
-            PieceType::Bishop => bishop::as_binary(self.color),
-            PieceType::Queen => queen::as_binary(self.color),
-            PieceType::King => king::as_binary(self.color),
-        }
-    }
-
     /// Returns a vector of possible moves for the simple_chess piece from a given position on the board.
     ///
     /// This function computes the possible moves for the simple_chess piece, based on its type, current
