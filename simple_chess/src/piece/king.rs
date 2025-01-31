@@ -11,10 +11,6 @@ pub fn as_utf_str(color: Color) -> &'static str {
     }
 }
 
-pub fn as_pgn_char() -> Option<char> {
-    Some('K')
-}
-
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),

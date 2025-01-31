@@ -112,35 +112,6 @@ impl ChessPiece {
         }
     }
 
-    /// Returns the PGN (Portable Game Notation) character representation of the simple_chess piece.
-    ///
-    /// PGN is a common notation for representing chess moves.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use simple_chess::piece::{ChessPiece, PieceType};
-    /// use simple_chess::Color;
-    ///
-    /// // PGN character for a white queen
-    /// let white_queen = ChessPiece::new(PieceType::Queen, Color::White);
-    /// assert_eq!(white_queen.as_pgn_char(), Some('Q'));
-    ///
-    /// // Pawns typically have no PGN character
-    /// let black_pawn = ChessPiece::new(PieceType::Pawn, Color::Black);
-    /// assert_eq!(black_pawn.as_pgn_char(), None);
-    /// ```
-    pub fn as_pgn_char(&self) -> Option<char> {
-        match self.piece_type {
-            PieceType::Pawn => pawn::as_pgn_char(),
-            PieceType::Rook => rook::as_pgn_char(),
-            PieceType::Knight => knight::as_pgn_char(),
-            PieceType::Bishop => bishop::as_pgn_char(),
-            PieceType::Queen => queen::as_pgn_char(),
-            PieceType::King => king::as_pgn_char(),
-        }
-    }
-
     /// Returns a vector of possible moves for the simple_chess piece from a given position on the board.
     ///
     /// This function computes the possible moves for the simple_chess piece, based on its type, current

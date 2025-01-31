@@ -1,6 +1,7 @@
 use crate::chess_game::ChessGame;
 use crate::chess_game_builder::ChessGameBuilder;
-use crate::piece::{ChessPiece, PieceType};
+use crate::piece::ChessPiece;
+use crate::piece::PieceType::{Bishop, King, Knight, Pawn, Queen, Rook};
 use crate::ChessMoveType;
 use crate::ChessMoveType::EnPassant;
 use crate::Color::{Black, White};
@@ -136,18 +137,18 @@ fn parse_board_from_string(
                 }
                 _ => {
                     let piece = match c {
-                        WHITE_PAWN => ChessPiece::new(PieceType::Pawn, White),
-                        BLACK_PAWN => ChessPiece::new(PieceType::Pawn, Black),
-                        WHITE_ROOK => ChessPiece::new(PieceType::Rook, White),
-                        BLACK_ROOK => ChessPiece::new(PieceType::Rook, Black),
-                        WHITE_KNIGHT => ChessPiece::new(PieceType::Knight, White),
-                        BLACK_KNIGHT => ChessPiece::new(PieceType::Knight, Black),
-                        WHITE_BISHOP => ChessPiece::new(PieceType::Bishop, White),
-                        BLACK_BISHOP => ChessPiece::new(PieceType::Bishop, Black),
-                        WHITE_QUEEN => ChessPiece::new(PieceType::Queen, White),
-                        BLACK_QUEEN => ChessPiece::new(PieceType::Queen, Black),
-                        WHITE_KING => ChessPiece::new(PieceType::King, White),
-                        BLACK_KING => ChessPiece::new(PieceType::King, Black),
+                        WHITE_PAWN => ChessPiece::new(Pawn, White),
+                        BLACK_PAWN => ChessPiece::new(Pawn, Black),
+                        WHITE_ROOK => ChessPiece::new(Rook, White),
+                        BLACK_ROOK => ChessPiece::new(Rook, Black),
+                        WHITE_KNIGHT => ChessPiece::new(Knight, White),
+                        BLACK_KNIGHT => ChessPiece::new(Knight, Black),
+                        WHITE_BISHOP => ChessPiece::new(Bishop, White),
+                        BLACK_BISHOP => ChessPiece::new(Bishop, Black),
+                        WHITE_QUEEN => ChessPiece::new(Queen, White),
+                        BLACK_QUEEN => ChessPiece::new(Queen, Black),
+                        WHITE_KING => ChessPiece::new(King, White),
+                        BLACK_KING => ChessPiece::new(King, Black),
                         _ => {
                             return Err(ForsythEdwardsNotationError::new(format!(
                                 "Unexpected char '{c}' in file '{file}' of piece placement data"
@@ -225,7 +226,7 @@ fn parse_en_passant_option_from_string(
                 let m = ChessMoveType::Move {
                     original_position: (col, original_row),
                     new_position: (col, new_row),
-                    piece: ChessPiece::new(PieceType::Pawn, pawn_color),
+                    piece: ChessPiece::new(Pawn, pawn_color),
                     taken_piece: None,
                     promotion: None,
                 };
@@ -283,7 +284,7 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
                 result.push_str(&empty_space_counter.to_string());
                 empty_space_counter = 0;
             }
-            result.push(piece.as_fen_char());
+            result.push(encode_piece_as_fen_char(piece));
         } else {
             empty_space_counter += 1;
         }
@@ -296,18 +297,19 @@ fn encode_row(board: &Board<ChessPiece>, row: usize) -> String {
 }
 
 fn encode_piece_as_fen_char(piece: &ChessPiece) -> char {
-    let fen_char = match piece.get_piece_type() {
-        PieceType::Pawn => (WHITE_PAWN, BLACK_PAWN),
-        PieceType::Rook => (WHITE_ROOK, BLACK_ROOK),
-        PieceType::Knight => (WHITE_KNIGHT, BLACK_KNIGHT),
-        PieceType::Bishop => (WHITE_BISHOP, BLACK_BISHOP),
-        PieceType::Queen => (WHITE_QUEEN, BLACK_QUEEN),
-        PieceType::King => (WHITE_KING, BLACK_KING),
-    };
-
-    match piece.get_color() {
-        White => fen_char.0,
-        Black => fen_char.1,
+    match (piece.get_color(), piece.get_piece_type()) {
+        (White, Pawn) => WHITE_PAWN,
+        (Black, Pawn) => BLACK_PAWN,
+        (White, Rook) => WHITE_ROOK,
+        (Black, Rook) => BLACK_ROOK,
+        (White, Knight) => WHITE_KNIGHT,
+        (Black, Knight) => BLACK_KNIGHT,
+        (White, Bishop) => WHITE_BISHOP,
+        (Black, Bishop) => BLACK_BISHOP,
+        (White, Queen) => WHITE_QUEEN,
+        (Black, Queen) => BLACK_QUEEN,
+        (White, King) => WHITE_KING,
+        (Black, King) => BLACK_KING,
     }
 }
 
