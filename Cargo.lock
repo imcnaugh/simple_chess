@@ -18,10 +18,14 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 name = "chess_cli"
 version = "1.0.0"
 dependencies = [
- "game_board",
+ "game_board 1.0.1",
  "rand",
  "simple_chess",
 ]
+
+[[package]]
+name = "game_board"
+version = "1.0.1"
 
 [[package]]
 name = "game_board"
@@ -105,11 +109,9 @@ dependencies = [
 
 [[package]]
 name = "simple_chess"
-version = "1.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4764dfa9896624d1b7ee50916fa681a95f0beb4368ea88dd7ef03758afcefd2d"
+version = "1.0.2"
 dependencies = [
- "game_board",
+ "game_board 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
