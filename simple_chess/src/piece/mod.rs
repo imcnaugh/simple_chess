@@ -138,6 +138,54 @@ impl ChessPiece {
         }
     }
 
+    /// Returns the PGN (Portable Game Notation) character representation of the simple_chess piece.
+    ///
+    /// PGN is a common notation for representing chess moves.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
+    ///
+    /// // PGN character for a white queen
+    /// let white_queen = ChessPiece::new(PieceType::Queen, Color::White);
+    /// assert_eq!(white_queen.as_pgn_char(), Some('Q'));
+    ///
+    /// // Pawns typically have no PGN character
+    /// let black_pawn = ChessPiece::new(PieceType::Pawn, Color::Black);
+    /// assert_eq!(black_pawn.as_pgn_char(), None);
+    /// ```
+    pub fn as_pgn_char(&self) -> Option<char> {
+        match self.piece_type {
+            PieceType::Pawn => pawn::as_pgn_char(),
+            PieceType::Rook => rook::as_pgn_char(),
+            PieceType::Knight => knight::as_pgn_char(),
+            PieceType::Bishop => bishop::as_pgn_char(),
+            PieceType::Queen => queen::as_pgn_char(),
+            PieceType::King => king::as_pgn_char(),
+        }
+    }
+
+
+    /// Returns the binary representation of the simple_chess piece as a `u8` value.
+    ///
+    /// This binary representation is useful for saving board state in a compact format
+    /// or for use in binary encoding schemes. The representation depends on the type
+    /// and color of the piece.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use simple_chess::piece::{ChessPiece, PieceType};
+    /// use simple_chess::Color;
+    ///
+    /// let white_pawn = ChessPiece::new(PieceType::Pawn, Color::White);
+    /// assert_eq!(white_pawn.as_binary(), 0b0010);
+    ///
+    /// let black_knight = ChessPiece::new(PieceType::Knight, Color::Black);
+    /// assert_eq!(black_knight.as_binary(), 0b0111);
+    /// ```
     pub fn as_binary(&self) -> u8 {
         match self.piece_type {
             PieceType::Pawn => pawn::as_binary(self.color),

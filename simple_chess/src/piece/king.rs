@@ -18,6 +18,10 @@ pub fn as_fen_char(color: Color) -> char {
     }
 }
 
+pub fn as_pgn_char() -> Option<char> {
+    Some('K')
+}
+
 pub fn as_binary(color: Color) -> u8 {
     match color {
         Color::White => 0b1010,
