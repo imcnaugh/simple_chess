@@ -2,6 +2,35 @@ use game_board::get_square_name_from_row_and_col;
 use crate::ChessMoveType;
 use crate::piece::{ChessPiece, PieceType};
 
+/// Encodes a chess move into algebraic notation based on its type.
+///
+/// # Arguments
+///
+/// * `chess_move_type` - A reference to the `ChessMoveType` enum that represents
+///   the type of move to be encoded.
+///
+/// # Returns
+///
+/// Returns a `String` containing the algebraic notation representation of the move.
+///
+/// # Examples
+///
+/// ```rust
+/// use simple_chess::{ChessMoveType};
+/// use simple_chess::piece::{PieceType, ChessPiece};
+/// use simple_chess::codec::algebraic_notation::encode_move_as_algebraic_notation;
+/// use simple_chess::Color::White;
+/// let chess_move_type = ChessMoveType::Move {
+///     original_position: (1, 1),
+///     new_position: (1, 3),
+///     piece: ChessPiece::new(PieceType::Pawn, White),
+///     taken_piece: None,
+///     promotion: None,
+/// };
+///
+/// let notation = encode_move_as_algebraic_notation(&chess_move_type);
+/// assert_eq!(notation, "b2b4");
+/// ```
 pub fn encode_move_as_algebraic_notation(
     chess_move_type: &ChessMoveType
 ) -> String {
