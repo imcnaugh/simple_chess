@@ -4,6 +4,8 @@ use rand::thread_rng;
 use simple_chess::chess_game_state_analyzer::GameState;
 use simple_chess::piece::ChessPiece;
 use simple_chess::{ChessGame, ChessMoveType, Color};
+use simple_chess::codec::algebraic_notation::{encode_move_as_algebraic_notation};
+use simple_chess::Color::{Black, White};
 
 fn main() {
     let mut game = ChessGame::new();
@@ -36,9 +38,28 @@ fn main() {
 
         game.make_move(next_move);
     }
+
+    let mut current_turn = White;
+    let mut current_turn_number = 1;
+    for m in game.get_moves() {
+        if current_turn == White {
+            print!("{}.", current_turn_number);
+        }
+
+        let move_str = encode_move_as_algebraic_notation(m);
+        print!("{}", move_str);
+
+        if current_turn == Black {
+            print!("\n");
+            current_turn_number = current_turn_number+1;
+        } else {
+            print!(" ");
+        }
+        current_turn = current_turn.opposite();
+    }
 }
 
-fn list_moves_and_select_one(
+fn _list_moves_and_select_one(
     moves: Vec<ChessMoveType>,
     board: &Board<ChessPiece>,
 ) -> ChessMoveType {
