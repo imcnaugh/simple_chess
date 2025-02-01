@@ -256,12 +256,7 @@ impl ChessGame {
     /// - Updates internal state for castling rights and the fifty-move rule counter.
     /// - Alternates the current player's turn.
     /// - Adds the move to the move history and updates previous board states.
-    ///
-    /// # Returns
-    ///
-    /// * `GameState` - The new state of the game after the move is applied, which includes checks for checks, checkmates, and draws.
-    ///
-    pub fn make_move(&mut self, chess_move: ChessMoveType) -> GameState {
+    pub fn make_move(&mut self, chess_move: ChessMoveType) {
         chess_move.make_move(&mut self.board);
         if self.current_players_turn == Black {
             self.turn_number += 1;
@@ -307,8 +302,6 @@ impl ChessGame {
         self.previous_board_states
             .push(encode_board_as_binary(self.get_board()));
         self.current_players_turn = self.current_players_turn.opposite();
-
-        self.get_game_state()
     }
 
     fn update_castling_rights(

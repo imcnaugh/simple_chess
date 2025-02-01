@@ -1,55 +1,68 @@
+use game_board::Board;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use game_board::Board;
 use simple_chess::chess_game_state_analyzer::GameState;
-use simple_chess::{ChessGame, ChessMoveType, Color};
 use simple_chess::piece::ChessPiece;
+use simple_chess::{ChessGame, ChessMoveType, Color};
+use simple_chess::codec::algebraic_notation::{encode_move_as_algebraic_notation};
+use simple_chess::Color::{Black, White};
 
 fn main() {
     let mut game = ChessGame::new();
-    println!("Welcome to Chess Game!");
-    println!("Its {:?}'s turn", game.get_current_players_turn());
-    let mut state = game.get_game_state();
 
     loop {
-        if let Some(reason) = game.can_claim_draw() {
-            println!("Draw by {:?}", reason);
-            println!("{}", game.get_board());
+        let state = game.get_game_state();
+
+        if let Some(_reason) = game.can_claim_draw() {
             break;
         }
 
         let next_move = match state {
-            GameState::InProgress { legal_moves, turn } => {
-                println!("play on, Its {:?}'s turn.", turn);
-                match turn {
-                    Color::White => list_moves_and_select_one(legal_moves, game.get_board()),
-                    Color::Black => pick_random_move(legal_moves),
-                }
-            }
+            GameState::InProgress { legal_moves, turn } => match turn {
+                Color::White => pick_random_move(legal_moves),
+                Color::Black => pick_random_move(legal_moves),
+            },
             GameState::Check { legal_moves, turn } => {
-                println!("Check! It's {:?}'s turn.", turn);
                 match turn {
-                    Color::White => list_moves_and_select_one(legal_moves, game.get_board()),
+                    Color::White => pick_random_move(legal_moves),
                     Color::Black => pick_random_move(legal_moves),
                 }
             }
-            GameState::Checkmate { winner } => {
-                println!("Checkmate! {:?} wins!", winner);
-                println!("{}", game.get_board());
+            GameState::Checkmate { winner: _winner } => {
                 break;
             }
             GameState::Stalemate => {
-                println!("Stalemate!");
-                println!("{}", game.get_board());
                 break;
             }
         };
 
-        state = game.make_move(next_move);
+        game.make_move(next_move);
+    }
+
+    let mut current_turn = White;
+    let mut current_turn_number = 1;
+    for m in game.get_moves() {
+        if current_turn == White {
+            print!("{}.", current_turn_number);
+        }
+
+        let move_str = encode_move_as_algebraic_notation(m);
+        print!("{}", move_str);
+
+        if current_turn == Black {
+            print!("\n");
+            current_turn_number = current_turn_number+1;
+        } else {
+            print!(" ");
+        }
+        current_turn = current_turn.opposite();
     }
 }
 
-fn list_moves_and_select_one(moves: Vec<ChessMoveType>, board: &Board<ChessPiece>) -> ChessMoveType {
+fn _list_moves_and_select_one(
+    moves: Vec<ChessMoveType>,
+    board: &Board<ChessPiece>,
+) -> ChessMoveType {
     println!("{}", board);
     for (index, chess_move) in moves.iter().enumerate() {
         println!("{}. {}", index, chess_move);

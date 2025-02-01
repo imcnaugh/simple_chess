@@ -11,20 +11,6 @@ pub fn as_utf_str(color: Color) -> &'static str {
     }
 }
 
-pub fn as_fen_char(color: Color) -> char {
-    match color {
-        Color::White => 'K',
-        Color::Black => 'k',
-    }
-}
-
-pub fn as_binary(color: Color) -> u8 {
-    match color {
-        Color::White => 0b1010,
-        Color::Black => 0b1011,
-    }
-}
-
 pub fn possible_moves(
     color: Color,
     position: (usize, usize),
