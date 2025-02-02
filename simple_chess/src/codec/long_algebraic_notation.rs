@@ -18,7 +18,7 @@ use crate::piece::{ChessPiece, PieceType};
 /// ```rust
 /// use simple_chess::{ChessMoveType};
 /// use simple_chess::piece::{PieceType, ChessPiece};
-/// use simple_chess::codec::algebraic_notation::encode_move_as_algebraic_notation;
+/// use simple_chess::codec::long_algebraic_notation::encode_move_as_long_algebraic_notation;
 /// use simple_chess::Color::White;
 /// let chess_move_type = ChessMoveType::Move {
 ///     original_position: (1, 1),
@@ -28,10 +28,10 @@ use crate::piece::{ChessPiece, PieceType};
 ///     promotion: None,
 /// };
 ///
-/// let notation = encode_move_as_algebraic_notation(&chess_move_type);
+/// let notation = encode_move_as_long_algebraic_notation(&chess_move_type);
 /// assert_eq!(notation, "b2b4");
 /// ```
-pub fn encode_move_as_algebraic_notation(
+pub fn encode_move_as_long_algebraic_notation(
     chess_move_type: &ChessMoveType
 ) -> String {
     match chess_move_type {
