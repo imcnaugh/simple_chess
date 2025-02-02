@@ -2,7 +2,7 @@ use game_board::get_square_name_from_row_and_col;
 use crate::ChessMoveType;
 use crate::piece::{ChessPiece, PieceType};
 
-/// Encodes a chess move into algebraic notation based on its type.
+/// Encodes a chess move into long algebraic notation based on its type.
 ///
 /// # Arguments
 ///
