@@ -1,5 +1,5 @@
-use game_board::get_square_name_from_row_and_col;
-use crate::ChessMoveType;
+use game_board::{get_square_name_from_row_and_col, Board};
+use crate::{ChessGame, ChessGameBuilder, ChessMoveType};
 use crate::piece::{ChessPiece, PieceType};
 
 /// Encodes a chess move into long algebraic notation based on its type.
@@ -64,6 +64,20 @@ pub fn encode_move_as_long_algebraic_notation(
         } => encode_castle(
             rook_original_position
         ),
+    }
+}
+
+pub fn build_game_from_long_algebraic_notation(long_algebraic_notation_string: &str) -> Result<ChessGame, String> {
+    let mut builder = ChessGameBuilder::new();
+
+    match Board::build(8, 8){
+        Ok(board) => builder = builder.set_board(board),
+        Err(_) => return Err(String::new()),
+    };
+
+    match builder.build() {
+        Ok(game) => Ok(game),
+        Err(e) => Err(String::new())
     }
 }
 
