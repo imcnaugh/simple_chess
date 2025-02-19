@@ -2,10 +2,10 @@ use game_board::Board;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 use simple_chess::chess_game_state_analyzer::GameState;
+use simple_chess::codec::long_algebraic_notation::encode_move_as_long_algebraic_notation;
 use simple_chess::piece::ChessPiece;
-use simple_chess::{ChessGame, ChessMoveType, Color};
-use simple_chess::codec::long_algebraic_notation::{encode_move_as_long_algebraic_notation};
 use simple_chess::Color::{Black, White};
+use simple_chess::{ChessGame, ChessMoveType, Color};
 
 fn main() {
     let mut game = ChessGame::new();
@@ -22,12 +22,10 @@ fn main() {
                 Color::White => pick_random_move(legal_moves),
                 Color::Black => pick_random_move(legal_moves),
             },
-            GameState::Check { legal_moves, turn } => {
-                match turn {
-                    Color::White => pick_random_move(legal_moves),
-                    Color::Black => pick_random_move(legal_moves),
-                }
-            }
+            GameState::Check { legal_moves, turn } => match turn {
+                Color::White => pick_random_move(legal_moves),
+                Color::Black => pick_random_move(legal_moves),
+            },
             GameState::Checkmate { winner: _winner } => {
                 break;
             }
@@ -51,7 +49,7 @@ fn main() {
 
         if current_turn == Black {
             print!("\n");
-            current_turn_number = current_turn_number+1;
+            current_turn_number = current_turn_number + 1;
         } else {
             print!(" ");
         }
