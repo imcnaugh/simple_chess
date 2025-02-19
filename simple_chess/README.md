@@ -12,6 +12,7 @@ package is suitable for both hobbyists and developers looking to integrate a che
 - Support for custom board setups
 - Undo and redo moves
 - Serializing/Deserializing via [Forsyth–Edwards Notation](https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation)
+- Serializing/Deserializing via [Long algebraic notation](https://en.wikipedia.org/wiki/Algebraic_notation_(chess)#Long_algebraic_notation)
 
 ## Usage
 
