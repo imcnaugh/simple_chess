@@ -11,3 +11,4 @@ pub use chess_game::ChessGame;
 pub use chess_game_builder::ChessGameBuilder;
 pub use chess_move::ChessMoveType;
 pub use color::Color;
+pub use game_board;

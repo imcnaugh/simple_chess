@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use crate::Color::{Black, White};
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
@@ -24,6 +25,15 @@ impl Color {
         match self {
             White => Black,
             Black => White,
+        }
+    }
+}
+
+impl Display for Color {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            White => write!(f, "White"),
+            Black => write!(f, "Black"),
         }
     }
 }
