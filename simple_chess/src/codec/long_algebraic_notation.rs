@@ -223,9 +223,9 @@ fn encode_castle(
     rook_original_position: &(usize, usize)
 ) -> String {
     if rook_original_position.0 == 0 {
-        String::from("O-O")
-    } else {
         String::from("O-O-O")
+    } else {
+        String::from("O-O")
     }
 }
 
