@@ -4,13 +4,13 @@ version = 4
 
 [[package]]
 name = "game_board"
-version = "1.0.2"
+version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c656dec8ce55b880ed9df831a2d92e320c98ca87d70a457019a1aa25691d7666"
+checksum = "daf3abdc6aabf24c510f17d7bbdc75514f338d7f0c8545843942460f9ab9718b"
 
 [[package]]
 name = "simple_chess"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "game_board",
 ]

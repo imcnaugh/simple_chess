@@ -9,6 +9,7 @@ use crate::Color::{Black, White};
 use game_board::Board;
 use std::collections::HashMap;
 
+#[derive(Debug, Clone)]
 pub struct ChessGame {
     board: Board<ChessPiece>,
     current_players_turn: Color,
