@@ -9,6 +9,7 @@ use std::fmt::Display;
 /// # Type Parameters
 ///
 /// * `P` - The type of pieces that can be placed on the board.
+#[derive(Debug, Clone)]
 pub struct Board<P> {
     squares: Vec<Square<P>>,
     width: usize,
