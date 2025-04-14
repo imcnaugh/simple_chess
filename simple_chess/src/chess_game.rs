@@ -305,6 +305,51 @@ impl ChessGame {
         self.current_players_turn = self.current_players_turn.opposite();
     }
 
+
+    /// Undoes the last move made in the game.
+    ///
+    /// # Effects
+    ///
+    /// - If no moves have been made, the method simply returns without making any changes.
+    /// - If there is a move to undo:
+    ///   - The move is removed from the move history.
+    ///   - The effects of the last move are reverted on the board.
+    ///
+    /// This method can be used to revert a move in case of user mistakes or for implementing
+    /// a "takeback" feature in the game.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use simple_chess::ChessGame;
+    /// use simple_chess::ChessMoveType;
+    /// use simple_chess::Color::White;
+    /// use simple_chess::piece::ChessPiece;
+    /// use simple_chess::piece::PieceType::Pawn;
+    /// let mut chess_game = ChessGame::new();
+    ///
+    /// let chess_move = ChessMoveType::Move {
+    ///     taken_piece: None,
+    ///     piece: ChessPiece::new(Pawn, White),
+    ///     original_position: (1, 0),
+    ///     new_position: (2, 0),
+    ///     promotion: None,
+    /// };
+    ///
+    /// chess_game.make_move(chess_move);
+    /// assert_eq!(chess_game.get_last_move().is_some(), true);
+    ///
+    /// chess_game.undo_last_move();
+    /// assert_eq!(chess_game.get_last_move(), None);
+    /// ```
+    pub fn undo_last_move(&mut self) {
+        if self.moves.is_empty() {
+            return;
+        }
+        let last_move = self.moves.pop().unwrap();
+        last_move.undo_move(&mut self.board);
+    }
+
     fn update_castling_rights(
         &mut self,
         taken_piece: Option<ChessPiece>,

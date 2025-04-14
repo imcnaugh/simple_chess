@@ -109,7 +109,7 @@ dependencies = [
 
 [[package]]
 name = "simple_chess"
-version = "1.0.4"
+version = "1.0.5"
 dependencies = [
  "game_board 1.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]

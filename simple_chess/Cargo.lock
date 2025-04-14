@@ -10,7 +10,7 @@ checksum = "daf3abdc6aabf24c510f17d7bbdc75514f338d7f0c8545843942460f9ab9718b"
 
 [[package]]
 name = "simple_chess"
-version = "1.0.4"
+version = "1.0.5"
 dependencies = [
  "game_board",
 ]
