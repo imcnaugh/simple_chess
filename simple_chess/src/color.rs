@@ -1,5 +1,5 @@
-use std::fmt::Display;
 use crate::Color::{Black, White};
+use std::fmt::Display;
 
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Color {

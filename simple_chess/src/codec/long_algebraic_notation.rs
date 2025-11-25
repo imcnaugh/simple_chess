@@ -1,7 +1,7 @@
-use game_board::get_square_name_from_row_and_col;
-use crate::{ChessGame, ChessMoveType};
 use crate::chess_game_state_analyzer::GameState;
 use crate::piece::{ChessPiece, PieceType};
+use crate::{ChessGame, ChessMoveType};
+use game_board::get_square_name_from_row_and_col;
 
 /// Encodes a chess move into long algebraic notation based on its type.
 ///
@@ -32,46 +32,37 @@ use crate::piece::{ChessPiece, PieceType};
 /// let notation = encode_move_as_long_algebraic_notation(&chess_move_type);
 /// assert_eq!(notation, "b2b4");
 /// ```
-pub fn encode_move_as_long_algebraic_notation(
-    chess_move_type: &ChessMoveType
-) -> String {
+pub fn encode_move_as_long_algebraic_notation(chess_move_type: &ChessMoveType) -> String {
     match chess_move_type {
         ChessMoveType::Move {
             original_position,
             new_position,
             piece,
             taken_piece,
-            promotion
+            promotion,
         } => encode_move(
             original_position,
             new_position,
             piece,
             taken_piece,
-            promotion
+            promotion,
         ),
         ChessMoveType::EnPassant {
             original_position,
             new_position,
             promotion,
             ..
-        } => encode_en_passant(
-            original_position,
-            new_position,
-            promotion,
-        ),
+        } => encode_en_passant(original_position, new_position, promotion),
         ChessMoveType::Castle {
             rook_original_position,
             ..
-        } => encode_castle(
-            rook_original_position
-        ),
+        } => encode_castle(rook_original_position),
     }
 }
 
-
 /// Encodes the entire `ChessGame` instance into a single string using long algebraic notation.
 ///
-/// This function takes the moves made in the game, encodes each move into long algebraic notation, 
+/// This function takes the moves made in the game, encodes each move into long algebraic notation,
 /// and combines them into a single string separated by spaces.
 ///
 /// # Arguments
@@ -80,7 +71,7 @@ pub fn encode_move_as_long_algebraic_notation(
 ///
 /// # Returns
 ///
-/// Returns a `String` containing the chess moves represented in long algebraic notation, 
+/// Returns a `String` containing the chess moves represented in long algebraic notation,
 /// separated by spaces.
 ///
 /// # Examples
@@ -106,14 +97,12 @@ pub fn encode_move_as_long_algebraic_notation(
 /// assert_eq!(notation, "b2b4");
 /// ```
 pub fn encode_game(game: &ChessGame) -> String {
-    game
-        .get_moves()
+    game.get_moves()
         .iter()
         .map(|m| encode_move_as_long_algebraic_notation(&m))
         .collect::<Vec<String>>()
         .join(" ")
 }
-
 
 /// Builds a `ChessGame` instance from a string containing moves encoded in
 /// long algebraic notation separated by spaces or newlines.
@@ -144,12 +133,17 @@ pub fn encode_game(game: &ChessGame) -> String {
 ///     _ => panic!("Game should be in progress"),
 /// }
 /// ```
-pub fn build_game_from_long_algebraic_notation(long_algebraic_notation_string: &str) -> Result<ChessGame, LongAlgebraicNotationError> {
+pub fn build_game_from_long_algebraic_notation(
+    long_algebraic_notation_string: &str,
+) -> Result<ChessGame, LongAlgebraicNotationError> {
     let mut game = ChessGame::new();
 
-    let normalized_string = long_algebraic_notation_string.trim().replace("\n", " ").to_lowercase();
+    let normalized_string = long_algebraic_notation_string
+        .trim()
+        .replace("\n", " ")
+        .to_lowercase();
     let moves = normalized_string.split(" ");
-    
+
     for mv in moves {
         let available_moves = match game.get_game_state() {
             GameState::InProgress { legal_moves, .. } => legal_moves,
@@ -158,16 +152,21 @@ pub fn build_game_from_long_algebraic_notation(long_algebraic_notation_string: &
             GameState::Stalemate => Vec::new(),
         };
 
-        let next_move = available_moves.iter().copied().find(|m| {
-            encode_move_as_long_algebraic_notation(m).to_lowercase() == mv
-        });
+        let next_move = available_moves
+            .iter()
+            .copied()
+            .find(|m| encode_move_as_long_algebraic_notation(m).to_lowercase() == mv);
 
         match next_move {
             Some(m) => game.make_move(m),
-            None => return Err(LongAlgebraicNotationError{reason: format!("Unable to make move {}", mv)})
+            None => {
+                return Err(LongAlgebraicNotationError {
+                    reason: format!("Unable to make move {}", mv),
+                })
+            }
         }
     }
-    
+
     Ok(game)
 }
 
@@ -176,28 +175,25 @@ fn encode_move(
     new_position: &(usize, usize),
     piece: &ChessPiece,
     taken_piece: &Option<ChessPiece>,
-    promotion: &Option<ChessPiece>
+    promotion: &Option<ChessPiece>,
 ) -> String {
     let moving_piece_str = get_piece_as_char(piece.get_piece_type()).unwrap_or(String::new());
-    let original_square_str = get_square_name_from_row_and_col(original_position.0, original_position.1);
+    let original_square_str =
+        get_square_name_from_row_and_col(original_position.0, original_position.1);
     let taken_str = match taken_piece {
-        Some( .. ) => "x",
-        None => ""
+        Some(..) => "x",
+        None => "",
     };
     let new_square_str = get_square_name_from_row_and_col(new_position.0, new_position.1);
     let promotion_str = match promotion {
         Some(piece) => {
             format!("={}", get_piece_as_char(piece.get_piece_type()).unwrap())
-        },
-        None => String::new()
+        }
+        None => String::new(),
     };
     format!(
         "{}{}{}{}{}",
-        moving_piece_str,
-        original_square_str,
-        taken_str,
-        new_square_str,
-        promotion_str
+        moving_piece_str, original_square_str, taken_str, new_square_str, promotion_str
     )
 }
 
@@ -206,22 +202,20 @@ fn encode_en_passant(
     new_position: &(usize, usize),
     promotion: &Option<ChessPiece>,
 ) -> String {
-    let original_square_str = get_square_name_from_row_and_col(original_position.0, original_position.1);
+    let original_square_str =
+        get_square_name_from_row_and_col(original_position.0, original_position.1);
     let new_square_str = get_square_name_from_row_and_col(new_position.0, new_position.1);
     let promotion_str = match promotion {
         None => String::new(),
-        Some(piece) => format!("={}", get_piece_as_char(piece.get_piece_type()).unwrap())
+        Some(piece) => format!("={}", get_piece_as_char(piece.get_piece_type()).unwrap()),
     };
-    format!("{}x{}{} e.p.",
-        original_square_str,
-        new_square_str,
-        promotion_str,
+    format!(
+        "{}x{}{} e.p.",
+        original_square_str, new_square_str, promotion_str,
     )
 }
 
-fn encode_castle(
-    rook_original_position: &(usize, usize)
-) -> String {
+fn encode_castle(rook_original_position: &(usize, usize)) -> String {
     if rook_original_position.0 == 0 {
         String::from("O-O-O")
     } else {
@@ -246,8 +240,8 @@ pub struct LongAlgebraicNotationError {
 
 #[cfg(test)]
 mod tests {
-    use crate::codec::forsyth_edwards_notation::encode_game_as_string;
     use super::*;
+    use crate::codec::forsyth_edwards_notation::encode_game_as_string;
 
     #[test]
     fn decode_string_to_game() {
@@ -274,7 +268,8 @@ mod tests {
     #[test]
     fn encode_game_to_string() {
         let mut game = ChessGame::new();
-        let expected_encoded_string = String::from("Nb1c3 a7a6 Ra1b1 a6a5 Rb1a1 a5a4 Ra1b1 a4a3 Rb1a1 a3xb2");
+        let expected_encoded_string =
+            String::from("Nb1c3 a7a6 Ra1b1 a6a5 Rb1a1 a5a4 Ra1b1 a4a3 Rb1a1 a3xb2");
         let mut expected_moves_as_encoded = expected_encoded_string.split(" ");
 
         for _ in 0..10 {
@@ -282,8 +277,11 @@ mod tests {
             let next_move = match game_state {
                 GameState::InProgress { legal_moves, .. } => legal_moves,
                 GameState::Check { legal_moves, .. } => legal_moves,
-                _ => panic!("Game has ended prematurely")
-            }.first().unwrap().clone();
+                _ => panic!("Game has ended prematurely"),
+            }
+            .first()
+            .unwrap()
+            .clone();
 
             let encoded_move = encode_move_as_long_algebraic_notation(&next_move);
             assert_eq!(expected_moves_as_encoded.next().unwrap(), encoded_move);

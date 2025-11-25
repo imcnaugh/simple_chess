@@ -305,7 +305,6 @@ impl ChessGame {
         self.current_players_turn = self.current_players_turn.opposite();
     }
 
-
     /// Undoes the last move made in the game.
     ///
     /// # Effects
