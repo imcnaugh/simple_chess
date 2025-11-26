@@ -347,6 +347,7 @@ impl ChessGame {
         }
         let last_move = self.moves.pop().unwrap();
         last_move.undo_move(&mut self.board);
+        self.current_players_turn = self.current_players_turn.opposite();
     }
 
     fn update_castling_rights(
