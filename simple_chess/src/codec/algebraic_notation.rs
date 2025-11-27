@@ -1,6 +1,6 @@
 use crate::chess_game_state_analyzer::GameState;
 use crate::codec::long_algebraic_notation::encode_move_as_long_algebraic_notation;
-use crate::piece::ChessPiece;
+use crate::piece::{ChessPiece, PieceType};
 use crate::{ChessGame, ChessMoveType};
 use game_board::Board;
 
@@ -81,7 +81,23 @@ fn idk(chess_move_type: &ChessMoveType, resulting_position: &Board<ChessPiece>) 
         _ => panic!("Unexpected state"),
     };
 
-    let conflicts = previous_legal_moves
+    let conflicts = find_conflicts(
+        moving_piece_type,
+        moving_piece_original_location,
+        moving_piece_new_position,
+        previous_legal_moves,
+    );
+
+    println!("{:?}", conflicts);
+}
+
+fn find_conflicts<'a>(
+    moving_piece_type: PieceType,
+    moving_piece_original_location: &(usize, usize),
+    moving_piece_new_position: &(usize, usize),
+    previous_legal_moves: &'a Vec<ChessMoveType>,
+) -> Vec<&'a ChessMoveType> {
+    previous_legal_moves
         .iter()
         .filter(|&plm| match plm {
             ChessMoveType::Move {
@@ -96,17 +112,14 @@ fn idk(chess_move_type: &ChessMoveType, resulting_position: &Board<ChessPiece>) 
             }
             _ => false,
         })
-        .collect::<Vec<&ChessMoveType>>();
-
-    println!("{:?}", conflicts);
+        .collect::<Vec<&ChessMoveType>>()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::codec::forsyth_edwards_notation::{
-        build_game_from_string, ForsythEdwardsNotationError,
-    };
+    use crate::codec::forsyth_edwards_notation::build_game_from_string;
+    use crate::piece::PieceType::Rook;
 
     #[test]
     fn test_conflicts_found() {
@@ -138,6 +151,8 @@ mod tests {
 
         game.make_move(m.clone());
 
-        idk(m, &game.get_board());
+        let conflicts = find_conflicts(Rook, &(1, 4), &(3, 4), &moves);
+        assert_eq!(3, conflicts.len());
+        println!("{:?}", conflicts);
     }
 }
