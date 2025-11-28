@@ -1,34 +1,12 @@
 use crate::chess_game_state_analyzer::GameState;
-use crate::codec::long_algebraic_notation::encode_move_as_long_algebraic_notation;
 use crate::piece::{ChessPiece, PieceType};
 use crate::{ChessGame, ChessMoveType, Color};
 use game_board::Board;
 
-pub fn encode_move_as_algebraic_notation(
+fn encode_move_as_algebraic_notation(
     chess_move_type: &ChessMoveType,
-    resulting_position: &Board<ChessPiece>,
-) -> String {
-    match chess_move_type {
-        ChessMoveType::Move {
-            original_position,
-            new_position,
-            piece,
-            taken_piece,
-            promotion,
-        } => encode_move_as_long_algebraic_notation(chess_move_type),
-        ChessMoveType::Castle { .. } => encode_move_as_long_algebraic_notation(chess_move_type),
-        ChessMoveType::EnPassant {
-            original_position,
-            new_position,
-            piece,
-            taken_piece,
-            taken_piece_position,
-            promotion,
-        } => encode_move_as_long_algebraic_notation(chess_move_type),
-    }
-}
-
-fn idk(chess_move_type: &ChessMoveType, resulting_position: &Board<ChessPiece>) {
+    starting_position: &Board<ChessPiece>,
+) {
     let (
         moving_piece_color,
         moving_piece_type,
@@ -39,17 +17,17 @@ fn idk(chess_move_type: &ChessMoveType, resulting_position: &Board<ChessPiece>) 
         promotion,
     ) = get_move_data(chess_move_type);
 
-    let mut game = build_game(chess_move_type, resulting_position, moving_piece_color);
+    let mut game = build_game(chess_move_type, starting_position, moving_piece_color);
 
-    let current_game_state = game.get_game_state();
+    let legal_moves = get_legal_moves(&mut game);
 
-    let previous_legal_moves = get_previous_legal_moves(&mut game);
+    let new_game_state = game.make_move(chess_move_type.clone());
 
     let conflicts = find_conflicts(
         moving_piece_type,
         moving_piece_original_location,
         moving_piece_new_position,
-        &previous_legal_moves,
+        &legal_moves,
     );
 }
 
@@ -99,8 +77,7 @@ fn get_move_data(
     }
 }
 
-fn get_previous_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
-    game.undo_last_move();
+fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
     match game.get_game_state() {
         GameState::InProgress { legal_moves, .. } => legal_moves,
         GameState::Check { legal_moves, .. } => legal_moves,
