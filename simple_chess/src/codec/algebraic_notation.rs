@@ -1,12 +1,12 @@
 use crate::chess_game_state_analyzer::GameState;
 use crate::piece::{ChessPiece, PieceType};
 use crate::{ChessGame, ChessMoveType, Color};
-use game_board::Board;
+use game_board::{get_square_name_from_row_and_col, Board};
 
 fn encode_move_as_algebraic_notation(
     chess_move_type: &ChessMoveType,
     starting_position: &Board<ChessPiece>,
-) {
+) -> String {
     let (
         moving_piece_color,
         moving_piece_type,
@@ -29,6 +29,38 @@ fn encode_move_as_algebraic_notation(
         moving_piece_new_position,
         &legal_moves,
     );
+
+    let piece_name = match moving_piece_type {
+        PieceType::Pawn => "",
+        PieceType::Rook => "R",
+        PieceType::Knight => "N",
+        PieceType::Bishop => "B",
+        PieceType::Queen => "Q",
+        PieceType::King => "K",
+    };
+
+    let conflict_string = "";
+
+    let take_string = if is_move_a_take { "x" } else { "" };
+
+    let new_position_name = match moving_piece_type {
+        PieceType::Pawn => String::new(),
+        _ => get_square_name_from_row_and_col(
+            moving_piece_new_position.0,
+            moving_piece_new_position.1,
+        ),
+    };
+
+    let game_state_string = match game.get_game_state() {
+        GameState::Check { .. } => "+",
+        GameState::Checkmate { .. } => "#",
+        _ => "",
+    };
+
+    format!(
+        "{}{}{}{}{}",
+        piece_name, conflict_string, take_string, new_position_name, game_state_string
+    )
 }
 
 fn get_move_data(
@@ -87,12 +119,12 @@ fn get_legal_moves(game: &mut ChessGame) -> Vec<ChessMoveType> {
 
 fn build_game(
     chess_move_type: &ChessMoveType,
-    resulting_position: &Board<ChessPiece>,
-    moving_piece_color: Color,
+    position: &Board<ChessPiece>,
+    turn: Color,
 ) -> ChessGame {
     ChessGame::build(
-        resulting_position.clone(),
-        moving_piece_color.opposite(),
+        position.clone(),
+        turn,
         1,
         0,
         false,
