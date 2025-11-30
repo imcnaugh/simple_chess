@@ -57,9 +57,16 @@ fn encode_move_as_algebraic_notation(
         _ => "",
     };
 
+    let en_passant_string = if is_move_en_passant { " e.p." } else { "" };
+
     format!(
-        "{}{}{}{}{}",
-        piece_name, conflict_string, take_string, new_position_name, game_state_string
+        "{}{}{}{}{}{}",
+        piece_name,
+        conflict_string,
+        take_string,
+        new_position_name,
+        game_state_string,
+        en_passant_string
     )
 }
 
