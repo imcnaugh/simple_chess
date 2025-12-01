@@ -5,7 +5,7 @@ authors = ["Ian McNaughton <IanMcNaugh@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/imcnaugh/simple_chess/tree/main/game_board"
-version = "1.0.3"
+version = "1.0.4"
 edition = "2021"
 
 [dependencies]

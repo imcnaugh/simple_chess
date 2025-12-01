@@ -32,6 +32,69 @@ use std::fmt::{Display, Formatter};
 /// assert_eq!(coordinate, "aa1");
 /// ```
 pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
+    format!("{}{}", get_file_name(column), get_rank_name(row))
+}
+
+
+/// Retrieves the rank name (1-based index) given the row (0-based index).
+///
+/// # Parameters
+///
+/// - `row`: A zero-based index (of type `usize`) representing the row.
+///
+/// # Returns
+///
+/// - A `usize` value, which is the rank name corresponding to the given row.
+///   The rank name is the 1-based index calculated as `row + 1`.
+///
+/// # Examples
+///
+/// ```
+/// let rank_name = get_rank_name(0); // For row 0 (0-based), rank name is 1 (1-based)
+/// assert_eq!(rank_name, 1);
+///
+/// let rank_name = get_rank_name(4); // For row 4 (0-based), rank name is 5 (1-based)
+/// assert_eq!(rank_name, 5);
+/// ```
+pub fn get_rank_name(row: usize) -> usize {
+    row + 1
+}
+
+/// Converts a column number (1-based) into a corresponding column name represented as a string.
+///
+/// The column name follows a pattern inspired by spreadsheet software like Excel,
+/// where columns are labeled in a sequential alphabetic order. For example:
+/// - Column 1 corresponds to "a"
+/// - Column 2 corresponds to "b"
+/// - Column 27 corresponds to "aa"
+/// - Column 28 corresponds to "ab"
+///
+/// # Arguments
+///
+/// * `column` - A 1-based column number to be converted into a string.
+///
+/// # Returns
+///
+/// A string representing the column name in the format described above.
+///
+/// # Example
+///
+/// ```
+/// let column_name = get_file_name(1);
+/// assert_eq!(column_name, "a");
+///
+/// let column_name = get_file_name(28);
+/// assert_eq!(column_name, "ab");
+///
+/// let column_name = get_file_name(703);
+/// assert_eq!(column_name, "aaa");
+/// ```
+///
+/// # Note
+///
+/// - The input `column` should be a positive integer greater than or equal to 1.
+///   If a value less than 1 is passed, the function behavior is undefined.
+pub fn get_file_name(column: usize) -> String {
     let mut col_id = String::new();
     let mut remainder = column;
 
@@ -47,8 +110,7 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
     }
 
     col_id = col_id.chars().rev().collect();
-
-    format!("{}{}", col_id, row + 1)
+    col_id
 }
 
 /// Converts a simple_chess-style coordinate string to a given column and row.
