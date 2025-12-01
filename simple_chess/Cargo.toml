@@ -9,4 +9,4 @@ version = "1.0.5"
 edition = "2021"
 
 [dependencies]
-game_board = "1.0.3"
+game_board = "1.0.5"
