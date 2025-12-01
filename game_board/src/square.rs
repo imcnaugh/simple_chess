@@ -56,8 +56,8 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
 /// let rank_name = get_rank_name(4); // For row 4 (0-based), rank name is 5 (1-based)
 /// assert_eq!(rank_name, 5);
 /// ```
-pub fn get_rank_name(row: usize) -> usize {
-    row + 1
+pub fn get_rank_name(row: usize) -> String {
+    format!("{}", row + 1)
 }
 
 /// Converts a column number (1-based) into a corresponding column name represented as a string.
