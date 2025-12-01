@@ -35,7 +35,6 @@ pub fn get_square_name_from_row_and_col(column: usize, row: usize) -> String {
     format!("{}{}", get_file_name(column), get_rank_name(row))
 }
 
-
 /// Retrieves the rank name (1-based index) given the row (0-based index).
 ///
 /// # Parameters
